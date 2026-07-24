@@ -1,0 +1,89 @@
+/* ==========================================================================
+ * Isthmus Meridian — design tokens (runtime source of truth)
+ *
+ * Every value is measured from the master deck
+ * (Downloads/"small changes isthumus.pdf", 10 slides, 16:9, native 720×405):
+ *   - grounds + accents sampled from vector fills by area
+ *   - text hierarchy sampled from glyph-span colours by character count
+ *   - type scale derived from span sizes (native pt → ×1.778 to the 1280 canvas)
+ *
+ * The deck is dark-primary, so the base theme here IS the dark theme. A light
+ * surface (--isth-light) exists for inverted panels but is not a full theme yet.
+ * Components read the semantic --isth-* aliases, never a raw hex.
+ * ========================================================================== */
+
+:root {
+  /* ---- Type families -------------------------------------------------- */
+  /* The deck is set in Helvetica Neue (Thin / Regular / Medium / Bold) with an
+   * Arial fallback — both system faces, so no webfont is loaded. */
+  --font-sans:
+    "Helvetica Neue", Helvetica, Arial, "Segoe UI", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+
+  /* ---- Grounds (dark, deepest → nearest) ------------------------------ */
+  --isth-stage: #000000; /* outermost letterbox behind the slide */
+  --isth-bg: #06121d; /* primary slide ground */
+  --isth-panel: #0b1926; /* raised panel / band */
+  --isth-surface: #0e1e2d; /* card / glass surface */
+  --isth-light: #f2f6fa; /* inverted light surface */
+
+  /* ---- Text hierarchy ------------------------------------------------- */
+  --isth-text: #f2f6fa; /* primary text */
+  --isth-text-bright: #eaf1f8; /* brightest headline white */
+  --isth-body: #9fadbb; /* body copy (most common) */
+  --isth-muted: #6a798a; /* eyebrows, captions, footers */
+  --isth-faint: #45525f; /* disabled / hairline labels */
+
+  /* ---- Accents -------------------------------------------------------- */
+  --isth-accent: #88c1ed; /* primary blue — emphasis, active nodes */
+  --isth-accent-2: #4f83b0; /* secondary blue — borders, inactive nodes */
+  --isth-gold: #d9a441; /* rare tertiary highlight */
+  --isth-danger: #c96f6f; /* muted red — negative / warning */
+
+  /* ---- Borders & radius ----------------------------------------------- */
+  --isth-border: color-mix(in srgb, var(--isth-accent-2) 40%, transparent);
+  --isth-border-strong: var(--isth-accent-2);
+  --isth-radius-sm: 4px;
+  --isth-radius: 10px;
+  --isth-radius-lg: 16px;
+
+  /* ---- Type scale (px on the 1280×720 authoring canvas) --------------- */
+  --isth-fs-display: 45px; /* cover / section headline (native 25.5pt) */
+  --isth-fs-h1: 34px;
+  --isth-fs-h2: 27px;
+  --isth-fs-h3: 23px;
+  --isth-fs-lead: 19px; /* subheads / lead paragraph */
+  --isth-fs-body: 17px; /* body (native 9.8pt) */
+  --isth-fs-small: 14px; /* captions (native 7.5pt) */
+  --isth-fs-eyebrow: 11px; /* tracked-out label (native 6.4pt) */
+
+  --isth-tracking-eyebrow: 0.22em;
+  --isth-tracking-wordmark: 0.14em;
+
+  --isth-weight-thin: 200;
+  --isth-weight-regular: 400;
+  --isth-weight-medium: 500;
+  --isth-weight-bold: 700;
+
+  /* ---- Spacing scale (deck rhythm, px @1280 canvas) ------------------- */
+  --isth-space-1: 4px;
+  --isth-space-2: 8px;
+  --isth-space-3: 12px;
+  --isth-space-4: 16px;
+  --isth-space-5: 24px;
+  --isth-space-6: 32px;
+  --isth-space-7: 48px;
+  --isth-space-8: 64px;
+  --isth-space-9: 80px; /* slide safe-margin */
+
+  /* ---- Effects -------------------------------------------------------- */
+  --isth-glow: 0 0 60px 0 color-mix(in srgb, var(--isth-accent) 22%, transparent);
+  --isth-grid-line: color-mix(in srgb, var(--isth-accent-2) 12%, transparent);
+}
+
+/* Bridge to the generic --font-sans/--font-mono the app & Tailwind read. */
+:root {
+  --color-bg: var(--isth-bg);
+  --color-text: var(--isth-text);
+  --color-accent: var(--isth-accent);
+}

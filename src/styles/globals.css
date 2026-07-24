@@ -1,0 +1,29 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "./tokens.css";
+
+/* Expose the Isthmus tokens to Tailwind v4's theme so utilities like
+ * bg-[--isth-bg] and text-[--isth-accent] resolve, and set the base surface. */
+@theme inline {
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --color-bg: var(--isth-bg);
+  --color-panel: var(--isth-panel);
+  --color-surface: var(--isth-surface);
+  --color-accent: var(--isth-accent);
+  --color-accent-2: var(--isth-accent-2);
+  --color-body: var(--isth-body);
+  --color-muted: var(--isth-muted);
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--isth-bg);
+  color: var(--isth-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
