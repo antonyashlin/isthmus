@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/isthmus-meridian-design-system-d76f869a-18a3-40ea-bbc9-2104235c7343/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/isthmus-meridian-design-system-d76f869a-18a3-40ea-bbc9-2104235c7343/tokens/colors.css">
+<link rel="stylesheet" href="_ds/isthmus-meridian-design-system-d76f869a-18a3-40ea-bbc9-2104235c7343/tokens/typography.css">
+<link rel="stylesheet" href="_ds/isthmus-meridian-design-system-d76f869a-18a3-40ea-bbc9-2104235c7343/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/isthmus-meridian-design-system-d76f869a-18a3-40ea-bbc9-2104235c7343/tokens/effects.css">
+<link rel="stylesheet" href="_ds/isthmus-meridian-design-system-d76f869a-18a3-40ea-bbc9-2104235c7343/styles.css">
+<script src="_ds/isthmus-meridian-design-system-d76f869a-18a3-40ea-bbc9-2104235c7343/_ds_bundle.js"></script>
+<style>
+  html, body { margin:0; padding:0; background:#000; }
+  body { font-family:"Helvetica Neue","Helvetica","Arimo",Arial,sans-serif; -webkit-font-smoothing:antialiased; }
+  a { color:#88C1ED; text-decoration:none; }
+  a:hover { color:#C9E2F6; }
+  @keyframes im-draw { from { stroke-dashoffset:1; } to { stroke-dashoffset:0; } }
+  @keyframes im-draw-rev { from { stroke-dashoffset:-1; } to { stroke-dashoffset:0; } }
+  @keyframes im-rise { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes im-slice { from { transform:scaleX(0); } to { transform:scaleX(1); } }
+  @keyframes im-fade { from { opacity:0; } to { opacity:1; } }
+</style>
+</helmet>
+
+<div style="background:#000; color:rgba(255,255,255,0.92); overflow-x:hidden">
+
+  <nav style="position:fixed; top:0; left:0; right:0; z-index:20; display:flex; align-items:center; justify-content:space-between; gap:24px; padding:16px 40px; background:rgba(2,5,9,0.6); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px)">
+    <div style="display:flex; align-items:center; gap:12px">
+      <svg viewBox="0 0 48 48" width="28" height="28" aria-label="Isthmus Meridian mark" style="display:block">
+        <g fill="none" stroke="#F2F6FA" stroke-width="1.5" stroke-linecap="round">
+          <line x1="24" y1="9" x2="24" y2="39"></line>
+          <path d="M12.5 12 C 24 18, 24 30, 12.5 38"></path>
+          <path d="M35.5 12 C 24 18, 24 30, 35.5 38"></path>
+        </g>
+      </svg>
+      <div style="font-size:12px; letter-spacing:0.2em; color:#fff">
+        <span style="font-weight:700">ISTHMUS</span> <span style="font-weight:300; color:rgba(255,255,255,0.7)">MERIDIAN</span>
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:34px">
+      <div style="display:flex; align-items:center; gap:26px; font-size:13px; color:rgba(255,255,255,0.6)">
+        <a href="#practice" style="color:inherit" style-hover="color:#fff">Practice</a>
+        <a href="#practice" style="color:inherit" style-hover="color:#fff">Approach</a>
+        <a href="#practice" style="color:inherit" style-hover="color:#fff">Platform</a>
+      </div>
+      <x-import component-from-global-scope="IsthmusMeridianDesignSystem_d76f86.Button" variant="primary" size="sm" hint-size="140px,34px">Request access</x-import>
+    </div>
+  </nav>
+
+  <section data-screen-label="00 · Hero" style="position:relative; min-height:100vh; display:flex; flex-direction:column; justify-content:center; padding:130px 40px 90px; background:radial-gradient(70% 80% at 50% 46%, #071624 0%, #040d16 40%, #01050a 74%, #000 100%); overflow:hidden">
+
+    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" fill="none" shape-rendering="geometricPrecision" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none; contain:paint">
+      <g transform="rotate(-18.3 351 -687)" stroke="#88C1ED" stroke-width="1" style="will-change:opacity">
+        <ellipse cx="351" cy="-687" rx="1150" ry="1058" stroke-opacity="0.22" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 1500ms forwards"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="1022.7" stroke-opacity="0.2084" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 1555ms forwards"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="987.5" stroke-opacity="0.197" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 1610ms forwards"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="952.2" stroke-opacity="0.1859" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 1665ms forwards"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="916.9" stroke-opacity="0.175" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 1720ms forwards"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="881.7" stroke-opacity="0.1643" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 1775ms forwards"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="846.4" stroke-opacity="0.1539" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 1830ms forwards"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="811.1" stroke-opacity="0.1438" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 1885ms forwards"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="775.9" stroke-opacity="0.1339" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 1940ms forwards"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="740.6" stroke-opacity="0.1243" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 1995ms forwards"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="705.3" stroke-opacity="0.115" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2050ms forwards"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="670.1" stroke-opacity="0.1059" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2105ms forwards"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="634.8" stroke-opacity="0.0972" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2160ms forwards"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="599.5" stroke-opacity="0.0887" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2215ms forwards"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="564.3" stroke-opacity="0.0805" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2270ms forwards"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="529" stroke-opacity="0.0726" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2325ms forwards"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="493.7" stroke-opacity="0.065" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2380ms forwards"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="458.5" stroke-opacity="0.0577" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2435ms forwards"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="423.2" stroke-opacity="0.0508" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2490ms forwards"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="387.9" stroke-opacity="0.0442" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2545ms forwards"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="352.7" stroke-opacity="0.0379" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2600ms forwards"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="317.4" stroke-opacity="0.032" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2655ms forwards"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="282.1" stroke-opacity="0.0265" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2710ms forwards"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="246.9" stroke-opacity="0.0214" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2765ms forwards"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="211.6" stroke-opacity="0.0168" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2820ms forwards"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="176.3" stroke-opacity="0.0125" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2875ms forwards"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="141.1" stroke-opacity="0.0088" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2930ms forwards"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="105.8" stroke-opacity="0.0055" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2985ms forwards"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="70.5" stroke-opacity="0.0029" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 3040ms forwards"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="35.3" stroke-opacity="0.001" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 3095ms forwards"></ellipse>
+      </g>
+      <g transform="rotate(-18.3 1089 1547)" stroke="#88C1ED" stroke-width="1" style="will-change:opacity">
+        <ellipse cx="1089" cy="1547" rx="1150" ry="1058" stroke-opacity="0.22" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 1500ms forwards"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="1022.7" stroke-opacity="0.2084" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 1555ms forwards"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="987.5" stroke-opacity="0.197" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 1610ms forwards"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="952.2" stroke-opacity="0.1859" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 1665ms forwards"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="916.9" stroke-opacity="0.175" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 1720ms forwards"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="881.7" stroke-opacity="0.1643" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 1775ms forwards"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="846.4" stroke-opacity="0.1539" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 1830ms forwards"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="811.1" stroke-opacity="0.1438" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 1885ms forwards"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="775.9" stroke-opacity="0.1339" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 1940ms forwards"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="740.6" stroke-opacity="0.1243" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 1995ms forwards"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="705.3" stroke-opacity="0.115" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2050ms forwards"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="670.1" stroke-opacity="0.1059" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2105ms forwards"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="634.8" stroke-opacity="0.0972" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2160ms forwards"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="599.5" stroke-opacity="0.0887" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2215ms forwards"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="564.3" stroke-opacity="0.0805" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2270ms forwards"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="529" stroke-opacity="0.0726" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2325ms forwards"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="493.7" stroke-opacity="0.065" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2380ms forwards"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="458.5" stroke-opacity="0.0577" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2435ms forwards"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="423.2" stroke-opacity="0.0508" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2490ms forwards"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="387.9" stroke-opacity="0.0442" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2545ms forwards"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="352.7" stroke-opacity="0.0379" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2600ms forwards"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="317.4" stroke-opacity="0.032" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2655ms forwards"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="282.1" stroke-opacity="0.0265" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2710ms forwards"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="246.9" stroke-opacity="0.0214" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2765ms forwards"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="211.6" stroke-opacity="0.0168" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2820ms forwards"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="176.3" stroke-opacity="0.0125" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2875ms forwards"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="141.1" stroke-opacity="0.0088" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2930ms forwards"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="105.8" stroke-opacity="0.0055" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 2985ms forwards"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="70.5" stroke-opacity="0.0029" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 3040ms forwards"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="35.3" stroke-opacity="0.001" style="opacity:0; animation:im-fade 900ms cubic-bezier(0.22,1,0.36,1) 3095ms forwards"></ellipse>
+      </g>
+      <g stroke="#F2F6FA" stroke-width="1.4" pathLength="1" style="stroke-dasharray:1; stroke-dashoffset:1">
+        <circle cx="351" cy="-687" r="1150" stroke-opacity="0.5" pathLength="1" style="stroke-dasharray:1; stroke-dashoffset:1; animation:im-draw 2600ms cubic-bezier(0.22,1,0.36,1) 1150ms forwards"></circle>
+        <circle cx="1089" cy="1547" r="1150" stroke-opacity="0.5" pathLength="1" style="stroke-dasharray:1; stroke-dashoffset:1; animation:im-draw 2600ms cubic-bezier(0.22,1,0.36,1) 1150ms forwards"></circle>
+      </g>
+      <path d="M-120 708 L 1560 152" stroke="#FFFFFF" stroke-width="1.2" stroke-opacity="0.85" pathLength="1" style="stroke-dasharray:1; stroke-dashoffset:1; animation:im-draw 1600ms cubic-bezier(0.22,1,0.36,1) 300ms forwards"></path>
+    </svg>
+
+  </section>
+
+  <section id="practice" data-screen-label="01 · Practice" style="position:relative; background:#FFFFFF; color:#05070A; padding:120px 40px 130px; overflow:hidden">
+    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" fill="none" shape-rendering="geometricPrecision" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none; contain:paint">
+      <g transform="rotate(-18.3 207.1 -658.2)" stroke="#4686B7" stroke-width="1">
+        <ellipse cx="207.1" cy="-658.2" rx="1150" ry="1150" stroke="#274F6F" stroke-width="1.3" stroke-opacity="0.2808" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="1073.3" ry="1150" stroke-opacity="0.2347" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="996.7" ry="1150" stroke-opacity="0.1936" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="920" ry="1150" stroke-opacity="0.1572" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="843.3" ry="1150" stroke-opacity="0.1254" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="766.7" ry="1150" stroke-opacity="0.0978" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="690" ry="1150" stroke-opacity="0.0744" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="613.3" ry="1150" stroke-opacity="0.0548" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="536.7" ry="1150" stroke-opacity="0.0387" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="460" ry="1150" stroke-opacity="0.0259" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="383.3" ry="1150" stroke-opacity="0.0161" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="306.7" ry="1150" stroke-opacity="0.0090" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="230" ry="1150" stroke-opacity="0.0043" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="153.3" ry="1150" stroke-opacity="0.0015" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="76.7" ry="1150" stroke-opacity="0.0003" pathLength="1"></ellipse>
+      </g>
+      <g transform="rotate(-18.3 1232.9 1488.2)" stroke="#4686B7" stroke-width="1">
+        <ellipse cx="1232.9" cy="1488.2" rx="1150" ry="1150" stroke="#274F6F" stroke-width="1.3" stroke-opacity="0.2808" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="1073.3" ry="1150" stroke-opacity="0.2347" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="996.7" ry="1150" stroke-opacity="0.1936" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="920" ry="1150" stroke-opacity="0.1572" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="843.3" ry="1150" stroke-opacity="0.1254" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="766.7" ry="1150" stroke-opacity="0.0978" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="690" ry="1150" stroke-opacity="0.0744" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="613.3" ry="1150" stroke-opacity="0.0548" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="536.7" ry="1150" stroke-opacity="0.0387" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="460" ry="1150" stroke-opacity="0.0259" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="383.3" ry="1150" stroke-opacity="0.0161" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="306.7" ry="1150" stroke-opacity="0.0090" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="230" ry="1150" stroke-opacity="0.0043" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="153.3" ry="1150" stroke-opacity="0.0015" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="76.7" ry="1150" stroke-opacity="0.0003" pathLength="1"></ellipse>
+      </g>
+      <path d="M -799 932 L 2239 -72" stroke="#274F6F" stroke-width="1.1" stroke-opacity="0.1080"></path>
+    </svg>
+
+    <div style="position:relative; max-width:1180px; margin:0 auto">
+      <div style="display:flex; align-items:center; gap:10px; font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:rgba(5,7,10,0.5)">
+        <span style="display:block; width:18px; height:1px; background:#4686B7"></span>
+        The practice
+      </div>
+      <h2 style="margin:28px 0 0; max-width:820px; font-weight:300; font-size:clamp(32px,4vw,58px); line-height:1.06; letter-spacing:-0.02em; text-wrap:pretty">
+        Financial engineering that takes a fund from <span style="font-weight:700">data room</span> to <span style="font-weight:700">reference standard</span>.
+      </h2>
+      <p style="margin:26px 0 0; max-width:560px; font-size:17px; line-height:1.6; color:rgba(5,7,10,0.6); text-wrap:pretty">
+        An unregulated back office built for allocators: modeling, diligence and institutional materials delivered on an AI-first bench, at the pace of a live raise.
+      </p>
+
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:1px; margin-top:88px; background:rgba(5,7,10,0.1)">
+        <div style="background:#fff; padding:38px 30px 44px">
+          <div style="font-size:11px; letter-spacing:0.2em; color:#4686B7">01</div>
+          <div style="margin-top:22px; font-size:20px; font-weight:500; letter-spacing:-0.01em">Modeling &amp; analysis</div>
+          <p style="margin:14px 0 0; font-size:15px; line-height:1.55; color:rgba(5,7,10,0.58)">Operating models, waterfalls and returns work that survive an IC.</p>
+        </div>
+        <div style="background:#fff; padding:38px 30px 44px">
+          <div style="font-size:11px; letter-spacing:0.2em; color:#4686B7">02</div>
+          <div style="margin-top:22px; font-size:20px; font-weight:500; letter-spacing:-0.01em">Diligence support</div>
+          <p style="margin:14px 0 0; font-size:15px; line-height:1.55; color:rgba(5,7,10,0.58)">Data-room build, QofE prep and buy-side question management.</p>
+        </div>
+        <div style="background:#fff; padding:38px 30px 44px">
+          <div style="font-size:11px; letter-spacing:0.2em; color:#4686B7">03</div>
+          <div style="margin-top:22px; font-size:20px; font-weight:500; letter-spacing:-0.01em">Institutional decks</div>
+          <p style="margin:14px 0 0; font-size:15px; line-height:1.55; color:rgba(5,7,10,0.58)">LP-grade narrative and design, produced in days rather than weeks.</p>
+        </div>
+        <div style="background:#fff; padding:38px 30px 44px">
+          <div style="font-size:11px; letter-spacing:0.2em; color:#4686B7">04</div>
+          <div style="margin-top:22px; font-size:20px; font-weight:500; letter-spacing:-0.01em">AI platforms</div>
+          <p style="margin:14px 0 0; font-size:15px; line-height:1.55; color:rgba(5,7,10,0.58)">Workspaces that turn a portfolio's data into a standing reference line.</p>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:40px; margin-top:96px; padding-top:46px; border-top:1px solid rgba(5,7,10,0.1)">
+        <div>
+          <div style="font-size:clamp(38px,4.4vw,64px); font-weight:300; letter-spacing:-0.03em; line-height:1">80%<span style="color:#4686B7">+</span></div>
+          <div style="margin-top:12px; font-size:13px; color:rgba(5,7,10,0.55)">Of a diligence cycle handled off the client's bench.</div>
+        </div>
+        <div>
+          <div style="font-size:clamp(38px,4.4vw,64px); font-weight:300; letter-spacing:-0.03em; line-height:1">48h</div>
+          <div style="margin-top:12px; font-size:13px; color:rgba(5,7,10,0.55)">Typical turn on a first-pass model or LP deck.</div>
+        </div>
+        <div>
+          <div style="font-size:clamp(38px,4.4vw,64px); font-weight:300; letter-spacing:-0.03em; line-height:1">$3.4B</div>
+          <div style="margin-top:12px; font-size:13px; color:rgba(5,7,10,0.55)">Enterprise value modeled across live mandates.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}"></script>
+</body>
+</html>      <g stroke="#4686B7" stroke-width="1">
+        <g transform="rotate(-18.3 351 -687)">
+          <ellipse cx="351" cy="-687" rx="1150" ry="1058" stroke-opacity="0.1500"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="1022.7" stroke-opacity="0.1421"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="987.5" stroke-opacity="0.1343"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="952.2" stroke-opacity="0.1267"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="916.9" stroke-opacity="0.1193"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="881.7" stroke-opacity="0.1120"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="846.4" stroke-opacity="0.1050"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="811.1" stroke-opacity="0.0981"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="775.9" stroke-opacity="0.0913"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="740.6" stroke-opacity="0.0848"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="705.3" stroke-opacity="0.0784"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="670.1" stroke-opacity="0.0722"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="634.8" stroke-opacity="0.0662"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="599.5" stroke-opacity="0.0605"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="564.3" stroke-opacity="0.0549"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="529" stroke-opacity="0.0495"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="493.7" stroke-opacity="0.0443"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="458.5" stroke-opacity="0.0394"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="423.2" stroke-opacity="0.0346"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="387.9" stroke-opacity="0.0301"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="352.7" stroke-opacity="0.0259"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="317.4" stroke-opacity="0.0219"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="282.1" stroke-opacity="0.0181"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="246.9" stroke-opacity="0.0146"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="211.6" stroke-opacity="0.0114"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="176.3" stroke-opacity="0.0085"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="141.1" stroke-opacity="0.0060"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="105.8" stroke-opacity="0.0038"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="70.5" stroke-opacity="0.0020"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="35.3" stroke-opacity="0.0006"></ellipse>
+        </g>
+        <g transform="rotate(-18.3 1089 1547)">
+          <ellipse cx="1089" cy="1547" rx="1150" ry="1058" stroke-opacity="0.1500"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="1022.7" stroke-opacity="0.1421"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="987.5" stroke-opacity="0.1343"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="952.2" stroke-opacity="0.1267"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="916.9" stroke-opacity="0.1193"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="881.7" stroke-opacity="0.1120"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="846.4" stroke-opacity="0.1050"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="811.1" stroke-opacity="0.0981"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="775.9" stroke-opacity="0.0913"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="740.6" stroke-opacity="0.0848"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="705.3" stroke-opacity="0.0784"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="670.1" stroke-opacity="0.0722"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="634.8" stroke-opacity="0.0662"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="599.5" stroke-opacity="0.0605"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="564.3" stroke-opacity="0.0549"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="529" stroke-opacity="0.0495"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="493.7" stroke-opacity="0.0443"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="458.5" stroke-opacity="0.0394"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="423.2" stroke-opacity="0.0346"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="387.9" stroke-opacity="0.0301"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="352.7" stroke-opacity="0.0259"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="317.4" stroke-opacity="0.0219"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="282.1" stroke-opacity="0.0181"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="246.9" stroke-opacity="0.0146"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="211.6" stroke-opacity="0.0114"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="176.3" stroke-opacity="0.0085"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="141.1" stroke-opacity="0.0060"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="105.8" stroke-opacity="0.0038"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="70.5" stroke-opacity="0.0020"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="35.3" stroke-opacity="0.0006"></ellipse>
+        </g>
+        <circle cx="351" cy="-687" r="1150" stroke-opacity="0.5" pathLength="1" style="stroke-dasharray:1; stroke-dashoffset:1; animation:im-draw 2600ms cubic-bezier(0.22,1,0.36,1) 1150ms forwards"></circle>
+        <circle cx="1089" cy="1547" r="1150" stroke-opacity="0.5" pathLength="1" style="stroke-dasharray:1; stroke-dashoffset:1; animation:im-draw 2600ms cubic-bezier(0.22,1,0.36,1) 1150ms forwards"></circle>
+      </g>
+      <path d="M-120 708 L 1560 152" stroke="#FFFFFF" stroke-width="1.2" stroke-opacity="0.85" pathLength="1" style="stroke-dasharray:1; stroke-dashoffset:1; animation:im-draw 1600ms cubic-bezier(0.22,1,0.36,1) 300ms forwards"></path>
+    </svg>
+
+  </section>
+
+  <section id="practice" data-screen-label="01 · Practice" style="position:relative; background:#FFFFFF; color:#05070A; padding:120px 40px 130px; overflow:hidden">
+    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" fill="none" shape-rendering="geometricPrecision" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none; contain:paint">
+      <g transform="rotate(-18.3 207.1 -658.2)" stroke="#4686B7" stroke-width="1">
+        <ellipse cx="207.1" cy="-658.2" rx="1150" ry="1150" stroke="#274F6F" stroke-width="1.3" stroke-opacity="0.2808" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="1073.3" ry="1150" stroke-opacity="0.2347" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="996.7" ry="1150" stroke-opacity="0.1936" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="920" ry="1150" stroke-opacity="0.1572" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="843.3" ry="1150" stroke-opacity="0.1254" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="766.7" ry="1150" stroke-opacity="0.0978" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="690" ry="1150" stroke-opacity="0.0744" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="613.3" ry="1150" stroke-opacity="0.0548" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="536.7" ry="1150" stroke-opacity="0.0387" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="460" ry="1150" stroke-opacity="0.0259" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="383.3" ry="1150" stroke-opacity="0.0161" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="306.7" ry="1150" stroke-opacity="0.0090" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="230" ry="1150" stroke-opacity="0.0043" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="153.3" ry="1150" stroke-opacity="0.0015" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="76.7" ry="1150" stroke-opacity="0.0003" pathLength="1"></ellipse>
+      </g>
+      <g transform="rotate(-18.3 1232.9 1488.2)" stroke="#4686B7" stroke-width="1">
+        <ellipse cx="1232.9" cy="1488.2" rx="1150" ry="1150" stroke="#274F6F" stroke-width="1.3" stroke-opacity="0.2808" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="1073.3" ry="1150" stroke-opacity="0.2347" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="996.7" ry="1150" stroke-opacity="0.1936" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="920" ry="1150" stroke-opacity="0.1572" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="843.3" ry="1150" stroke-opacity="0.1254" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="766.7" ry="1150" stroke-opacity="0.0978" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="690" ry="1150" stroke-opacity="0.0744" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="613.3" ry="1150" stroke-opacity="0.0548" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="536.7" ry="1150" stroke-opacity="0.0387" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="460" ry="1150" stroke-opacity="0.0259" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="383.3" ry="1150" stroke-opacity="0.0161" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="306.7" ry="1150" stroke-opacity="0.0090" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="230" ry="1150" stroke-opacity="0.0043" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="153.3" ry="1150" stroke-opacity="0.0015" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="76.7" ry="1150" stroke-opacity="0.0003" pathLength="1"></ellipse>
+      </g>
+      <path d="M -799 932 L 2239 -72" stroke="#274F6F" stroke-width="1.1" stroke-opacity="0.1080"></path>
+    </svg>
+
+    <div style="position:relative; max-width:1180px; margin:0 auto">
+      <div style="display:flex; align-items:center; gap:10px; font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:rgba(5,7,10,0.5)">
+        <span style="display:block; width:18px; height:1px; background:#4686B7"></span>
+        The practice
+      </div>
+      <h2 style="margin:28px 0 0; max-width:820px; font-weight:300; font-size:clamp(32px,4vw,58px); line-height:1.06; letter-spacing:-0.02em; text-wrap:pretty">
+        Financial engineering that takes a fund from <span style="font-weight:700">data room</span> to <span style="font-weight:700">reference standard</span>.
+      </h2>
+      <p style="margin:26px 0 0; max-width:560px; font-size:17px; line-height:1.6; color:rgba(5,7,10,0.6); text-wrap:pretty">
+        An unregulated back office built for allocators: modeling, diligence and institutional materials delivered on an AI-first bench, at the pace of a live raise.
+      </p>
+
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:1px; margin-top:88px; background:rgba(5,7,10,0.1)">
+        <div style="background:#fff; padding:38px 30px 44px">
+          <div style="font-size:11px; letter-spacing:0.2em; color:#4686B7">01</div>
+          <div style="margin-top:22px; font-size:20px; font-weight:500; letter-spacing:-0.01em">Modeling &amp; analysis</div>
+          <p style="margin:14px 0 0; font-size:15px; line-height:1.55; color:rgba(5,7,10,0.58)">Operating models, waterfalls and returns work that survive an IC.</p>
+        </div>
+        <div style="background:#fff; padding:38px 30px 44px">
+          <div style="font-size:11px; letter-spacing:0.2em; color:#4686B7">02</div>
+          <div style="margin-top:22px; font-size:20px; font-weight:500; letter-spacing:-0.01em">Diligence support</div>
+          <p style="margin:14px 0 0; font-size:15px; line-height:1.55; color:rgba(5,7,10,0.58)">Data-room build, QofE prep and buy-side question management.</p>
+        </div>
+        <div style="background:#fff; padding:38px 30px 44px">
+          <div style="font-size:11px; letter-spacing:0.2em; color:#4686B7">03</div>
+          <div style="margin-top:22px; font-size:20px; font-weight:500; letter-spacing:-0.01em">Institutional decks</div>
+          <p style="margin:14px 0 0; font-size:15px; line-height:1.55; color:rgba(5,7,10,0.58)">LP-grade narrative and design, produced in days rather than weeks.</p>
+        </div>
+        <div style="background:#fff; padding:38px 30px 44px">
+          <div style="font-size:11px; letter-spacing:0.2em; color:#4686B7">04</div>
+          <div style="margin-top:22px; font-size:20px; font-weight:500; letter-spacing:-0.01em">AI platforms</div>
+          <p style="margin:14px 0 0; font-size:15px; line-height:1.55; color:rgba(5,7,10,0.58)">Workspaces that turn a portfolio's data into a standing reference line.</p>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:40px; margin-top:96px; padding-top:46px; border-top:1px solid rgba(5,7,10,0.1)">
+        <div>
+          <div style="font-size:clamp(38px,4.4vw,64px); font-weight:300; letter-spacing:-0.03em; line-height:1">80%<span style="color:#4686B7">+</span></div>
+          <div style="margin-top:12px; font-size:13px; color:rgba(5,7,10,0.55)">Of a diligence cycle handled off the client's bench.</div>
+        </div>
+        <div>
+          <div style="font-size:clamp(38px,4.4vw,64px); font-weight:300; letter-spacing:-0.03em; line-height:1">48h</div>
+          <div style="margin-top:12px; font-size:13px; color:rgba(5,7,10,0.55)">Typical turn on a first-pass model or LP deck.</div>
+        </div>
+        <div>
+          <div style="font-size:clamp(38px,4.4vw,64px); font-weight:300; letter-spacing:-0.03em; line-height:1">$3.4B</div>
+          <div style="margin-top:12px; font-size:13px; color:rgba(5,7,10,0.55)">Enterprise value modeled across live mandates.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}"></script>
+</body>
+</html>      <g stroke="#4686B7" stroke-width="1">
+        <g transform="rotate(-18.3 351 -687)">
+          <ellipse cx="351" cy="-687" rx="1150" ry="1035" stroke-opacity="0.15"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="966" stroke-opacity="0.1343"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="897" stroke-opacity="0.1193"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="828" stroke-opacity="0.105"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="759" stroke-opacity="0.0913"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="690" stroke-opacity="0.0784"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="621" stroke-opacity="0.0662"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="552" stroke-opacity="0.0549"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="483" stroke-opacity="0.0443"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="414" stroke-opacity="0.0346"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="345" stroke-opacity="0.0259"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="276" stroke-opacity="0.0181"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="207" stroke-opacity="0.0114"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="138" stroke-opacity="0.006"></ellipse>
+          <ellipse cx="351" cy="-687" rx="1150" ry="69" stroke-opacity="0.002"></ellipse>
+        </g>
+        <g transform="rotate(-18.3 1089 1547)">
+          <ellipse cx="1089" cy="1547" rx="1150" ry="1035" stroke-opacity="0.15"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="966" stroke-opacity="0.1343"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="897" stroke-opacity="0.1193"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="828" stroke-opacity="0.105"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="759" stroke-opacity="0.0913"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="690" stroke-opacity="0.0784"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="621" stroke-opacity="0.0662"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="552" stroke-opacity="0.0549"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="483" stroke-opacity="0.0443"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="414" stroke-opacity="0.0346"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="345" stroke-opacity="0.0259"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="276" stroke-opacity="0.0181"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="207" stroke-opacity="0.0114"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="138" stroke-opacity="0.006"></ellipse>
+          <ellipse cx="1089" cy="1547" rx="1150" ry="69" stroke-opacity="0.002"></ellipse>
+        </g>
+        <circle cx="351" cy="-687" r="1150" stroke-opacity="0.5" pathLength="1" style="stroke-dasharray:1; stroke-dashoffset:1; animation:im-draw 2600ms cubic-bezier(0.22,1,0.36,1) 1150ms forwards"></circle>
+        <circle cx="1089" cy="1547" r="1150" stroke-opacity="0.5" pathLength="1" style="stroke-dasharray:1; stroke-dashoffset:1; animation:im-draw 2600ms cubic-bezier(0.22,1,0.36,1) 1150ms forwards"></circle>
+      </g>
+      <path d="M-120 708 L 1560 152" stroke="#FFFFFF" stroke-width="1.2" stroke-opacity="0.85" pathLength="1" style="stroke-dasharray:1; stroke-dashoffset:1; animation:im-draw 1600ms cubic-bezier(0.22,1,0.36,1) 300ms forwards"></path>
+    </svg>
+
+  </section>
+
+  <section id="practice" data-screen-label="01 · Practice" style="position:relative; background:#FFFFFF; color:#05070A; padding:120px 40px 130px; overflow:hidden">
+    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" fill="none" shape-rendering="geometricPrecision" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none; contain:paint">
+      <g transform="rotate(-18.3 207.1 -658.2)" stroke="#4686B7" stroke-width="1">
+        <ellipse cx="207.1" cy="-658.2" rx="1150" ry="1150" stroke="#274F6F" stroke-width="1.3" stroke-opacity="0.2808" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="1073.3" ry="1150" stroke-opacity="0.2347" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="996.7" ry="1150" stroke-opacity="0.1936" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="920" ry="1150" stroke-opacity="0.1572" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="843.3" ry="1150" stroke-opacity="0.1254" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="766.7" ry="1150" stroke-opacity="0.0978" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="690" ry="1150" stroke-opacity="0.0744" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="613.3" ry="1150" stroke-opacity="0.0548" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="536.7" ry="1150" stroke-opacity="0.0387" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="460" ry="1150" stroke-opacity="0.0259" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="383.3" ry="1150" stroke-opacity="0.0161" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="306.7" ry="1150" stroke-opacity="0.0090" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="230" ry="1150" stroke-opacity="0.0043" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="153.3" ry="1150" stroke-opacity="0.0015" pathLength="1"></ellipse>
+        <ellipse cx="207.1" cy="-658.2" rx="76.7" ry="1150" stroke-opacity="0.0003" pathLength="1"></ellipse>
+      </g>
+      <g transform="rotate(-18.3 1232.9 1488.2)" stroke="#4686B7" stroke-width="1">
+        <ellipse cx="1232.9" cy="1488.2" rx="1150" ry="1150" stroke="#274F6F" stroke-width="1.3" stroke-opacity="0.2808" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="1073.3" ry="1150" stroke-opacity="0.2347" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="996.7" ry="1150" stroke-opacity="0.1936" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="920" ry="1150" stroke-opacity="0.1572" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="843.3" ry="1150" stroke-opacity="0.1254" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="766.7" ry="1150" stroke-opacity="0.0978" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="690" ry="1150" stroke-opacity="0.0744" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="613.3" ry="1150" stroke-opacity="0.0548" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="536.7" ry="1150" stroke-opacity="0.0387" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="460" ry="1150" stroke-opacity="0.0259" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="383.3" ry="1150" stroke-opacity="0.0161" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="306.7" ry="1150" stroke-opacity="0.0090" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="230" ry="1150" stroke-opacity="0.0043" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="153.3" ry="1150" stroke-opacity="0.0015" pathLength="1"></ellipse>
+        <ellipse cx="1232.9" cy="1488.2" rx="76.7" ry="1150" stroke-opacity="0.0003" pathLength="1"></ellipse>
+      </g>
+      <path d="M -799 932 L 2239 -72" stroke="#274F6F" stroke-width="1.1" stroke-opacity="0.1080"></path>
+    </svg>
+
+    <div style="position:relative; max-width:1180px; margin:0 auto">
+      <div style="display:flex; align-items:center; gap:10px; font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:rgba(5,7,10,0.5)">
+        <span style="display:block; width:18px; height:1px; background:#4686B7"></span>
+        The practice
+      </div>
+      <h2 style="margin:28px 0 0; max-width:820px; font-weight:300; font-size:clamp(32px,4vw,58px); line-height:1.06; letter-spacing:-0.02em; text-wrap:pretty">
+        Financial engineering that takes a fund from <span style="font-weight:700">data room</span> to <span style="font-weight:700">reference standard</span>.
+      </h2>
+      <p style="margin:26px 0 0; max-width:560px; font-size:17px; line-height:1.6; color:rgba(5,7,10,0.6); text-wrap:pretty">
+        An unregulated back office built for allocators: modeling, diligence and institutional materials delivered on an AI-first bench, at the pace of a live raise.
+      </p>
+
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:1px; margin-top:88px; background:rgba(5,7,10,0.1)">
+        <div style="background:#fff; padding:38px 30px 44px">
+          <div style="font-size:11px; letter-spacing:0.2em; color:#4686B7">01</div>
+          <div style="margin-top:22px; font-size:20px; font-weight:500; letter-spacing:-0.01em">Modeling &amp; analysis</div>
+          <p style="margin:14px 0 0; font-size:15px; line-height:1.55; color:rgba(5,7,10,0.58)">Operating models, waterfalls and returns work that survive an IC.</p>
+        </div>
+        <div style="background:#fff; padding:38px 30px 44px">
+          <div style="font-size:11px; letter-spacing:0.2em; color:#4686B7">02</div>
+          <div style="margin-top:22px; font-size:20px; font-weight:500; letter-spacing:-0.01em">Diligence support</div>
+          <p style="margin:14px 0 0; font-size:15px; line-height:1.55; color:rgba(5,7,10,0.58)">Data-room build, QofE prep and buy-side question management.</p>
+        </div>
+        <div style="background:#fff; padding:38px 30px 44px">
+          <div style="font-size:11px; letter-spacing:0.2em; color:#4686B7">03</div>
+          <div style="margin-top:22px; font-size:20px; font-weight:500; letter-spacing:-0.01em">Institutional decks</div>
+          <p style="margin:14px 0 0; font-size:15px; line-height:1.55; color:rgba(5,7,10,0.58)">LP-grade narrative and design, produced in days rather than weeks.</p>
+        </div>
+        <div style="background:#fff; padding:38px 30px 44px">
+          <div style="font-size:11px; letter-spacing:0.2em; color:#4686B7">04</div>
+          <div style="margin-top:22px; font-size:20px; font-weight:500; letter-spacing:-0.01em">AI platforms</div>
+          <p style="margin:14px 0 0; font-size:15px; line-height:1.55; color:rgba(5,7,10,0.58)">Workspaces that turn a portfolio's data into a standing reference line.</p>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:40px; margin-top:96px; padding-top:46px; border-top:1px solid rgba(5,7,10,0.1)">
+        <div>
+          <div style="font-size:clamp(38px,4.4vw,64px); font-weight:300; letter-spacing:-0.03em; line-height:1">80%<span style="color:#4686B7">+</span></div>
+          <div style="margin-top:12px; font-size:13px; color:rgba(5,7,10,0.55)">Of a diligence cycle handled off the client's bench.</div>
+        </div>
+        <div>
+          <div style="font-size:clamp(38px,4.4vw,64px); font-weight:300; letter-spacing:-0.03em; line-height:1">48h</div>
+          <div style="margin-top:12px; font-size:13px; color:rgba(5,7,10,0.55)">Typical turn on a first-pass model or LP deck.</div>
+        </div>
+        <div>
+          <div style="font-size:clamp(38px,4.4vw,64px); font-weight:300; letter-spacing:-0.03em; line-height:1">$3.4B</div>
+          <div style="margin-top:12px; font-size:13px; color:rgba(5,7,10,0.55)">Enterprise value modeled across live mandates.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}"></script>
+</body>
+</html>      <g stroke="#4686B7" stroke-width="1">
+        <g transform="rotate(-18.3 351 -687)">
+        <ellipse cx="351" cy="-687" rx="1150" ry="1035" stroke-opacity="0.14"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="897" stroke-opacity="0.1"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="736" stroke-opacity="0.07"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="552" stroke-opacity="0.05"></ellipse>
+        <ellipse cx="351" cy="-687" rx="1150" ry="345" stroke-opacity="0.03"></ellipse>
+        </g>
+        <g transform="rotate(-18.3 1089 1547)">
+        <ellipse cx="1089" cy="1547" rx="1150" ry="1035" stroke-opacity="0.14"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="897" stroke-opacity="0.1"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="736" stroke-opacity="0.07"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="552" stroke-opacity="0.05"></ellipse>
+        <ellipse cx="1089" cy="1547" rx="1150" ry="345" stroke-opacity="0.03"></ellipse>
+        </g>
+        <circle cx="351" cy="-687" r="1150" stroke-width="1.4" stroke-opacity="0.22"></circle>
+        <circle cx="1089" cy="1547" r="1150" stroke-width="1.4" stroke-opacity="0.22"></circle>
+      </g>
+      <path d="M -799 932 L 2239 -72" stroke="#274F6F" stroke-width="1.1" stroke-opacity="0.1080"></path>
+    </svg>
+
+    <div style="position:relative; max-width:1180px; margin:0 auto">
+      <div style="display:flex; align-items:center; gap:10px; font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:rgba(5,7,10,0.5)">
+        <span style="display:block; width:18px; height:1px; background:#4686B7"></span>
+        The practice
+      </div>
+      <h2 style="margin:28px 0 0; max-width:820px; font-weight:300; font-size:clamp(32px,4vw,58px); line-height:1.06; letter-spacing:-0.02em; text-wrap:pretty">
+        Financial engineering that takes a fund from <span style="font-weight:700">data room</span> to <span style="font-weight:700">reference standard</span>.
+      </h2>
+      <p style="margin:26px 0 0; max-width:560px; font-size:17px; line-height:1.6; color:rgba(5,7,10,0.6); text-wrap:pretty">
+        An unregulated back office built for allocators: modeling, diligence and institutional materials delivered on an AI-first bench, at the pace of a live raise.
+      </p>
+
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:1px; margin-top:88px; background:rgba(5,7,10,0.1)">
+        <div style="background:#fff; padding:38px 30px 44px">
+          <div style="font-size:11px; letter-spacing:0.2em; color:#4686B7">01</div>
+          <div style="margin-top:22px; font-size:20px; font-weight:500; letter-spacing:-0.01em">Modeling &amp; analysis</div>
+          <p style="margin:14px 0 0; font-size:15px; line-height:1.55; color:rgba(5,7,10,0.58)">Operating models, waterfalls and returns work that survive an IC.</p>
+        </div>
+        <div style="background:#fff; padding:38px 30px 44px">
+          <div style="font-size:11px; letter-spacing:0.2em; color:#4686B7">02</div>
+          <div style="margin-top:22px; font-size:20px; font-weight:500; letter-spacing:-0.01em">Diligence support</div>
+          <p style="margin:14px 0 0; font-size:15px; line-height:1.55; color:rgba(5,7,10,0.58)">Data-room build, QofE prep and buy-side question management.</p>
+        </div>
+        <div style="background:#fff; padding:38px 30px 44px">
+          <div style="font-size:11px; letter-spacing:0.2em; color:#4686B7">03</div>
+          <div style="margin-top:22px; font-size:20px; font-weight:500; letter-spacing:-0.01em">Institutional decks</div>
+          <p style="margin:14px 0 0; font-size:15px; line-height:1.55; color:rgba(5,7,10,0.58)">LP-grade narrative and design, produced in days rather than weeks.</p>
+        </div>
+        <div style="background:#fff; padding:38px 30px 44px">
+          <div style="font-size:11px; letter-spacing:0.2em; color:#4686B7">04</div>
+          <div style="margin-top:22px; font-size:20px; font-weight:500; letter-spacing:-0.01em">AI platforms</div>
+          <p style="margin:14px 0 0; font-size:15px; line-height:1.55; color:rgba(5,7,10,0.58)">Workspaces that turn a portfolio's data into a standing reference line.</p>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:40px; margin-top:96px; padding-top:46px; border-top:1px solid rgba(5,7,10,0.1)">
+        <div>
+          <div style="font-size:clamp(38px,4.4vw,64px); font-weight:300; letter-spacing:-0.03em; line-height:1">80%<span style="color:#4686B7">+</span></div>
+          <div style="margin-top:12px; font-size:13px; color:rgba(5,7,10,0.55)">Of a diligence cycle handled off the client's bench.</div>
+        </div>
+        <div>
+          <div style="font-size:clamp(38px,4.4vw,64px); font-weight:300; letter-spacing:-0.03em; line-height:1">48h</div>
+          <div style="margin-top:12px; font-size:13px; color:rgba(5,7,10,0.55)">Typical turn on a first-pass model or LP deck.</div>
+        </div>
+        <div>
+          <div style="font-size:clamp(38px,4.4vw,64px); font-weight:300; letter-spacing:-0.03em; line-height:1">$3.4B</div>
+          <div style="margin-top:12px; font-size:13px; color:rgba(5,7,10,0.55)">Enterprise value modeled across live mandates.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}"></script>
+</body>
+</html>

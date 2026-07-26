@@ -1,0 +1,11 @@
+/* Isthmus Meridian — Design System
+   ================================================================
+   Global entry point. Consumers link THIS file only.
+   Import order: fonts → tokens → (effects). Keep this file as an
+   @import manifest — no rules inline here.
+*/
+@import "tokens/fonts.css";
+@import "tokens/colors.css";
+@import "tokens/typography.css";
+@import "tokens/spacing.css";
+@import "tokens/effects.css";
