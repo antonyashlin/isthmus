@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en" data-stack="a">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Isthmus Meridian — Type specimen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Instrument+Serif:ital@0;1&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Geist:wght@100..900&family=Bodoni+Moda:ital,opsz,wght@1,6..96,400..900&family=Cormorant:ital,wght@1,500;1,600&family=Arimo:wght@400;700&display=swap">
+<style>
+/* ─────────────────────────────────────────────────────────────
+   Isthmus Meridian — type specimen
+   Real copy, real tokens, real scale, on the real #04101c ground.
+   Everything except type is held constant between stacks, so the
+   only variable you are judging is the typography.
+   Ground / ink values copied from website/index.html:18-33.
+   ───────────────────────────────────────────────────────────── */
+:root{
+  --sky:#88C1ED; --steel:#4686B7;
+  --bg:#04101c; --panel:#0B0F14;
+  --tx:rgba(255,255,255,0.94); --tx-2:rgba(255,255,255,0.62); --tx-3:rgba(255,255,255,0.42);
+  --line:rgba(255,255,255,0.10); --line-2:rgba(255,255,255,0.18);
+  --accent-ink:var(--sky);
+  --max:1200px; --ease:cubic-bezier(0.22,1,0.36,1);
+  --ui:ui-sans-serif,-apple-system,"Segoe UI",system-ui,sans-serif;
+
+  /* live-tunable hero params, driven by the panel */
+  --p-isth-ls:0.005em; --p-isth-wdth:108; --p-mer-scale:0.91; --p-mer-mt:-0.02em;
+}
+
+/* ── STACK: current (Helvetica Neue → Arimo, Cormorant, Newsreader) ── */
+[data-stack="current"]{
+  --sans:"Helvetica Neue","Helvetica","Arimo",Arial,sans-serif;
+  --serif-display:"Cormorant",Georgia,serif;
+  --serif-text:"Newsreader",Georgia,serif;
+  --label-family:"SFMono-Regular","SF Mono",ui-monospace,Menlo,Consolas,monospace;
+  --label-ls:0.18em; --label-weight:400;
+  --isth-ls:0.02em; --isth-wdth:100;
+  --mer-weight:600; --mer-scale:1; --mer-mt:-0.06em;
+  --head-ls:-0.02em; --head-xl-ls:-0.025em;
+}
+/* ── STACK A: Archivo + Instrument Serif  (the recommendation) ── */
+[data-stack="a"]{
+  --sans:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --serif-display:"Instrument Serif",Georgia,serif;
+  --serif-text:"Newsreader",Georgia,serif;
+  --label-family:var(--sans);
+  --label-ls:0.22em; --label-weight:500;
+  --isth-ls:var(--p-isth-ls); --isth-wdth:var(--p-isth-wdth);
+  --mer-weight:400; --mer-scale:var(--p-mer-scale); --mer-mt:var(--p-mer-mt);
+  --head-ls:-0.012em; --head-xl-ls:-0.014em;
+}
+/* ── STACK B: Geist + Bodoni Moda  (the alternate) ── */
+[data-stack="b"]{
+  --sans:"Geist","Helvetica Neue",Arial,sans-serif;
+  --serif-display:"Bodoni Moda",Georgia,serif;
+  --serif-text:"Newsreader",Georgia,serif;
+  --label-family:var(--sans);
+  --label-ls:0.22em; --label-weight:500;
+  --isth-ls:0.03em; --isth-wdth:100;   /* no width axis — tracking carries it */
+  --mer-weight:400; --mer-scale:0.89; --mer-mt:-0.03em;
+  --head-ls:-0.015em; --head-xl-ls:-0.018em;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font-family:var(--sans);line-height:1.5;
+     -webkit-font-smoothing:antialiased;overflow-x:hidden}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 40px}
+
+/* ── control bar ───────────────────────────────────────────── */
+.bar{position:sticky;top:0;z-index:50;background:rgba(4,16,28,0.86);
+     backdrop-filter:blur(14px) saturate(140%);border-bottom:1px solid var(--line)}
+.bar-in{max-width:var(--max);margin:0 auto;padding:11px 40px;display:flex;
+        align-items:center;gap:26px;flex-wrap:wrap;font-family:var(--ui)}
+.bar-t{font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:var(--tx-3);
+       white-space:nowrap}
+.seg{display:flex;border:1px solid var(--line-2);border-radius:10px;overflow:hidden}
+.seg button{appearance:none;background:none;border:0;border-right:1px solid var(--line);
+  color:var(--tx-2);font:inherit;font-size:12px;padding:7px 14px;cursor:pointer;
+  transition:background .16s var(--ease),color .16s var(--ease);white-space:nowrap}
+.seg button:last-child{border-right:0}
+.seg button:hover{background:rgba(255,255,255,0.05);color:var(--tx)}
+.seg button[aria-pressed="true"]{background:var(--sky);color:#04101c;font-weight:600}
+.seg button:focus-visible{outline:2px solid var(--sky);outline-offset:-2px}
+.bar-note{font-size:11.5px;color:var(--tx-3);margin-left:auto}
+kbd{font:inherit;font-size:10.5px;border:1px solid var(--line-2);border-radius:4px;
+    padding:1px 5px;color:var(--tx-2)}
+
+/* ── specimen scaffolding (deliberately plain — it is an instrument) ── */
+.band{border-bottom:1px solid var(--line);padding:64px 0 72px}
+.band.lit{background:#EDF2F7;color:#0d1c2b;
+  --tx:#0d1c2b;--tx-2:rgba(13,28,43,0.66);--tx-3:rgba(13,28,43,0.46);
+  --line:rgba(13,28,43,0.12);--accent-ink:#2f628a}
+.tag{font-family:var(--ui);font-size:10.5px;letter-spacing:0.18em;text-transform:uppercase;
+     color:var(--tx-3);margin:0 0 30px;display:flex;gap:10px;align-items:center}
+.tag::after{content:"";flex:1;height:1px;background:var(--line)}
+
+/* ── real site fragments ───────────────────────────────────── */
+.nav{display:flex;align-items:center;gap:34px;padding:16px 0;border-bottom:1px solid var(--line)}
+.nav .wm{font-family:var(--sans);font-size:12px;letter-spacing:0.22em;white-space:nowrap}
+.nav .wm b{font-weight:700}
+.nav .wm i{font-style:normal;font-weight:300;color:rgba(255,255,255,0.66)}
+.nav-links{display:flex;gap:30px;margin:0 auto}
+.nav-links a{font-family:var(--label-family);font-size:12px;letter-spacing:0.02em;
+             font-weight:var(--label-weight);color:rgba(255,255,255,0.6);text-decoration:none}
+.nav-links a:hover{color:var(--tx)}
+.btn{display:inline-block;background:var(--sky);color:#04101c;border-radius:999px;
+     padding:9px 19px;font-family:var(--sans);font-size:12.5px;font-weight:500;
+     letter-spacing:0.005em;text-decoration:none;white-space:nowrap}
+
+.hero-tag{font-size:clamp(23px,2.7vw,34px);line-height:1.3;letter-spacing:-0.01em;
+          font-weight:400;max-width:20ch;margin:0}
+.wordmark{display:flex;flex-direction:column;align-items:flex-end;margin:76px 0 0;line-height:1}
+.w-isth{font-family:var(--sans);font-weight:200;font-size:clamp(52px,11vw,150px);
+  font-variation-settings:"wdth" var(--isth-wdth);
+  letter-spacing:var(--isth-ls);text-transform:uppercase;color:#fff;
+  background:linear-gradient(176deg,#FFFFFF 0%,#EAF1F8 20%,#C2D0DD 48%,#FFFFFF 60%,#96A6B4 86%,#C4D2DF 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.w-mer{font-family:var(--serif-display);font-style:italic;font-weight:var(--mer-weight);
+  font-size:calc(clamp(46px,9.6vw,132px) * var(--mer-scale));
+  letter-spacing:0;color:var(--sky);margin-top:var(--mer-mt)}
+
+.eyebrow{display:inline-block;font-family:var(--label-family);font-size:11px;
+  letter-spacing:var(--label-ls);font-weight:var(--label-weight);text-transform:uppercase;
+  color:var(--accent-ink);margin:0 0 20px}
+.h-xl{font-family:var(--sans);font-weight:300;font-size:clamp(40px,6.2vw,82px);line-height:1.0;
+      letter-spacing:var(--head-xl-ls);max-width:17ch;margin:0;text-wrap:balance}
+.h-lg{font-family:var(--sans);font-weight:300;font-size:clamp(34px,5vw,64px);line-height:1.02;
+      letter-spacing:var(--head-xl-ls);max-width:19ch;margin:0;text-wrap:balance}
+.h-md{font-family:var(--sans);font-weight:300;font-size:clamp(22px,2.6vw,32px);line-height:1.12;
+      letter-spacing:var(--head-ls);margin:0}
+.serif-i{font-family:var(--serif-text);font-style:italic;font-weight:500;letter-spacing:0;
+         color:var(--accent-ink)}
+.lead{font-size:20px;line-height:1.6;max-width:60ch;color:var(--tx-2)}
+.body{font-size:17px;line-height:1.62;max-width:62ch;color:var(--tx-2)}
+.pull{font-family:var(--serif-display);font-style:italic;font-weight:var(--mer-weight);
+      font-size:clamp(40px,3.8vw,46px);line-height:1.24;max-width:22ch;margin:0;color:var(--tx)}
+.pull .accent{color:var(--accent-ink)}
+.fk{font-family:var(--serif-text);font-style:italic;font-weight:500;font-size:27px;
+    color:var(--accent-ink)}
+.source{font-family:var(--label-family);font-size:11.5px;letter-spacing:0.01em;
+        color:var(--tx-3);line-height:1.6}
+.source a{color:var(--tx-2)}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:30px}
+.mgrid strong{display:block;font-family:var(--sans);font-size:34px;font-weight:200;
+  letter-spacing:-0.02em;font-variant-numeric:tabular-nums;color:var(--tx)}
+.mgrid span{font-family:var(--label-family);font-size:11px;letter-spacing:var(--label-ls);
+  font-weight:var(--label-weight);text-transform:uppercase;color:var(--tx-3);margin-top:8px;display:block}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:44px}
+.cols p{margin:8px 0 0;font-size:16px;line-height:1.6;color:var(--tx-2);max-width:36ch}
+
+/* ── the deciding panel: body copy, all three at once ──────── */
+.abc{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:38px}
+.abc section{border-top:1px solid var(--line);padding-top:20px}
+.abc h4{font-family:var(--ui);font-size:10.5px;letter-spacing:0.16em;text-transform:uppercase;
+        color:var(--tx-3);margin:0 0 16px;font-weight:500}
+.abc .s-current{font-family:"Helvetica Neue","Helvetica","Arimo",Arial,sans-serif}
+.abc .s-a{font-family:"Archivo","Helvetica Neue",Arial,sans-serif}
+.abc .s-b{font-family:"Geist","Helvetica Neue",Arial,sans-serif}
+.abc p{font-size:17px;line-height:1.62;color:var(--tx-2);margin:0 0 14px}
+.abc .big{font-size:34px;font-weight:200;letter-spacing:-0.02em;color:var(--tx);
+          line-height:1.1;margin:0 0 14px}
+
+/* ── weight-200 proof ──────────────────────────────────────── */
+.proof{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:34px}
+.proof section{border:1px solid var(--line);border-radius:10px;padding:24px}
+.proof .word{font-size:46px;font-weight:200;text-transform:uppercase;letter-spacing:0.02em;
+             line-height:1.1;margin:0 0 16px;color:var(--tx)}
+.proof .f-arimo{font-family:"Arimo",Arial,sans-serif}
+.proof .f-archivo{font-family:"Archivo",Arial,sans-serif}
+.proof .f-hn{font-family:"Helvetica Neue",Arial,sans-serif}
+.verdict{font-family:var(--ui);font-size:12.5px;line-height:1.55;color:var(--tx-2);margin:0}
+.verdict b{display:block;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;
+           margin-bottom:6px}
+/* pass/fail uses the system's own voices: accent blue, and the one permitted red
+   (Muted Danger #c96f6f, DESIGN.md:112). No green exists in this system. */
+.ok b{color:var(--sky)} .bad b{color:#c96f6f}
+
+/* ── tuner ─────────────────────────────────────────────────── */
+.tuner{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:22px 30px;
+       font-family:var(--ui)}
+.tuner label{display:block;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;
+             color:var(--tx-3);margin-bottom:9px}
+.tuner output{color:var(--sky);font-variant-numeric:tabular-nums}
+.tuner input[type=range]{width:100%;accent-color:var(--sky)}
+.hint{font-family:var(--ui);font-size:12.5px;line-height:1.6;color:var(--tx-3);max-width:74ch}
+.hint b{color:var(--tx-2);font-weight:600}
+[data-stack="current"] .tuner-wrap,[data-stack="b"] .tuner-wrap{opacity:.36;pointer-events:none}
+[data-stack="current"] .tuner-off,[data-stack="b"] .tuner-off{display:block}
+.tuner-off{display:none;font-family:var(--ui);font-size:12px;color:var(--tx-3);margin-top:14px}
+
+@media (max-width:720px){
+  .wrap,.bar-in{padding-left:22px;padding-right:22px}
+  .nav-links{display:none}
+  .band{padding:44px 0 50px}
+  .wordmark{margin-top:48px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <div class="bar-in">
+    <span class="bar-t">Type stack</span>
+    <div class="seg" role="group" aria-label="Type stack">
+      <button data-set="current" aria-pressed="false">1 · Current</button>
+      <button data-set="a" aria-pressed="true">2 · Archivo + Instrument Serif</button>
+      <button data-set="b" aria-pressed="false">3 · Geist + Bodoni Moda</button>
+    </div>
+    <span class="bar-note">Press <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> to flicker-compare</span>
+  </div>
+</div>
+
+<!-- ── nav + hero, at true scale ───────────────────────────── -->
+<div class="band">
+  <div class="wrap">
+    <p class="tag">Nav &amp; hero — true scale</p>
+    <div class="nav">
+      <span class="wm"><b>ISTHMUS</b> <i>MERIDIAN</i></span>
+      <div class="nav-links">
+        <a href="#">Services</a><a href="#">How We Work</a><a href="#">Who We Serve</a>
+        <a href="#">Why Isthmus</a><a href="#">Company</a>
+      </div>
+      <a class="btn" href="#">Request access</a>
+    </div>
+    <div style="padding:70px 0 10px">
+      <p class="hero-tag">The analytical, operational, and reporting work behind an investment firm, run as a service.</p>
+      <h1 class="wordmark"><span class="w-isth">Isthmus</span><span class="w-mer">Meridian</span></h1>
+    </div>
+  </div>
+</div>
+
+<!-- ── hero tuner ──────────────────────────────────────────── -->
+<div class="band">
+  <div class="wrap">
+    <p class="tag">Tune the lockup</p>
+    <p class="hint" style="margin:0 0 26px">Archivo's width axis is the reason it was chosen over every other free
+      grotesque with a real Thin. Dial <b>Width</b> up and the wordmark reads drafted and monumental without getting
+      larger. The <b>Meridian</b> controls exist because Instrument Serif's x-height is much bigger than Cormorant's —
+      the current <code>132px</code> and <code>margin-top:-0.06em</code> are hand-tuned to Cormorant and will both be
+      wrong. Land values here and they go straight into <code>index.html:112-117</code>.</p>
+    <div class="tuner-wrap">
+      <div class="tuner">
+        <div><label for="t1">Isthmus tracking <output id="o1">0.005em</output></label>
+          <input type="range" id="t1" min="-20" max="40" value="5"></div>
+        <div><label for="t2">Isthmus width axis <output id="o2">108</output></label>
+          <input type="range" id="t2" min="62" max="125" value="108"></div>
+        <div><label for="t3">Meridian size <output id="o3">0.91×</output></label>
+          <input type="range" id="t3" min="70" max="115" value="91"></div>
+        <div><label for="t4">Meridian baseline <output id="o4">-0.02em</output></label>
+          <input type="range" id="t4" min="-16" max="6" value="-2"></div>
+      </div>
+    </div>
+    <p class="tuner-off">Tuner drives stack 2 only — Geist has no width axis, and the current stack is the
+      thing being replaced. Press <kbd>2</kbd> to enable.</p>
+  </div>
+</div>
+
+<!-- ── THE DECIDING PANEL ──────────────────────────────────── -->
+<div class="band">
+  <div class="wrap">
+    <p class="tag">Body copy — the actual decision</p>
+    <p class="hint" style="margin:0 0 30px">All three shown at once, always, at the real <code>17px / 1.62 / 62ch</code>.
+      <b>The hero looks good in every stack — it is not the test.</b> Archivo is picked on display strengths
+      (the Thin, the width axis, engineered counters) and those same qualities make it a cooler, stiffer body face
+      than Helvetica Neue. If that reads too mechanical here, Geist is the answer. Judge this panel, then go back up.</p>
+    <div class="abc">
+      <section><h4>Current — Helvetica Neue / Arimo</h4><div class="s-current">
+        <p class="big">$4.2bn</p>
+        <p>Every firm needs financial models, diligence, investor materials, reporting, research, portfolio
+        monitoring, data management, and operational coordination. Today that work is built three ways, and
+        none of them fit.</p>
+        <p>More activity and longer, more complex holding periods create more analytical and operational
+        work for investment teams.</p></div></section>
+      <section><h4>A — Archivo</h4><div class="s-a">
+        <p class="big">$4.2bn</p>
+        <p>Every firm needs financial models, diligence, investor materials, reporting, research, portfolio
+        monitoring, data management, and operational coordination. Today that work is built three ways, and
+        none of them fit.</p>
+        <p>More activity and longer, more complex holding periods create more analytical and operational
+        work for investment teams.</p></div></section>
+      <section><h4>B — Geist</h4><div class="s-b">
+        <p class="big">$4.2bn</p>
+        <p>Every firm needs financial models, diligence, investor materials, reporting, research, portfolio
+        monitoring, data management, and operational coordination. Today that work is built three ways, and
+        none of them fit.</p>
+        <p>More activity and longer, more complex holding periods create more analytical and operational
+        work for investment teams.</p></div></section>
+    </div>
+  </div>
+</div>
+
+<!-- ── weight 200 proof ────────────────────────────────────── -->
+<div class="band">
+  <div class="wrap">
+    <p class="tag">The bug this fixes — weight 200</p>
+    <p class="hint" style="margin:0 0 28px"><code>.w-isth</code> asks for <code>font-weight:200</code>.
+      Helvetica Neue has UltraLight, so it works on your Mac. <b>Arimo — the only webfont actually loaded —
+      ships 400/500/700 only</b>, so every Windows and Android visitor gets a synthesised or snapped weight and
+      the hero collapses. Checked below with <code>document.fonts.check()</code>, which reports what the browser
+      really has rather than what CSS asked for.</p>
+    <div class="proof">
+      <section><h4 style="font-family:var(--ui);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--tx-3);margin:0 0 12px;font-weight:500">Helvetica Neue — macOS only</h4>
+        <p class="word f-hn">Isthmus</p>
+        <p class="verdict" data-check="'Helvetica Neue'">…</p></section>
+      <section><h4 style="font-family:var(--ui);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--tx-3);margin:0 0 12px;font-weight:500">Arimo — what everyone else gets</h4>
+        <p class="word f-arimo">Isthmus</p>
+        <p class="verdict" data-check="Arimo">…</p></section>
+      <section><h4 style="font-family:var(--ui);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--tx-3);margin:0 0 12px;font-weight:500">Archivo — proposed</h4>
+        <p class="word f-archivo">Isthmus</p>
+        <p class="verdict" data-check="Archivo">…</p></section>
+    </div>
+  </div>
+</div>
+
+<!-- ── dark section fragments ──────────────────────────────── -->
+<div class="band">
+  <div class="wrap">
+    <p class="tag">Headings, inline serif italic, body</p>
+    <p class="eyebrow">Private markets</p>
+    <h2 class="h-lg">Private-market pressure is <span class="serif-i">rising</span>.</h2>
+    <p class="body" style="margin-top:26px">More activity and longer, more complex holding periods create more
+      analytical and operational work for investment teams.</p>
+    <p class="source" style="margin-top:26px">Source: <a href="#">McKinsey Global Private Equity Report 2026</a>.</p>
+    <div class="mgrid" style="margin-top:52px">
+      <div><strong>+44%</strong><span>Large deal value</span></div>
+      <div><strong>+17%</strong><span>Overall PE deal value</span></div>
+      <div><strong>+40%</strong><span>PE-backed exit value</span></div>
+      <div><strong>+48%</strong><span>Secondaries volume</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── light section fragments ─────────────────────────────── -->
+<div class="band lit">
+  <div class="wrap">
+    <p class="tag">Light ground — display italic &amp; text italic together</p>
+    <h2 class="h-xl">Running a fund takes more than an <span class="serif-i">investment team</span>.</h2>
+    <p class="body" style="margin-top:28px">Every firm needs financial models, diligence, investor materials,
+      reporting, research, portfolio monitoring, data management, and operational coordination. Today that work
+      is built three ways, and none of them fit.</p>
+    <blockquote class="pull" style="margin-top:56px">We do not hand your team another tool to run.
+      <span class="accent">We run the work.</span></blockquote>
+    <div class="cols" style="margin-top:52px">
+      <div><div class="fk">You send</div><p>A deal, a model, a reporting need, a fundraise, a research question.</p></div>
+      <div><div class="fk">We operate</div><p>On an AI-first bench, to your firm's standard, at the pace of a live raise.</p></div>
+      <div><div class="fk">You receive</div><p>Completed, institutional-grade work, ready for the IC or the LP.</p></div>
+    </div>
+    <p class="hint" style="margin-top:44px;color:rgba(13,28,43,0.5)">The pull quote uses the <em>display</em> serif;
+      “You send / We operate / You receive” and the inline italics use the <em>text</em> serif (Newsreader, low
+      optical size). That split is the whole argument for keeping two serifs — Instrument Serif and Bodoni Moda
+      are display faces and lose their hairlines at 16px.</p>
+  </div>
+</div>
+
+<div class="band" style="border-bottom:0">
+  <div class="wrap">
+    <p class="hint">Specimen loads fonts from the Google CDN for convenience. Shipping self-hosts them —
+      see <code>typography/README.md</code> §4 Step 2.</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  var root=document.documentElement, btns=[].slice.call(document.querySelectorAll('.seg button'));
+  function set(id){
+    root.setAttribute('data-stack',id);
+    btns.forEach(function(b){b.setAttribute('aria-pressed', String(b.dataset.set===id));});
+  }
+  btns.forEach(function(b){b.addEventListener('click',function(){set(b.dataset.set);});});
+  document.addEventListener('keydown',function(e){
+    if(/^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
+    var m={'1':'current','2':'a','3':'b'}[e.key]; if(m) set(m);
+  });
+
+  // hero tuner → CSS custom properties
+  function bind(input,out,prop,fmt){
+    var el=document.getElementById(input), o=document.getElementById(out);
+    function apply(){var v=fmt(+el.value); root.style.setProperty(prop,v); o.textContent=v;}
+    el.addEventListener('input',apply); apply();
+  }
+  bind('t1','o1','--p-isth-ls',  function(v){return (v/1000)+'em';});
+  bind('t2','o2','--p-isth-wdth',function(v){return String(v);});
+  bind('t3','o3','--p-mer-scale',function(v){return (v/100).toFixed(2);});
+  bind('t4','o4','--p-mer-mt',   function(v){return (v/100)+'em';});
+  document.getElementById('o3').textContent='0.91×';
+
+  /* Does a family really have a 200 cut?
+     NOT via document.fonts.check() — that follows CSS font-matching rules and
+     returns true whenever the *family* resolves, so it answers "true" for
+     Arimo at weight 200 even though Arimo has no ExtraLight. Useless here.
+     Instead: rasterise the word at 200 and at 400 and diff the pixels. If the
+     browser has no distinct 200 it serves the 400 glyphs and the two are
+     byte-identical. That is the actual question. */
+  function probe(family){
+    var W=760,H=150,c=document.createElement('canvas'),x=c.getContext('2d',{willReadFrequently:true});
+    c.width=W;c.height=H;
+    function draw(w){
+      x.clearRect(0,0,W,H);
+      x.font=w+' 104px '+family;
+      x.textBaseline='top';x.fillStyle='#fff';x.fillText('ISTHMUS',4,8);
+      return {px:x.getImageData(0,0,W,H).data, w:x.measureText('ISTHMUS').width};
+    }
+    var a=draw(200), b=draw(400), diff=0;
+    for(var i=3;i<a.px.length;i+=4){ if(a.px[i]!==b.px[i]) diff++; }
+    return {distinct:diff>0, diff:diff, w200:a.w.toFixed(1), w400:b.w.toFixed(1)};
+  }
+  function report(){
+    document.querySelectorAll('[data-check]').forEach(function(el){
+      var fam=el.dataset.check, r;
+      try{ r=probe(fam); }catch(err){ r=null; }
+      if(!r){ el.textContent='probe failed'; return; }
+      el.className='verdict '+(r.distinct?'ok':'bad');
+      el.innerHTML='<b>'+(r.distinct?'Real ExtraLight — 200 renders':'No 200 cut — collapses to 400')+'</b>'+
+        (r.distinct
+          ? 'Weight 200 rasterises differently from 400, so a genuine ExtraLight exists and the hairline wordmark renders as designed.'
+          : 'Weight 200 and weight 400 rasterise <em>identically</em>. There is no ExtraLight — the browser silently serves Regular and the hero collapses.')+
+        '<br><br><code style="opacity:.62">'+fam+'<br>advance @200 '+r.w200+'px · @400 '+r.w400+'px<br>'+
+        r.diff.toLocaleString()+' differing pixels</code>';
+    });
+  }
+  if(document.fonts&&document.fonts.ready){document.fonts.ready.then(function(){setTimeout(report,120);});}
+  else{ report(); }
+})();
+</script>
+</body>
+</html>

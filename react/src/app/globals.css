@@ -1,0 +1,4 @@
+/* Reuse the shared Isthmus token system + Tailwind v4 bridge, then the site CSS
+   (snap pages, globe field, glass) ported from the static build. */
+@import "../styles/globals.css";
+@import "../styles/site.css";

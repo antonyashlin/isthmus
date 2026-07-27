@@ -1,0 +1,605 @@
+/* Ported verbatim from the static build (website/index.html). Class names are reused 1:1 in the React components. */
+/* The Bklit funnel uses shadcn tokens (foreground/background) which are dark-theme
+   (light text). On the light AI page, re-map them to the light palette so the value/
+   label text and the % pill invert correctly. */
+.funnel-on-light{--foreground:#06121e;--muted-foreground:rgba(13,28,43,0.55);--background:#EDF2F7}
+:root{
+  --sky:#88C1ED; --sky-2:#C9E2F6; --steel:#4686B7; --steel-2:#63A6D9; --deep:#274F6F;
+  --ink-0:#000000; --ink-1:#05070A; --ink-2:#0B0F14; --ink-3:#101720;
+  --sans:"Helvetica Neue","Helvetica","Arimo",Arial,sans-serif;
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;
+  --mono:"SFMono-Regular","SF Mono",ui-monospace,Menlo,Consolas,"Liberation Mono",monospace;
+  --max:1200px; --ease:cubic-bezier(0.22,1,0.36,1);
+  /* vertical rhythm — one deliberate two-tier scale for caption->evidence gaps.
+     --stack: a component follows its caption. --stack-lg: a distinct beat (diagram groups). */
+  --stack:clamp(38px,4.6vh,56px); --stack-lg:clamp(52px,6vh,80px);
+  /* theme tokens (dark is the default screen) */
+  --bg:#04101c; --heading:#ffffff;
+  --tx:rgba(255,255,255,0.94); --tx-2:rgba(255,255,255,0.62); --tx-3:rgba(255,255,255,0.42);
+  --line:rgba(255,255,255,0.10); --line-2:rgba(255,255,255,0.18); --line-3:rgba(136,193,237,0.24);
+  --panel:#0B0F14; --card:#080d13; --card-hover:#111a24;
+  --accent-ink:var(--sky); --mer:#88C1ED;
+}
+.light{
+  --bg:#EDF2F7; --heading:#06121e;
+  --tx:#0d1c2b; --tx-2:rgba(13,28,43,0.66); --tx-3:rgba(13,28,43,0.46);
+  --line:rgba(13,28,43,0.12); --line-2:rgba(13,28,43,0.22); --line-3:rgba(70,134,183,0.32);
+  --panel:#ffffff; --card:#ffffff; --card-hover:#e3ecf4;
+  --accent-ink:#2f628a; --mer:#4686B7;
+  /* Bklit chart chrome is token-driven and ships dark-only; a light screen has
+     to hand it the paper palette or the gauges/funnel render near-invisible */
+  --chart-1:var(--steel); --chart-2:var(--steel-2);
+  /* shadcn's --foreground drives the gauge's centre figure (text-foreground) */
+  --foreground:var(--tx); --muted-foreground:var(--tx-2);
+  --chart-foreground:var(--tx); --chart-foreground-muted:var(--tx-2);
+  --chart-label:var(--tx-2); --chart-grid:var(--line);
+  --border:var(--line-2);
+}
+*{box-sizing:border-box}
+/* one screen = one bound. mandatory (no scroll-snap-stop:always, so a fast flick
+   can still cross several screens) */
+html{scroll-behavior:smooth;scroll-snap-type:y mandatory;scroll-padding-top:0}
+html,body{margin:0;padding:0}
+/* Screens carry their own background and rise into place like a stack of cards.
+   This replaces the old body background-color crossfade, and it is cheaper: that
+   transition repainted the whole viewport every frame for 300ms on every screen
+   change, whereas a card's colour is painted once and its entrance is a pure
+   transform on the compositor. `body` is now only a base colour behind the deck.
+   The cards sit at z-index:-2 so the globe field (-1) still reads across all of
+   them; body.on-light survives because the globe's colour still flips. */
+body{background-color:#04101c}
+section[id],#top{scroll-margin-top:66px}
+.hero,main>section{scroll-snap-align:start}
+body{font-family:var(--sans);color:var(--tx);-webkit-font-smoothing:antialiased;line-height:1.5;overflow-x:hidden}
+img,svg{display:block;max-width:100%}
+/* Kokonut ships its glass <filter> in an `svg.hidden`; this stylesheet is
+   unlayered, so the rule above would otherwise beat Tailwind's `hidden` and
+   leave an empty 150px block inside every card. */
+svg.hidden{display:none}
+a{color:var(--accent-ink);text-decoration:none;transition:color .2s var(--ease)}
+:focus-visible{outline:2px solid var(--sky);outline-offset:3px;border-radius:2px}
+.btn:focus-visible{outline-offset:2px}
+.wrap{position:relative;z-index:1;width:100%;max-width:var(--max);margin:0 auto;padding:0 48px}
+main>section,footer{position:relative;overflow:hidden;background:transparent;color:var(--tx)}
+/* the card itself. -2 keeps it under the globe field; the rounded top edge and
+   the shadow are what read as one screen resting on the one before it */
+.hero::after,main>section::before{content:"";position:absolute;inset:0;z-index:-2;
+  background:var(--bg);border-radius:26px 26px 0 0;
+  box-shadow:0 -26px 60px -28px rgba(0,0,0,0.6)}
+.hero::after{border-radius:0;box-shadow:none}
+h1,h2,h3,h4{margin:0;font-weight:300;letter-spacing:-0.02em;text-wrap:pretty;color:var(--heading)}
+p{margin:0}
+.serif-i{font-family:var(--serif);font-style:italic;font-weight:500;letter-spacing:0;color:var(--accent-ink)}
+
+/* meta labels in mono, cartographer's-instrument style */
+.eyebrow{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:0.18em;
+  text-transform:uppercase;color:var(--tx-3);font-weight:400}
+.lead{font-size:20px;line-height:1.6;color:var(--tx-2);max-width:60ch}
+.body{font-size:17px;line-height:1.62;color:var(--tx-2);max-width:62ch}
+
+/* meridian graticule per section */
+.sec-field{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.sec-field .sf{stroke:var(--mer);fill:none;stroke-width:1}
+.sec-field .sf-line{stroke:var(--mer);fill:none;stroke-width:1.1}
+
+/* ---- nav ---- */
+.nav{position:fixed;inset:0 0 auto 0;z-index:30;display:flex;align-items:center;justify-content:space-between;
+  gap:24px;height:64px;padding:0 48px;background:rgba(4,10,16,0.62);
+  backdrop-filter:blur(20px) saturate(140%);-webkit-backdrop-filter:blur(20px) saturate(140%);
+  border-bottom:1px solid rgba(255,255,255,0.06)}
+.brand{display:flex;align-items:center;gap:12px}
+.brand .wm{font-size:12px;letter-spacing:0.22em}
+.brand .wm b{font-weight:700;color:#fff}
+.brand .wm i{font-style:normal;font-weight:300;color:rgba(255,255,255,0.66)}
+.nav-links{display:flex;align-items:center;gap:30px}
+.nav-links a{font-family:var(--mono);font-size:12px;letter-spacing:0.02em;color:rgba(255,255,255,0.6)}
+.nav-links a:hover{color:#fff}
+.nav-cta{display:flex;align-items:center;gap:16px}
+
+/* ---- buttons ---- */
+.btn{display:inline-flex;align-items:center;justify-content:center;height:46px;padding:0 24px;border-radius:999px;
+  font-family:var(--sans);font-size:14px;font-weight:500;letter-spacing:0.005em;white-space:nowrap;cursor:pointer;
+  border:1px solid transparent;transition:transform .14s var(--ease),background .2s var(--ease),border-color .2s var(--ease),color .2s var(--ease)}
+.btn:active{transform:translateY(1px)}
+.btn-sm{height:34px;padding:0 18px;font-size:12.5px}
+.btn-primary{background:var(--sky);color:#04121e}
+.btn-primary:hover{background:#a6d4f3}
+.btn-ghost{background:transparent;color:var(--tx);border-color:var(--line-2)}
+.btn-ghost:hover{border-color:var(--accent-ink);color:var(--heading)}
+.btn-row{display:flex;flex-wrap:wrap;gap:14px}
+
+/* ---- hero ---- */
+.hero{position:relative;height:100vh;display:flex;flex-direction:column;justify-content:center;
+  padding:120px 48px 84px;overflow:hidden;background:transparent}
+/* subtle glow over the field, low enough opacity to let the globe read */
+.hero::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(70% 60% at 80% 12%, rgba(70,134,183,0.22) 0%, rgba(4,16,28,0) 66%)}
+.hero-field{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;contain:paint}
+.hero-inner{position:relative;z-index:2;max-width:var(--max);margin:0 auto;width:100%;
+  min-height:calc(100dvh - 210px);display:flex;flex-direction:column;justify-content:space-between}
+.hero-top{margin-right:auto;text-align:left;max-width:900px}
+.hero-tag{font-size:clamp(23px,2.7vw,34px);line-height:1.3;color:rgba(255,255,255,0.86);letter-spacing:-0.01em;text-wrap:pretty}
+.hero-bottom{margin-top:auto;display:flex;justify-content:flex-end}
+.wordmark{display:flex;flex-direction:column;align-items:flex-end;text-align:right;gap:0;line-height:0.9}
+.wordmark .w-isth{font-family:var(--sans);font-weight:200;font-size:clamp(52px,11vw,150px);
+  letter-spacing:0.02em;text-transform:uppercase;color:#fff;
+  background:linear-gradient(176deg,#FFFFFF 0%,#EAF1F8 20%,#C2D0DD 48%,#FFFFFF 60%,#96A6B4 86%,#C4D2DF 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.wordmark .w-mer{font-family:"Cormorant",Georgia,serif;font-style:italic;font-weight:600;
+  font-size:clamp(46px,9.6vw,132px);letter-spacing:0;color:var(--sky);margin-top:-0.06em}
+
+/* ---- one continuous globe field, fixed & UNDER the text (z-index:-1), panned by scroll ---- */
+/* 300vh tall: the hero sees the top third, screen 2 the middle, the last screen the bottom */
+.fg{position:fixed;top:0;left:0;width:100vw;height:300vh;z-index:-1;pointer-events:none;
+  transform:translateY(-100vh);will-change:transform}   /* composited layer; fallback = centred globe */
+.fg g,.fg circle,.fg path,.fg line{fill:none}
+/* soft glow — a genuine blur, but rasterised ONCE onto this layer's own
+   compositor texture (will-change:transform) so the scroll-pan is a cheap
+   translate, never a per-frame re-blur. Replaces the old fat-stroke fake glow. */
+.fgl-glow{filter:blur(6px)}
+.fgl-glow .gf-field{stroke-linecap:round;stroke-width:2.2;opacity:.55;stroke:#C9E2F6;
+  animation:gfBreathe 9s var(--ease) infinite}
+.fgl-sharp .gf-field{stroke-linecap:round;stroke-width:1.1;opacity:.92;stroke:#FFFFFF}
+/* deep-blue when the screen under the globe is light */
+body.on-light .fgl-glow .gf-field{stroke:#63A6D9;opacity:.5}
+body.on-light .fgl-sharp .gf-field{stroke:#356C97}
+
+/* ---- travelling lights ----
+   Each lamp is four concentric filled circles rather than a drop-shadow: this
+   layer's contents move every frame, and an SVG/CSS filter here would force a
+   re-rasterise of the whole 300vh layer on each one. */
+.fgl-spark{contain:paint}
+.spk,.spk-md{animation:spkBreathe 5.5s ease-in-out infinite}
+.spk:nth-of-type(2n){animation-duration:7.2s;animation-delay:-2.4s}
+.spk:nth-of-type(3n){animation-duration:6.3s;animation-delay:-4.1s}
+.fgl-spark .spk circle,.fgl-spark .spk-md circle{stroke:none}
+.fgl-spark .lp-3{fill:var(--sky-2);fill-opacity:.07}
+.fgl-spark .lp-2{fill:var(--sky-2);fill-opacity:.14}
+.fgl-spark .lp-1{fill:var(--sky-2);fill-opacity:.5}
+.fgl-spark .lp-0{fill:#FFFFFF;fill-opacity:.95}
+body.on-light .fgl-spark .lp-3{fill:var(--steel-2);fill-opacity:.10}
+body.on-light .fgl-spark .lp-2{fill:var(--steel-2);fill-opacity:.20}
+body.on-light .fgl-spark .lp-1{fill:var(--steel);fill-opacity:.55}
+body.on-light .fgl-spark .lp-0{fill:var(--deep);fill-opacity:.95}
+/* the medium light is the scroll read-out — it belongs to the body screens, not
+   the hero, and it fades rather than cuts when you leave the top */
+/* GlobeSparks adds .lit only while the lamp is actually crossing the viewport */
+.spk-md{opacity:0;transition:opacity .5s var(--ease)}
+.spk-md.lit{animation:spkBreatheMd 6.4s ease-in-out infinite}
+body.at-hero .spk-md{opacity:0;animation:none}
+@keyframes spkBreathe{0%,100%{opacity:.45}50%{opacity:1}}
+@keyframes spkBreatheMd{0%,100%{opacity:.62}50%{opacity:1}}
+/* straight glowing side rule — changes colour with the globe (white on dark, blue on light) */
+.gf-rule{position:fixed;left:3.6%;top:0;width:1.5px;height:100vh;z-index:-1;
+  background:linear-gradient(180deg,rgba(255,255,255,0.08) 0%,#FFFFFF 20%,#C9E2F6 80%,rgba(255,255,255,0.08) 100%);
+  box-shadow:0 0 10px 2px rgba(200,226,246,0.4),0 0 26px 6px rgba(200,226,246,0.14);
+  animation:gfBreatheSoft 9s var(--ease) infinite}
+body.on-light .gf-rule{
+  background:linear-gradient(180deg,rgba(53,108,151,0.12) 0%,#4686B7 20%,#356C97 80%,rgba(53,108,151,0.12) 100%);
+  box-shadow:0 0 10px 2px rgba(70,134,183,0.35),0 0 26px 6px rgba(70,134,183,0.12)}
+/* no vertical side rule on the hero screen (display:none so the breathing
+   opacity animation can't keep it visible) */
+body.at-hero .gf-rule{display:none}
+@keyframes gfBreathe{0%,100%{opacity:.3}50%{opacity:.62}}
+@keyframes gfBreatheSoft{0%,100%{opacity:.5}50%{opacity:.95}}
+@supports (animation-timeline: scroll()){
+  @media (prefers-reduced-motion: no-preference){
+    /* pan the field: hero top -> screen-2 centre -> hold -> last screen bottom */
+    .fg{animation:fgPan linear both;animation-timeline:scroll(root block)}
+    @keyframes fgPan{0%{transform:translateY(0)}12%{transform:translateY(-100vh)}86%{transform:translateY(-100vh)}100%{transform:translateY(-200vh)}}
+    main>section .wrap,main>section .slide{animation:gfFadeOut linear both;animation-timeline:view();animation-range:cover 72% cover 100%}
+    @keyframes gfFadeOut{0%{opacity:1}100%{opacity:0}}
+    /* the card rises as its screen enters and is exactly settled by the time the
+       screen snaps home (`entry 100%` == fully in view). transform only. */
+    main>section::before{animation:cardUp linear both;animation-timeline:view();
+      animation-range:entry 0% entry 100%}
+    @keyframes cardUp{from{transform:translateY(52px)}to{transform:translateY(0)}}
+  }
+}
+
+/* ---- section rhythm — each section is exactly one snap bound (100vh) ---- */
+/* one idea per screen, content centred and clipped to the viewport so every page
+   renders cleanly within its bound over a solid dark-navy or white background */
+.sec{height:100vh;display:flex;flex-direction:column;justify-content:center;
+  padding:104px 0 64px;overflow:hidden}
+.eyebrow + .h-xl,.eyebrow + .h-lg{margin-top:20px}
+.h-xl{font-size:clamp(40px,6.2vw,82px);font-weight:400;line-height:1.0;letter-spacing:-0.025em;max-width:17ch}
+.h-lg{font-size:clamp(34px,5vw,64px);font-weight:400;line-height:1.02;letter-spacing:-0.025em;max-width:19ch}
+.h-md{font-size:clamp(22px,2.6vw,32px);line-height:1.12}
+.mt-s{margin-top:24px}.mt-m{margin-top:34px}.mt-l{margin-top:72px}.mt-xl{margin-top:96px}
+
+/* ============================================================
+   Body-slide framing system.
+   Every body slide clears a left NO-ZONE (--nozone) — the band
+   the globe arc + vertical rule occupy — then frames three blocks:
+     .blk-head  the page heading (big, always visible)
+     .blk-desc  description copy (grows with the space it's given)
+     .blk-viz   the chart / illustration (animated, interactive)
+   arranged in one of four archetypes (.lay-a … .lay-d).
+   The grid is left-anchored just past the no-zone and capped so
+   line-lengths stay sane; extra width falls to the right.
+   ============================================================ */
+:root{ --nozone:clamp(190px,21vw,400px); --edge:clamp(24px,4vw,80px); }
+
+.sec.slide-sec{padding:0;justify-content:stretch}
+.slide{position:relative;z-index:1;width:100%;height:100%;
+  max-width:calc(var(--nozone) + 1200px);margin-right:auto;
+  display:grid;padding:116px var(--edge) 88px var(--nozone);
+  column-gap:clamp(30px,4vw,72px);row-gap:clamp(20px,3.2vh,44px)}
+
+.blk-head{margin:0;align-self:start}
+.blk-desc{margin:0}
+.blk-viz{margin:0;min-width:0;align-self:center}
+/* the viz block owns the row height; drop the stacked-flow top margins the
+   inner components carry so the grid gap is the single source of spacing */
+.blk-viz > *{margin-top:0}
+.blk-viz .chart-block,.blk-viz .routes,.blk-viz .flow,.blk-viz .journey,
+.blk-viz .offers,.blk-viz .contrasts,.blk-viz .mcards,.blk-viz .echart,
+.blk-viz .funnel,.blk-viz .radarw,.blk-viz .dials,.blk-viz .source{margin-top:0}
+.blk-viz .source{margin-top:22px}
+
+/* A — heading → description → illustration, one left-anchored column */
+.lay-a{grid-template-columns:minmax(0,1fr);align-content:center;justify-items:stretch}
+
+/* B — illustration leads, description, heading anchored at the base */
+.lay-b{grid-template-columns:minmax(0,1fr);align-content:center}
+.lay-b .blk-viz{order:1}.lay-b .blk-desc{order:2}.lay-b .blk-head{order:3;align-self:auto}
+/* `low` pushes the blocks to the two ends of the bound, so the statement
+   heading sits at the base of the screen rather than under the diagram */
+.slide.low{align-content:space-between;padding-top:clamp(150px,21vh,260px)}
+
+/* C — tall illustration left, heading + copy stacked on the right */
+.lay-c{grid-template-columns:minmax(0,1.02fr) minmax(0,0.98fr);align-content:center;align-items:center}
+.lay-c .blk-viz{grid-column:1;grid-row:1 / span 2;align-self:center}
+.lay-c .blk-head{grid-column:2;grid-row:1;align-self:end}
+.lay-c .blk-desc{grid-column:2;grid-row:2;align-self:start}
+
+/* D — heading spans the top, description left + illustration right */
+.lay-d{grid-template-columns:minmax(0,0.82fr) minmax(0,1.18fr);align-content:center;align-items:center}
+.lay-d .blk-head{grid-column:1 / -1}
+.lay-d .blk-desc{grid-column:1;grid-row:2;align-self:center}
+.lay-d .blk-viz{grid-column:2;grid-row:2}
+
+/* E — heading + copy on the left, one full-height illustration column on the right */
+.lay-e{grid-template-columns:minmax(0,0.86fr) minmax(0,1.14fr);align-content:center;
+  column-gap:clamp(30px,4vw,72px)}
+.lay-e .blk-head{grid-column:1;grid-row:1;align-self:end}
+.lay-e .blk-desc{grid-column:1;grid-row:2;align-self:start}
+.lay-e .blk-viz{grid-column:2;grid-row:1 / span 2;align-self:center}
+
+/* The globe arc sweeps furthest right across the TOP-LEFT of a screen (measured:
+   x≈757 at y=0, receding to ≤290 below y=300 at 1512w). A single left no-zone
+   can't clear it up there, so a heading that sits high steps right instead; the
+   illustration below sits where the arc has already receded. */
+.blk-head.clear-arc{margin-left:clamp(0px,19.5vw,340px)}
+
+/* radial charts (radar / rose) in a two-column archetype: let the canvas fill
+   its column so the long outer axis labels aren't clipped (radius stays capped
+   by the chart height, so it doesn't balloon) */
+.lay-c .blk-viz .echart.radial,.lay-d .blk-viz .echart.radial{max-width:none;margin-inline:auto}
+
+/* ---- problem: three routes, each a line diagram of its own failure mode ----
+   Every reveal on a 100vh screen is opacity + lift over space that is already
+   reserved, never an animated height — a bound must not change size under you. */
+.routes{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
+.route{padding:22px 30px 28px;border-left:1px solid var(--line);
+  transition:opacity .3s var(--ease),transform .3s var(--ease)}
+.route:first-child{border-left:none;padding-left:0}
+.route.off{opacity:.42}
+.route.on{transform:translateY(-5px)}
+.rt-glyph{width:100%;max-width:212px;height:auto;overflow:visible}
+.rt-base{stroke:var(--line-2);stroke-width:1;fill:none}
+.rt-dash{stroke:var(--accent-ink);stroke-width:1;stroke-dasharray:4 5;opacity:.5;fill:none}
+.rt-bar{fill:none;stroke:var(--accent-ink);stroke-width:1.2;opacity:.72;transition:opacity .3s var(--ease)}
+.rt-node{fill:none;stroke:var(--accent-ink);stroke-width:1.2}
+.rt-hole{fill:none;stroke:var(--line-2);stroke-width:1;stroke-dasharray:3 4}
+.rt-funnel{fill:none;stroke:var(--accent-ink);stroke-width:1.2;opacity:.78;transition:opacity .3s var(--ease)}
+.rt-drop{fill:var(--accent-ink);stroke:none}
+/* same mono caption step as .eyebrow — 11 user units in a 200-wide viewBox */
+.rt-deskmark{fill:var(--tx-3);font-family:var(--mono);font-size:11px;letter-spacing:0.14em;text-transform:uppercase}
+.route.on .rt-bar,.route.on .rt-funnel{opacity:1}
+.rt-name{margin-top:20px;font-family:var(--serif);font-style:italic;font-weight:500;font-size:26px;color:var(--accent-ink)}
+.rt-lede{margin-top:14px;font-size:16px;line-height:1.55;color:var(--tx-2)}
+.rt-detail{margin-top:13px;font-size:14.5px;line-height:1.5;color:var(--tx-3);
+  opacity:0;transform:translateY(6px);transition:opacity .3s var(--ease),transform .3s var(--ease)}
+.route.on .rt-detail{opacity:1;transform:none}
+@keyframes rtDrift{to{stroke-dashoffset:-18}}
+@keyframes rtPulse{0%,100%{opacity:.45}50%{opacity:1}}
+@keyframes rtFall{0%{transform:translateY(4px);opacity:0}16%{opacity:1}72%{opacity:1}100%{transform:translateY(110px);opacity:0}}
+@media (prefers-reduced-motion:no-preference){
+  .rt-drift{animation:rtDrift 2.6s linear infinite}
+  .rt-pulse{animation:rtPulse 3s ease-in-out infinite}
+  .rt-drop{animation:rtFall 3.8s linear infinite}
+}
+
+/* ---- pressure radar (Bklit) — plot and key share one active index ---- */
+.radarw{width:100%}
+.radarw-plot{width:100%;max-width:352px;margin-left:0;margin-right:auto}
+.rdr-lab{fill:var(--tx-2);font-family:var(--sans);font-size:12.5px;transition:fill .2s var(--ease)}
+.rdr-val{fill:var(--accent-ink);font-family:var(--mono);font-size:12px;transition:fill .2s var(--ease)}
+.rdr-lab.on{fill:var(--heading)}
+.rdr-val.on{fill:var(--sky)}
+.rdr-dot{fill:var(--sky);stroke:var(--bg);stroke-width:2}
+.rdr-hit{fill:transparent;cursor:pointer}
+.radarw-key{list-style:none;margin:20px 0 0;padding:14px 0 0;border-top:1px solid var(--line);
+  display:grid;grid-template-columns:1fr 1fr;gap:4px 18px}
+.rk{display:block;width:100%;text-align:left;background:none;border:0;border-radius:10px;
+  padding:8px 12px 10px;font:inherit;color:inherit;cursor:pointer;
+  transition:background .25s var(--ease)}
+.rk.on{background:color-mix(in srgb,var(--accent-ink) 13%,transparent)}
+.rk-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.rk-label{font-size:14px;color:var(--tx-2)}
+.rk-val{font-family:var(--mono);font-size:13px;color:var(--accent-ink)}
+.rk-note{display:block;margin-top:6px;font-size:12.5px;line-height:1.45;color:var(--tx-3);
+  opacity:0;transform:translateY(4px);transition:opacity .28s var(--ease),transform .28s var(--ease)}
+.rk.on .rk-note{opacity:1;transform:none}
+
+/* ---- glass plate behind a graph ----
+   A ~35% fill so the line-work reads as a plate resting on the globe field
+   rather than floating loose over it. */
+.viz-plate{position:relative;border-radius:20px;padding:clamp(20px,2.6vw,38px);
+  background:rgba(11,20,32,0.34);border:1px solid var(--line);
+  -webkit-backdrop-filter:blur(10px) saturate(130%);backdrop-filter:blur(10px) saturate(130%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.06)}
+.light .viz-plate{background:rgba(255,255,255,0.38);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.72)}
+@media (prefers-reduced-transparency: reduce){
+  .viz-plate{background:var(--panel);backdrop-filter:none;-webkit-backdrop-filter:none}
+}
+
+/* ---- services tree (replaces the ECharts tree) ---- */
+.tree{display:flex;flex-direction:column;gap:20px;width:100%}
+.tree-plot{position:relative;width:100%;height:clamp(300px,40vh,420px)}
+.tree-links{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.tr-link{fill:none;stroke:var(--line-2);stroke-width:1.1;vector-effect:non-scaling-stroke;
+  transition:stroke .25s var(--ease)}
+.tr-link.lit{stroke:var(--accent-ink);stroke-width:1.6}
+.tr-slot{position:absolute;transform:translateY(-50%)}
+.slot-root{left:0;width:20%}
+.slot-branch{left:27%;width:19%}
+.slot-leaf{left:55%;width:45%}
+.tr-node{display:block;width:100%;margin:0;text-align:left}
+html.js .tree:not(.ready) .tr-node{opacity:0}
+.tr-root{font-family:var(--serif);font-style:italic;font-weight:500;
+  font-size:clamp(18px,1.6vw,23px);color:var(--accent-ink);line-height:1.2}
+.tr-branch{font-size:clamp(15px,1.3vw,19px);color:var(--tx-2);letter-spacing:-0.01em;
+  line-height:1.25;transition:color .25s var(--ease)}
+.tr-branch.lit{color:var(--heading)}
+.tr-leaf{background:none;border:0;padding:0;font:inherit;cursor:pointer;
+  font-size:clamp(16px,1.4vw,20px);color:var(--heading);letter-spacing:-0.01em;line-height:1.25;
+  transition:color .25s var(--ease)}
+.tr-leaf.lit{color:var(--accent-ink)}
+.tree-detail{min-height:3em;margin:0;padding-top:16px;border-top:1px solid var(--line);
+  font-size:clamp(15px,1.35vw,19px);line-height:1.5;color:var(--tx-2);max-width:64ch}
+
+/* ---- readiness rings (Bklit RingChart, replaces the ECharts rose) ---- */
+.rings{display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(18px,2.4vw,38px);align-items:center}
+.rings-plot{position:relative;flex:none}
+.rings-center{position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;pointer-events:none}
+.rings-key{list-style:none;margin:0;padding:0;display:grid;gap:2px;align-content:center}
+.rings-figure{display:block;font-size:30px;font-weight:200;color:var(--heading);
+  letter-spacing:-0.02em;font-variant-numeric:tabular-nums;line-height:1.05}
+.rings-cap{display:block;margin-top:6px;max-width:11ch;font-size:12.5px;line-height:1.35;color:var(--tx-3)}
+
+/* ---- back-office dials (Bklit gauge) ---- */
+.dials{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;align-items:start}
+.dial{display:flex;flex-direction:column;align-items:center;text-align:center;
+  background:none;border:0;border-radius:16px;padding:14px 16px 20px;font:inherit;color:inherit;cursor:pointer;
+  transition:background .3s var(--ease),transform .3s var(--ease),opacity .3s var(--ease)}
+.dial.on{background:color-mix(in srgb,var(--accent-ink) 10%,transparent);transform:translateY(-5px)}
+.dial.off{opacity:.48}
+.dial-label{margin-top:8px;font-size:15.5px;color:var(--heading);letter-spacing:-0.01em}
+.dial-note{margin-top:9px;max-width:28ch;font-size:12.5px;line-height:1.45;color:var(--tx-3);
+  opacity:0;transform:translateY(4px);transition:opacity .28s var(--ease),transform .28s var(--ease)}
+.dial.on .dial-note{opacity:1;transform:none}
+
+/* ---- data screen (charts breathe on the ground, no box) ---- */
+.chart-block{margin-top:var(--stack)}
+.chart-title{font-size:clamp(19px,2vw,24px);font-weight:400;color:var(--heading);letter-spacing:-0.01em;max-width:34ch}
+.chart-cap{margin-top:12px;font-size:16px;color:var(--tx-2);line-height:1.55;max-width:58ch}
+/* a chart tight under its own title/caption; the leading gap is owned by .chart-block */
+.echart{width:100%;margin-top:22px}
+/* a diagram that leads a screen straight after the section caption */
+.echart.chart-lead{margin-top:var(--stack-lg)}
+/* radial specimens (radar, rose): cap + left-align to the content column (like the
+   hero and every heading) so the plot fills its box and sits under its caption, not adrift */
+.echart.radial{max-width:560px;margin-left:0;margin-right:auto}
+
+/* ---- Bklit-style funnel ---- */
+.funnel{width:100%;margin-top:var(--stack);--fn:#4686B7;--fn-line:rgba(13,28,43,0.16)}
+.funnel svg{width:100%;height:auto;display:block;overflow:visible}
+.fn-seg{transform-box:fill-box;transform-origin:center}
+html.js .funnel{opacity:0}
+.fn-top{fill:var(--heading);font-family:var(--sans);font-weight:600;font-size:23px;letter-spacing:-0.01em}
+.fn-pill rect{fill:var(--heading)}
+.fn-pilltext{fill:var(--bg);font-family:var(--sans);font-weight:600;font-size:15px}
+.fn-bot{fill:var(--tx-2);font-family:var(--sans);font-size:14.5px}
+@media (prefers-reduced-motion: reduce){ html.js .funnel{opacity:1} }
+.echart canvas{cursor:default}
+.source{margin-top:26px;font-family:var(--mono);font-size:11.5px;letter-spacing:0.01em;color:var(--tx-3);line-height:1.6}
+.source a{color:var(--tx-3);text-decoration:underline;text-decoration-color:var(--line-2);text-underline-offset:3px}
+.source a:hover{color:var(--accent-ink)}
+
+/* ---- services grid ---- */
+.svc{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;margin-top:var(--stack-lg);background:var(--line);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.svc article{background:var(--card);padding:34px 32px 38px;min-height:210px;display:flex;flex-direction:column;transition:background .3s var(--ease)}
+.svc article:hover{background:var(--card-hover)}
+.svc .idx{font-family:var(--serif);font-style:italic;font-size:20px;color:var(--accent-ink)}
+.svc h3{margin-top:auto;font-size:21px;font-weight:400;letter-spacing:-0.01em;color:var(--heading)}
+.svc p{margin-top:14px;font-size:14.5px;line-height:1.52;color:var(--tx-2)}
+.svc .s-wide{grid-column:span 3}
+.svc .s-mid{grid-column:span 3}
+.svc .s-tri{grid-column:span 2}
+
+/* ---- how: journey line (five waypoints on a meridian) ---- */
+.journey{position:relative;display:grid;grid-template-columns:repeat(5,1fr);gap:0;margin-top:var(--stack-lg)}
+.journey-track{position:absolute;top:8px;left:14px;right:8%;height:1.5px;
+  background:linear-gradient(90deg,var(--deep),var(--steel) 45%,var(--sky));opacity:.7}
+.jstep{position:relative;padding:0 26px 0 0}
+.jdot{position:absolute;top:1px;left:8px;width:15px;height:15px;border-radius:50%;
+  background:var(--bg);border:2px solid var(--sky);
+  box-shadow:0 0 0 4px var(--bg),0 0 16px -2px var(--sky)}
+.jn{margin-top:44px;font-family:var(--mono);font-size:12px;letter-spacing:0.1em;color:var(--accent-ink)}
+.jstep h3{margin-top:16px;font-size:20px;font-weight:400;color:var(--heading);letter-spacing:-0.01em}
+.jstep p{margin-top:12px;font-size:14.5px;line-height:1.52;color:var(--tx-2);max-width:22ch}
+
+/* ---- shift: a three-step flow on a meridian line ---- */
+.flow{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:var(--stack-lg)}
+.flow-track{position:absolute;top:8px;left:14px;right:22%;height:1.5px;
+  background:linear-gradient(90deg,var(--deep),var(--steel) 50%,var(--sky));opacity:.7}
+.fstep{position:relative;padding:0 44px 0 0}
+.fdot{position:absolute;top:1px;left:8px;width:15px;height:15px;border-radius:50%;
+  background:var(--bg);border:2px solid var(--sky);box-shadow:0 0 0 4px var(--bg),0 0 16px -2px var(--sky)}
+.fdot.feat{background:var(--sky)}
+.fk{margin-top:46px;font-family:var(--serif);font-style:italic;font-weight:500;font-size:27px;color:var(--accent-ink)}
+.fstep p{margin-top:16px;font-size:16px;line-height:1.55;color:var(--tx-2);max-width:26ch}
+/* the packet: work moving along the flow. `left` transitions between two calc()
+   lengths so the waypoints stay pinned to the dots at any column width */
+.flow .fstep{opacity:.6;transition:opacity .35s var(--ease)}
+.flow .fstep.lit{opacity:1}
+.fstep.lit .fdot{background:var(--sky);box-shadow:0 0 0 4px var(--bg),0 0 24px 1px var(--sky)}
+.flow-fill{position:absolute;top:8px;left:14px;height:1.5px;width:0;z-index:1;
+  background:linear-gradient(90deg,var(--steel),var(--sky));
+  box-shadow:0 0 12px 1px rgba(136,193,237,0.5);pointer-events:none}
+.flow-packet{position:absolute;top:1px;z-index:2;width:15px;height:15px;margin-left:-7.5px;
+  border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,#FFFFFF 0%,var(--sky) 46%,rgba(136,193,237,0) 72%);
+  box-shadow:0 0 20px 5px rgba(136,193,237,0.45);
+  will-change:transform}
+@media (prefers-reduced-motion:reduce){ .flow-packet,.flow-fill{display:none} .flow .fstep{opacity:1} }
+
+/* ---- interactive liquid glass (offers + metrics) ----
+   The Kokonut card is a shadcn Card (flex column, overflow hidden); its only
+   in-flow child is the content wrapper, so that is what has to grow. */
+.glass-slot{position:relative;display:flex;min-width:0}
+.glass-slot > *{width:100%}
+.glass-spot{position:absolute;inset:-48px;z-index:0;pointer-events:none}
+.glass-detail{display:block;opacity:0;transform:translateY(7px);
+  transition:opacity .3s var(--ease),transform .3s var(--ease)}
+.glass-detail.on{opacity:1;transform:none}
+.offer > div.relative,.mcard > div.relative{display:flex;flex:1;flex-direction:column}
+
+/* ---- who: offerings ---- */
+.offers{display:grid;grid-template-columns:1fr 1.12fr 1fr;gap:22px;align-items:stretch}
+.offer{height:100%;padding:34px 32px 30px;border:1px solid var(--line);border-radius:18px;background:var(--card);
+  transition:border-color .3s var(--ease),box-shadow .3s var(--ease),opacity .3s var(--ease)}
+.offer.feat{border-color:var(--line-3);box-shadow:0 0 70px -24px rgba(70,134,183,0.55)}
+.offer.on{border-color:var(--line-3);box-shadow:0 22px 60px -30px rgba(70,134,183,0.75)}
+.offer.off{opacity:.62}
+.offer h3{font-size:23px;font-weight:400;color:var(--heading);letter-spacing:-0.01em}
+.offer p{margin-top:13px;font-size:15.5px;line-height:1.55;color:var(--tx-2)}
+.offer .btn{margin-top:auto;align-self:flex-start}
+.glass-detail{margin-top:14px}
+.offer .glass-detail{list-style:none;margin:14px 0 24px;padding:0}
+.offer .glass-detail li{position:relative;padding-left:16px;font-size:13.5px;line-height:1.5;color:var(--tx-3)}
+.offer .glass-detail li + li{margin-top:7px}
+.offer .glass-detail li::before{content:"";position:absolute;left:0;top:8px;width:6px;height:1px;background:var(--accent-ink)}
+.feat-tag{font-family:var(--mono);font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:16px}
+
+/* ---- LP expectations: metric cards ---- */
+.mcards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:stretch}
+.mcard{height:100%;padding:28px 26px 26px;border:1px solid var(--line);border-radius:16px;background:var(--card);
+  transition:border-color .3s var(--ease),box-shadow .3s var(--ease),opacity .3s var(--ease)}
+.mcard.on{border-color:var(--line-3);box-shadow:0 22px 60px -30px rgba(70,134,183,0.7)}
+.mcard.off{opacity:.62}
+.mcard-figure{display:block;font-size:34px;font-weight:200;color:var(--heading);letter-spacing:-0.02em;font-variant-numeric:tabular-nums}
+.mcard-blurb{display:block;margin-top:14px;font-size:14px;line-height:1.5;color:var(--tx-2)}
+.mcard .glass-detail{margin-top:12px;font-size:13px;line-height:1.45;color:var(--tx-3)}
+
+/* ---- why: contrasts ---- */
+.contrasts{display:grid;grid-template-columns:1fr 1fr;gap:1px 0;margin-top:var(--stack-lg);background:var(--line);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.contrasts div{background:var(--card);padding:28px 32px;display:flex;align-items:baseline;gap:18px}
+.contrasts .yes{font-size:20px;color:var(--heading);font-weight:400;letter-spacing:-0.01em}
+.contrasts .no{font-family:var(--serif);font-style:italic;font-size:16px;color:var(--tx-3)}
+
+/* ---- pull quote ---- */
+.pull{font-family:var(--serif);font-style:italic;font-weight:500;font-size:clamp(26px,3.8vw,46px);
+  line-height:1.22;letter-spacing:-0.01em;color:var(--heading);max-width:18ch}
+/* the statement page carries the screen — it gets the display size, not the body size */
+.pull-xl{font-size:clamp(32px,5.1vw,64px);line-height:1.16;max-width:19ch}
+.pull .accent{color:var(--accent-ink)}
+
+/* ---- company / cta — heading top-right, CTA body below-left ---- */
+.cta-sec{justify-content:flex-start}
+.company-head{max-width:22ch;margin-left:auto;text-align:right}
+.company-body{margin-top:clamp(40px,7vh,88px);max-width:56ch}
+.company-body .btn-row{margin-top:34px}
+
+/* ---- liquid-glass contact bar, pinned to the bottom of the company bound ---- */
+.glassbar{position:absolute;left:0;right:0;bottom:0;z-index:2;display:flex;align-items:center;
+  justify-content:space-between;gap:24px;flex-wrap:wrap;padding:20px clamp(24px,4vw,64px);
+  background:rgba(8,16,26,0.5);-webkit-backdrop-filter:blur(22px) saturate(160%);
+  backdrop-filter:blur(22px) saturate(160%);
+  border-top:1px solid rgba(255,255,255,0.16);box-shadow:inset 0 1px 0 rgba(255,255,255,0.08)}
+.glassbar .wm{font-size:12px;letter-spacing:0.22em}
+.glassbar .wm b{color:var(--heading);font-weight:700}.glassbar .wm i{font-style:normal;font-weight:300;color:var(--tx-3)}
+.contact{display:flex;align-items:center;gap:clamp(16px,2vw,28px);flex-wrap:wrap;font-family:var(--mono);font-size:12.5px}
+.contact-label{color:var(--tx-3);text-transform:uppercase;letter-spacing:0.16em;font-size:11px}
+.contact a{color:var(--tx);text-decoration:none;transition:color .2s var(--ease)}
+.contact a:hover{color:var(--sky)}
+@media (prefers-reduced-transparency: reduce){ .glassbar{background:#0a141e;backdrop-filter:none;-webkit-backdrop-filter:none} }
+.foot-nav a{color:var(--tx-2)}.foot-nav a:hover{color:#fff}
+
+/* ---- reveal — entrance choreography handed to Motion (see motion.js) ---- */
+.reveal{opacity:1}                 /* visible by default so the page is readable without JS */
+html.js .reveal{opacity:0}         /* hidden only when Motion will animate them in */
+
+@media (prefers-reduced-motion: no-preference){
+  .mg-draw,.mg-axis{stroke-dasharray:1;stroke-dashoffset:1;animation:mg-draw 2.6s var(--ease) .9s forwards}
+  .mg-axis{animation-duration:1.7s;animation-delay:.3s}
+  .mg-fan ellipse{opacity:0;animation:mg-fade .9s var(--ease) forwards}
+  .mg-faint{opacity:0;animation:mg-fade 1.4s var(--ease) 1.8s forwards}
+  .mg-breathe-a{animation:mg-breathe 13s ease-in-out 2.2s infinite}
+  .mg-breathe-b{animation:mg-breathe 13s ease-in-out 3.4s infinite}
+  .sec-field .sf{animation:mg-breathe 15s ease-in-out infinite}
+  .wordmark{opacity:0;animation:mg-rise 1s var(--ease) 1.1s forwards}
+  .hero-top{opacity:0;animation:mg-rise 1s var(--ease) .7s forwards}
+}
+@media (prefers-reduced-motion: reduce){
+  html.js .reveal{opacity:1;transform:none}
+  .mg-spark,.fgl-spark{display:none}
+  html{scroll-snap-type:none}
+}
+@keyframes mg-draw{to{stroke-dashoffset:0}}
+@keyframes mg-fade{to{opacity:1}}
+@keyframes mg-rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+@keyframes mg-breathe{0%,100%{opacity:.62}50%{opacity:1}}
+.mg-bright{filter:drop-shadow(0 0 5px rgba(136,193,237,0.45))}
+.mg-axis{filter:drop-shadow(0 0 4px rgba(200,226,246,0.6))}
+.mg-spark{filter:drop-shadow(0 0 4px rgba(200,226,246,0.9))}
+
+/* ---- responsive ---- */
+@media (max-width:1000px){
+  .journey{grid-template-columns:1fr 1fr;gap:36px 0}
+  .journey-track{display:none}
+  .jstep{padding-left:8px}
+  .offers,.mcards{grid-template-columns:1fr}
+  .contrasts{grid-template-columns:1fr}
+  .routes,.dials{grid-template-columns:1fr}
+  .route{border-left:none;border-top:1px solid var(--line);padding:22px 0}
+  .route:first-child{border-top:none}
+  .dial{align-items:flex-start;text-align:left;padding-left:0}
+  .radarw-key{grid-template-columns:1fr}
+  /* collapse the two-column archetypes (C/D) to a single stacked column and
+     shrink the no-zone (the arc reads narrower on smaller viewports) */
+  :root{--nozone:clamp(28px,8vw,150px)}
+  .slide,.lay-c,.lay-d,.lay-e{grid-template-columns:minmax(0,1fr)}
+  .blk-head.clear-arc{margin-left:0}
+  .slide .blk-head,.slide .blk-desc,.slide .blk-viz{grid-column:1;grid-row:auto;align-self:auto}
+  .lay-b .blk-viz{order:1}.lay-b .blk-desc{order:2}.lay-b .blk-head{order:3}
+}
+@media (max-width:760px){
+  .wrap{padding:0 24px}
+  .nav{padding:0 24px}
+  .nav-links{display:none}
+  .wbr{display:none}
+  .sec{height:auto;min-height:auto;justify-content:flex-start;padding:96px 0;overflow:visible}
+  .slide{height:auto;padding:0 24px;row-gap:26px}
+  html{scroll-snap-type:none}
+  .hero{padding:104px 24px 64px}
+  .journey{grid-template-columns:1fr;gap:30px 0}
+  .flow{grid-template-columns:1fr;gap:34px 0}
+  .flow-track,.flow-packet,.flow-fill{display:none}
+  .flow .fstep{opacity:1}
+}

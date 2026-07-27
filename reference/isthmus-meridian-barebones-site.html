@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Isthmus Meridian</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      color: #111;
+      background: #fff;
+      line-height: 1.5;
+    }
+
+    header,
+    section,
+    footer {
+      padding: 32px 24px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    nav {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    nav a,
+    .button {
+      color: #111;
+      text-decoration: none;
+      border: 1px solid #111;
+      padding: 8px 12px;
+      display: inline-block;
+      margin: 4px 4px 4px 0;
+      background: #fff;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      font-size: 44px;
+      line-height: 1.1;
+      margin: 0 0 16px;
+    }
+
+    h2 {
+      font-size: 28px;
+      margin: 0 0 12px;
+    }
+
+    h3 {
+      font-size: 20px;
+      margin: 0 0 8px;
+    }
+
+    .lead {
+      font-size: 20px;
+      max-width: 760px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .box {
+      border: 1px solid #bbb;
+      padding: 16px;
+    }
+
+    .chart {
+      border: 1px solid #bbb;
+      padding: 16px;
+      margin-top: 20px;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 190px 1fr 56px;
+      gap: 12px;
+      align-items: center;
+      margin: 10px 0;
+    }
+
+    .track {
+      height: 18px;
+      background: #eee;
+      border: 1px solid #ccc;
+    }
+
+    .fill {
+      height: 100%;
+      background: #111;
+    }
+
+    .source {
+      font-size: 12px;
+      color: #555;
+      margin-top: 12px;
+    }
+
+    .source a {
+      color: #555;
+    }
+
+    .featured {
+      border: 2px solid #111;
+      background: #f5f5f5;
+    }
+
+    ul,
+    ol {
+      padding-left: 22px;
+    }
+
+    blockquote {
+      margin: 16px 0;
+      padding-left: 16px;
+      border-left: 4px solid #999;
+      font-weight: bold;
+    }
+
+    .eyebrow {
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      color: #555;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <nav>
+        <strong>Isthmus Meridian</strong>
+        <div class="nav-links">
+          <a href="#services">Services</a>
+          <a href="#how">How We Work</a>
+          <a href="#who">Who We Serve</a>
+          <a href="#why">Why Isthmus</a>
+          <a href="#contact">Company</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <section>
+    <div class="wrap">
+      <div class="eyebrow">AI-enabled private-markets back-office services</div>
+      <h1>The private-markets back office, rebuilt with AI.</h1>
+      <p class="lead">We operate the analytical, operational, and reporting functions behind investment firms, from active deal execution through portfolio monitoring.</p>
+      <a class="button" href="#contact">Build Your Back Office</a>
+      <a class="button" href="#contact">Bring Us a Deal</a>
+
+      <div class="chart">
+        <h3>Private-market pressure is rising</h3>
+        <p>More transaction activity, harder underwriting, and liquidity pressure create more work for investment teams.</p>
+        <div class="bar-row">
+          <span>Large deal value</span>
+          <div class="track"><div class="fill" style="width: 44%"></div></div>
+          <strong>+44%</strong>
+        </div>
+        <div class="bar-row">
+          <span>Overall PE deal value</span>
+          <div class="track"><div class="fill" style="width: 17%"></div></div>
+          <strong>+17%</strong>
+        </div>
+        <div class="bar-row">
+          <span>PE-backed exit value</span>
+          <div class="track"><div class="fill" style="width: 40%"></div></div>
+          <strong>+40%</strong>
+        </div>
+        <div class="bar-row">
+          <span>Secondaries volume</span>
+          <div class="track"><div class="fill" style="width: 48%"></div></div>
+          <strong>+48%</strong>
+        </div>
+        <p class="source">Source: <a href="https://www.mckinsey.com/industries/private-capital/our-insights/global-private-markets-report/private-equity">McKinsey Global Private Equity Report 2026</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>Running a fund requires more than an investment team.</h2>
+      <p>Every investment firm needs financial models, diligence, investor materials, reporting, research, portfolio monitoring, data management, and operational coordination.</p>
+      <div class="grid">
+        <div class="box">Building every function internally is expensive.</div>
+        <div class="box">Coordinating multiple providers is fragmented.</div>
+        <div class="box">Generic AI tools still leave the work to the investor.</div>
+      </div>
+
+      <div class="chart">
+        <h3>The back office is the bottleneck</h3>
+        <p>These are directional figures from different surveys, shown together to frame the operational pain.</p>
+        <div class="bar-row">
+          <span>Data fragmentation</span>
+          <div class="track"><div class="fill" style="width: 89%"></div></div>
+          <strong>89%</strong>
+        </div>
+        <div class="bar-row">
+          <span>More detailed LP requests</span>
+          <div class="track"><div class="fill" style="width: 58%"></div></div>
+          <strong>58%</strong>
+        </div>
+        <div class="bar-row">
+          <span>Static reporting</span>
+          <div class="track"><div class="fill" style="width: 44%"></div></div>
+          <strong>44%</strong>
+        </div>
+        <p class="source">Sources: <a href="https://www.equiforte.com/resources/blog/pe-cfo-reporting-survey">Equiforte PE CFO survey</a>, <a href="https://www.maybern.com/post/meeting-the-growing-demands-of-in-flight-lp-information-requests">Maybern / Private Funds CFO</a>, <a href="https://www.pwc.com/mk/en/news/cfo-compass-survey-2025.html">PwC CFO Compass 2025</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>We do not give your team another tool to operate. We operate the work.</h2>
+      <p>The client sends Isthmus a deal, reporting requirement, fundraising process, portfolio update, research question, or operational workflow. Isthmus returns completed work.</p>
+      <blockquote>Not another tool for your team to manage. An embedded team that completes the work.</blockquote>
+    </div>
+  </section>
+
+  <section id="services">
+    <div class="wrap">
+      <div class="eyebrow">Services</div>
+      <h2>What Isthmus Meridian provides</h2>
+      <div class="grid">
+        <div class="box">
+          <h3>Deal Team Support</h3>
+          <p>Support the investment team from sourcing through investment committee.</p>
+          <ul>
+            <li>Deal sourcing support</li>
+            <li>Opportunity research</li>
+            <li>Company screening</li>
+            <li>Market mapping</li>
+            <li>Investment memo preparation</li>
+            <li>Investment committee presentations</li>
+          </ul>
+        </div>
+
+        <div class="box">
+          <h3>Financial Modeling</h3>
+          <p>Institutional financial analysis delivered faster and consistently across every transaction.</p>
+          <ul>
+            <li>Financial model development</li>
+            <li>Forecasting</li>
+            <li>Valuation</li>
+            <li>Comparable-company analysis</li>
+            <li>Returns analysis</li>
+            <li>Scenario analysis</li>
+          </ul>
+        </div>
+
+        <div class="box">
+          <h3>Capital Formation</h3>
+          <p>Materials and analysis that help funds communicate with current and prospective investors.</p>
+          <ul>
+            <li>Fund presentations</li>
+            <li>Pitch decks</li>
+            <li>Track-record presentations</li>
+            <li>LP update materials</li>
+            <li>Due diligence questionnaires</li>
+            <li>Investor meeting materials</li>
+          </ul>
+        </div>
+
+        <div class="box">
+          <h3>Fund Operations</h3>
+          <p>Recurring operational work that would otherwise require internal hires or multiple providers.</p>
+          <ul>
+            <li>Deal pipeline administration</li>
+            <li>Investment documentation management</li>
+            <li>Internal reporting</li>
+            <li>Data-room organization</li>
+            <li>Workflow coordination</li>
+            <li>Operating calendars and deadlines</li>
+          </ul>
+        </div>
+
+        <div class="box">
+          <h3>Portfolio Monitoring</h3>
+          <p>A consistent view across every portfolio company.</p>
+          <ul>
+            <li>KPI collection and normalization</li>
+            <li>Financial-performance analysis</li>
+            <li>Budget-versus-actual analysis</li>
+            <li>Risk identification</li>
+            <li>Portfolio dashboards</li>
+            <li>Exit-readiness analysis</li>
+          </ul>
+        </div>
+
+        <div class="box">
+          <h3>Research and Intelligence</h3>
+          <p>Research delivered within the context of your actual investment strategy and active deals.</p>
+          <ul>
+            <li>Sector research</li>
+            <li>Company research</li>
+            <li>Market intelligence</li>
+            <li>Transaction research</li>
+            <li>Competitive landscapes</li>
+            <li>Ongoing watchlists</li>
+          </ul>
+        </div>
+
+        <div class="box">
+          <h3>Data and AI Enablement</h3>
+          <p>We automate the work after we understand how your firm performs it.</p>
+          <ul>
+            <li>Workflow mapping</li>
+            <li>Internal knowledge organization</li>
+            <li>Document processing</li>
+            <li>Reusable templates</li>
+            <li>Automated reporting</li>
+            <li>Custom analytical tools</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how">
+    <div class="wrap">
+      <div class="eyebrow">How We Work</div>
+      <h2>An embedded team without the cost of building one.</h2>
+      <ol>
+        <li><strong>Understand:</strong> Map the firm's strategy, standards, processes, and recurring requirements.</li>
+        <li><strong>Operate:</strong> Take responsibility for defined analytical and operational workflows.</li>
+        <li><strong>Standardize:</strong> Build repeatable templates, reporting structures, and quality controls.</li>
+        <li><strong>Automate:</strong> Use AI and internal tools to reduce turnaround times and repetitive labor.</li>
+        <li><strong>Expand:</strong> Take on additional functions as the relationship develops.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="eyebrow">AI Advantage</div>
+      <h2>Faster execution without sacrificing institutional quality.</h2>
+      <p>AI helps Isthmus review more information, extract and structure data, accelerate research, build first-pass analysis, check consistency, reuse institutional knowledge, automate recurring reports, and reduce turnaround time.</p>
+      <p>Every output remains part of a managed service.</p>
+
+      <div class="chart">
+        <h3>AI is active, but execution still matters</h3>
+        <div class="bar-row">
+          <span>Use GenAI in M&amp;A</span>
+          <div class="track"><div class="fill" style="width: 90%"></div></div>
+          <strong>90%</strong>
+        </div>
+        <div class="bar-row">
+          <span>Use across multiple stages</span>
+          <div class="track"><div class="fill" style="width: 37%"></div></div>
+          <strong>37%</strong>
+        </div>
+        <div class="bar-row">
+          <span>Most value from advisory-led use</span>
+          <div class="track"><div class="fill" style="width: 35%"></div></div>
+          <strong>35%</strong>
+        </div>
+        <div class="bar-row">
+          <span>Use AI transaction evaluations</span>
+          <div class="track"><div class="fill" style="width: 5%"></div></div>
+          <strong>5%</strong>
+        </div>
+        <p class="source">Sources: <a href="https://www.deloitte.com/us/en/what-we-do/capabilities/mergers-acquisitions-restructuring/articles/m-and-a-generative-ai-study.html">Deloitte 2026 GenAI in M&amp;A Pulse Study</a>, <a href="https://corpgov.law.harvard.edu/2025/11/04/ready-for-the-deal-transaction-readiness-in-turbulent-times/">Harvard Law School Forum transaction readiness survey</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="who">
+    <div class="wrap">
+      <div class="eyebrow">Engagement Models</div>
+      <h2>Choose the operating model that fits the firm.</h2>
+      <div class="grid">
+        <div class="box">
+          <h3>Transaction Support</h3>
+          <p>For a specific active deal.</p>
+          <ul>
+            <li>Screening</li>
+            <li>Research</li>
+            <li>Diligence</li>
+            <li>Financial modeling</li>
+            <li>Valuation</li>
+            <li>Investment committee materials</li>
+          </ul>
+          <a class="button" href="#contact">Bring Us a Deal</a>
+        </div>
+
+        <div class="box featured">
+          <h3>Embedded Back Office</h3>
+          <p>The central offering. Isthmus becomes an ongoing extension of the investment firm.</p>
+          <ul>
+            <li>Deal team support</li>
+            <li>Financial analysis</li>
+            <li>Investor materials</li>
+            <li>Investment operations</li>
+            <li>Portfolio monitoring</li>
+            <li>Workflow automation</li>
+          </ul>
+          <a class="button" href="#contact">Build Your Back Office</a>
+        </div>
+
+        <div class="box">
+          <h3>Portfolio and Fund Support</h3>
+          <p>For firms that already have an investment team but need recurring operational infrastructure.</p>
+          <ul>
+            <li>Portfolio reporting</li>
+            <li>KPI tracking</li>
+            <li>LP materials</li>
+            <li>Investment committee reporting</li>
+            <li>Fund documentation</li>
+            <li>Workflow management</li>
+          </ul>
+          <a class="button" href="#contact">Discuss Ongoing Support</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="eyebrow">Proof</div>
+      <h2>Already operating inside a live investment firm.</h2>
+      <p>Isthmus currently supports a growth-capital investor with institutional decks, deal models, diligence, and portfolio materials, subject to client disclosure permissions.</p>
+    </div>
+  </section>
+
+  <section id="why">
+    <div class="wrap">
+      <div class="eyebrow">Why Isthmus</div>
+      <h2>Built for private-market operating work.</h2>
+      <ul>
+        <li>Integrated instead of fragmented</li>
+        <li>Embedded instead of external</li>
+        <li>Execution rather than software licenses</li>
+        <li>Investment-specific rather than generic</li>
+        <li>AI-enabled rather than labor-only</li>
+        <li>Scalable rather than dependent on internal hiring</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="wrap">
+      <h2>Build the investment firm without building every function internally.</h2>
+      <a class="button" href="mailto:hello@example.com">Build Your Back Office</a>
+      <a class="button" href="mailto:hello@example.com">Bring Us a Deal</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <p><strong>Isthmus Meridian</strong></p>
+      <p>We run the back office behind private-market investors.</p>
+    </div>
+  </footer>
+</body>
+</html>
