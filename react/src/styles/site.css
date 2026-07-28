@@ -774,9 +774,11 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
      copy is dead weight — drop it, and lay the repeated items out as compact
      rows instead of stacked cards. */
   /* full cards again: glyph, name, lede AND detail, with room around them */
-  .route{display:grid;grid-template-columns:94px minmax(0,1fr);
-    gap:4px 16px;align-items:start;padding:18px 0 20px}
-  .rt-glyph{grid-column:1;grid-row:1 / span 3;max-width:94px;margin-top:4px}
+  /* the glyph column scales with the viewport rather than sitting at a fixed
+     94px, so the illustration grows without starving the copy beside it */
+  .route{display:grid;grid-template-columns:clamp(108px,33vw,158px) minmax(0,1fr);
+    gap:4px 14px;align-items:start;padding:20px 0 22px}
+  .rt-glyph{grid-column:1;grid-row:1 / span 3;width:100%;max-width:none;margin-top:4px}
   .rt-name,.rt-lede,.rt-detail{grid-column:2}
   .rt-name{grid-row:1;margin-top:0;font-size:19px}
   .rt-lede{grid-row:2}
