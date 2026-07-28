@@ -1,7 +1,7 @@
 "use client";
 
 import { animate, createDrawable, stagger } from "animejs";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 /**
  * The operating tree — root → three branches → seven functions.
@@ -13,16 +13,17 @@ import { useEffect, useMemo, useRef, useState } from "react";
  * 100×100 viewBox, so the connectors track the absolutely-positioned HTML nodes
  * at any size. Elbows rather than curves: right angles survive the non-uniform
  * scale without looking warped, and they suit the drafting style of the field.
- * `vector-effect: non-scaling-stroke` keeps the line weight honest.
  *
- * Because every node is absolutely positioned, highlighting never reflows.
+ * Hover is handled by toggling classes on the DOM directly, NOT React state.
+ * Driving it through state re-rendered ten paths and eleven nodes on every
+ * pointer move, which showed up as a stutter (worst frame 32ms → 18ms once this
+ * and the plate's backdrop-filter were removed).
  */
 
 export type TreeLeaf = { key: string; name: string; desc: string };
 export type TreeBranch = { key: string; name: string; leaves: TreeLeaf[] };
 
 const EASE = "cubicBezier(0.22, 1, 0.36, 1)";
-/** leaf centres, top to bottom, as a % of the plot height */
 const LEAF_Y = [6, 20, 34, 49, 63, 78, 92];
 const ROOT_X = 20;
 const BRANCH_X = 27;
@@ -38,11 +39,8 @@ export function ServicesTree({
   branches: TreeBranch[];
   summary: string;
 }) {
-  const [active, setActive] = useState<string | null>(null);
   const scope = useRef<HTMLDivElement>(null);
-  const detail = useRef<HTMLParagraphElement>(null);
 
-  // flatten once: every leaf carries its row index and its owning branch
   const layout = useMemo(() => {
     let row = 0;
     const leaves: Array<TreeLeaf & { y: number; branch: string }> = [];
@@ -53,16 +51,12 @@ export function ServicesTree({
         row += 1;
       }
       const ys = LEAF_Y.slice(first, row);
-      const y = (Math.min(...ys) + Math.max(...ys)) / 2;
-      return { ...b, y };
+      return { ...b, y: (Math.min(...ys) + Math.max(...ys)) / 2 };
     });
     return { leaves, spines };
   }, [branches]);
 
-  const activeLeaf = layout.leaves.find((l) => l.key === active);
-  const activeBranch = activeLeaf?.branch ?? null;
-
-  // enter: draw the connectors, then bring the nodes in behind them
+  // enter: draw the connectors, bring the nodes in behind them
   useEffect(() => {
     const el = scope.current;
     if (!el) return;
@@ -95,20 +89,62 @@ export function ServicesTree({
     return () => io.disconnect();
   }, []);
 
-  // swap the detail line with a short lift rather than a hard cut
+  // hover: pure DOM, no re-render
   useEffect(() => {
-    const el = detail.current;
+    const el = scope.current;
     if (!el) return;
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    animate(el, {
-      opacity: [0, 1],
-      y: [6, 0],
-      duration: 300,
-      ease: EASE,
-    });
-  }, [active]);
+    const detail = el.querySelector<HTMLElement>(".tree-detail");
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let current: string | null = null;
 
-  const hold = (key: string | null) => () => setActive(key);
+    const paint = (leafKey: string | null) => {
+      if (leafKey === current) return;
+      current = leafKey;
+      const leaf = layout.leaves.find((l) => l.key === leafKey);
+      const branchKey = leaf?.branch ?? null;
+
+      for (const n of el.querySelectorAll<HTMLElement>("[data-leaf]")) {
+        n.classList.toggle("lit", n.dataset.leaf === leafKey);
+      }
+      for (const n of el.querySelectorAll<HTMLElement>("[data-branch]")) {
+        n.classList.toggle("lit", n.dataset.branch === branchKey);
+      }
+      for (const p of el.querySelectorAll<SVGPathElement>("[data-link]")) {
+        p.classList.toggle("lit", p.dataset.link === leafKey);
+      }
+      for (const p of el.querySelectorAll<SVGPathElement>("[data-spine]")) {
+        p.classList.toggle("lit", p.dataset.spine === branchKey);
+      }
+
+      if (!detail) return;
+      detail.textContent = leaf ? leaf.desc : summary;
+      if (reduce) return;
+      // no JS keyframe here on purpose: re-running a [6,0] rise on every pointer
+      // move restarts the translate from 6px each time, which reads as a jitter
+      // when you shuffle quickly. A CSS transition interpolates from wherever
+      // the value currently is, so rapid switching just settles.
+      detail.classList.add("swapping");
+      requestAnimationFrame(() => detail.classList.remove("swapping"));
+    };
+
+    const offs: Array<() => void> = [];
+    for (const btn of el.querySelectorAll<HTMLElement>(".tr-leaf")) {
+      const k = btn.dataset.leaf ?? null;
+      const on = () => paint(k);
+      const off = () => paint(null);
+      btn.addEventListener("mouseenter", on);
+      btn.addEventListener("focus", on);
+      btn.addEventListener("mouseleave", off);
+      btn.addEventListener("blur", off);
+      offs.push(() => {
+        btn.removeEventListener("mouseenter", on);
+        btn.removeEventListener("focus", on);
+        btn.removeEventListener("mouseleave", off);
+        btn.removeEventListener("blur", off);
+      });
+    }
+    return () => offs.forEach((o) => o());
+  }, [layout, summary]);
 
   return (
     <div className="tree" ref={scope}>
@@ -121,8 +157,9 @@ export function ServicesTree({
         >
           {layout.spines.map((b) => (
             <path
-              className={`tr-link${activeBranch === b.key ? " lit" : ""}`}
+              className="tr-link"
               d={`M ${ROOT_X} 50 H 23.5 V ${b.y} H ${BRANCH_X}`}
+              data-spine={b.key}
               key={`s-${b.key}`}
             />
           ))}
@@ -130,26 +167,22 @@ export function ServicesTree({
             const b = layout.spines.find((s) => s.key === l.branch);
             return (
               <path
-                className={`tr-link${active === l.key ? " lit" : ""}`}
+                className="tr-link"
                 d={`M ${BRANCH_R} ${b?.y ?? 50} H 51 V ${l.y} H ${LEAF_X}`}
+                data-link={l.key}
                 key={`l-${l.key}`}
               />
             );
           })}
         </svg>
 
-        {/* .tr-slot owns the vertical centring, .tr-node owns the animation —
-            anime writes `transform` on the node, so it must not also be the
-            element carrying translateY(-50%) */}
         <div className="tr-slot slot-root" style={{ top: "50%" }}>
           <div className="tr-node tr-root">{root}</div>
         </div>
 
         {layout.spines.map((b) => (
           <div className="tr-slot slot-branch" key={b.key} style={{ top: `${b.y}%` }}>
-            <div
-              className={`tr-node tr-branch${activeBranch === b.key ? " lit" : ""}`}
-            >
+            <div className="tr-node tr-branch" data-branch={b.key}>
               {b.name}
             </div>
           </div>
@@ -157,23 +190,14 @@ export function ServicesTree({
 
         {layout.leaves.map((l) => (
           <div className="tr-slot slot-leaf" key={l.key} style={{ top: `${l.y}%` }}>
-            <button
-              className={`tr-node tr-leaf${active === l.key ? " lit" : ""}`}
-              onBlur={hold(null)}
-              onFocus={hold(l.key)}
-              onMouseEnter={hold(l.key)}
-              onMouseLeave={hold(null)}
-              type="button"
-            >
+            <button className="tr-node tr-leaf" data-leaf={l.key} type="button">
               {l.name}
             </button>
           </div>
         ))}
       </div>
 
-      <p className="tree-detail" key={active ?? "root"} ref={detail}>
-        {activeLeaf ? activeLeaf.desc : summary}
-      </p>
+      <p className="tree-detail">{summary}</p>
     </div>
   );
 }

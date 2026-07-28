@@ -1,15 +1,19 @@
 "use client";
 
-import { motion } from "motion/react";
-import { useState } from "react";
+import { animate, createTimeline, stagger, utils } from "animejs";
+import { useEffect, useRef } from "react";
 
 /**
  * "Running a fund takes more than an investment team" — the three routes firms
- * take today, drawn rather than listed. Each route is a line diagram of its own
- * failure mode; hovering or focusing one draws it out and expands the cost.
+ * take today, each drawn as its own failure mode rather than listed.
+ *
+ * anime.js drives everything: an entry sequence per route, an idle loop that
+ * keeps each diagram alive, and a hover state that plays the failure through.
+ * Hover is DOM-class only — no React state — so pointing along the row never
+ * re-renders the tree of SVG nodes underneath it.
  */
 
-const EASE = [0.22, 1, 0.36, 1] as const;
+const EASE = "cubicBezier(0.22, 1, 0.36, 1)";
 
 const ROUTES = [
   {
@@ -35,26 +39,20 @@ const ROUTES = [
   },
 ] as const;
 
-const grow = {
-  hidden: { scaleY: 0 },
-  show: { scaleY: 1 },
-};
-
 /** cost climbing straight through the line it was meant to stay under */
 function GlyphBuild() {
   const bars = [20, 34, 52, 76, 106];
   return (
     <svg aria-hidden="true" className="rt-glyph" viewBox="0 0 200 124">
       <line className="rt-base" x1="6" x2="194" y1="114" y2="114" />
-      <line className="rt-dash rt-drift" x1="6" x2="194" y1="56" y2="56" />
+      <line className="rt-dash" x1="6" x2="194" y1="56" y2="56" />
       {bars.map((h, i) => (
-        <motion.rect
+        <rect
           className="rt-bar"
+          data-bar={i}
           height={h}
           key={h}
           style={{ transformBox: "fill-box", transformOrigin: "50% 100%" }}
-          transition={{ duration: 0.62, delay: 0.09 * i, ease: EASE }}
-          variants={grow}
           width={16}
           x={24 + i * 32}
           y={114 - h}
@@ -74,27 +72,24 @@ function GlyphOutsource() {
   ];
   return (
     <svg aria-hidden="true" className="rt-glyph" viewBox="0 0 200 124">
-      {nodes.map((n, i) => (
-        <motion.line
-          className="rt-dash rt-drift"
+      {nodes.map((n) => (
+        <line
+          className="rt-dash rt-spoke"
           key={`l-${n.x}-${n.y}`}
-          style={{ transformBox: "fill-box", transformOrigin: "50% 50%" }}
-          transition={{ duration: 0.55, delay: 0.08 * i, ease: EASE }}
-          variants={{ hidden: { scaleX: 0, scaleY: 0 }, show: { scaleX: 1, scaleY: 1 } }}
           x1={n.x}
           x2={100 + (n.x - 100) * 0.34}
           y1={n.y}
           y2={64 + (n.y - 64) * 0.34}
         />
       ))}
-      {nodes.map((n, i) => (
+      {nodes.map((n) => (
         <circle
-          className="rt-node rt-pulse"
+          className="rt-node"
           cx={n.x}
           cy={n.y}
           key={`n-${n.x}-${n.y}`}
           r={7}
-          style={{ animationDelay: `${i * 0.7}s` }}
+          style={{ transformBox: "fill-box", transformOrigin: "50% 50%" }}
         />
       ))}
       <circle className="rt-hole" cx={100} cy={64} r={13} />
@@ -104,25 +99,15 @@ function GlyphOutsource() {
 
 /** input goes in, drafts come out, the residue still lands on the desk */
 function GlyphAutomate() {
-  const drops = [0, 1, 2, 3, 4, 5];
   return (
     <svg aria-hidden="true" className="rt-glyph" viewBox="0 0 200 124">
-      <motion.path
+      <path
         className="rt-funnel"
         d="M 46 18 L 154 18 L 112 66 L 112 88 L 88 88 L 88 66 Z"
         style={{ transformBox: "fill-box", transformOrigin: "50% 0%" }}
-        transition={{ duration: 0.6, ease: EASE }}
-        variants={grow}
       />
-      {drops.map((d) => (
-        <circle
-          className="rt-drop"
-          cx={100}
-          cy={0}
-          key={d}
-          r={2.6}
-          style={{ animationDelay: `${d * 0.62}s` }}
-        />
+      {[0, 1, 2, 3, 4, 5].map((d) => (
+        <circle className="rt-drop" cx={100} cy={0} key={d} r={2.6} />
       ))}
       <line className="rt-base" x1="30" x2="170" y1="114" y2="114" />
       <text className="rt-deskmark" textAnchor="end" x="170" y="108">
@@ -139,38 +124,147 @@ const GLYPHS: Record<string, () => React.ReactElement> = {
 };
 
 export function ApproachRoutes() {
-  const [active, setActive] = useState<string | null>(null);
+  const scope = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = scope.current;
+    if (!el) return;
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const q = <T extends Element>(s: string) => Array.from(el.querySelectorAll<T>(s));
+
+    const bars = q<SVGRectElement>(".rt-bar");
+    const nodes = q<SVGCircleElement>(".rt-node");
+    const spokes = q<SVGLineElement>(".rt-spoke");
+    const funnel = el.querySelector<SVGPathElement>(".rt-funnel");
+    const drops = q<SVGCircleElement>(".rt-drop");
+    const routes = q<HTMLElement>(".route");
+
+    if (reduce) {
+      utils.set([...bars, ...nodes, ...drops], { opacity: 1 });
+      if (funnel) utils.set(funnel, { opacity: 1 });
+      el.classList.add("ready");
+      return;
+    }
+
+    utils.set(bars, { scaleY: 0 });
+    utils.set(nodes, { scale: 0, opacity: 1 });
+    if (funnel) utils.set(funnel, { scaleY: 0 });
+    utils.set(drops, { opacity: 0 });
+
+    // idle: the cost line keeps creeping, the providers pulse out of phase,
+    // and drafts keep falling through onto the desk
+    const idles: Array<{ pause: () => void }> = [];
+    const startIdle = () => {
+      idles.push(
+        animate(nodes, {
+          opacity: [1, 0.45, 1],
+          duration: 2800,
+          delay: stagger(420),
+          loop: true,
+          ease: "inOut(2)",
+        })
+      );
+      idles.push(
+        animate(spokes, {
+          strokeDashoffset: [0, -18],
+          duration: 2400,
+          loop: true,
+          ease: "linear",
+        })
+      );
+      idles.push(
+        animate(drops, {
+          y: [4, 110],
+          opacity: [
+            { to: 1, duration: 260 },
+            { to: 1, duration: 2200 },
+            { to: 0, duration: 320 },
+          ],
+          duration: 2800,
+          delay: stagger(430),
+          loop: true,
+          ease: "linear",
+        })
+      );
+    };
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        io.disconnect();
+        el.classList.add("ready");
+        const tl = createTimeline({ defaults: { ease: EASE } });
+        tl.add(bars, { scaleY: 1, duration: 620, delay: stagger(90) }, 0)
+          .add(nodes, { scale: 1, duration: 520, delay: stagger(80) }, 120)
+          .add(funnel ?? [], { scaleY: 1, duration: 600 }, 200);
+        tl.then(startIdle);
+      },
+      { threshold: 0.3 }
+    );
+    io.observe(el);
+
+    // hover: play the failure through, and dim the routes not being read
+    const offs: Array<() => void> = [];
+    routes.forEach((r, i) => {
+      const on = () => {
+        routes.forEach((o, j) => {
+          o.classList.toggle("on", j === i);
+          o.classList.toggle("off", j !== i);
+        });
+        if (i === 0) {
+          animate(bars, {
+            scaleY: [0.82, 1],
+            duration: 620,
+            delay: stagger(70),
+            ease: "out(3)",
+          });
+        }
+        if (i === 1) {
+          animate(nodes, {
+            scale: [1, 1.28, 1],
+            duration: 620,
+            delay: stagger(70),
+            ease: "out(3)",
+          });
+        }
+        if (i === 2 && funnel) {
+          animate(funnel, { scaleY: [0.9, 1], duration: 560, ease: "out(4)" });
+        }
+      };
+      const off = () => routes.forEach((o) => o.classList.remove("on", "off"));
+      r.addEventListener("mouseenter", on);
+      r.addEventListener("focusin", on);
+      r.addEventListener("mouseleave", off);
+      r.addEventListener("focusout", off);
+      offs.push(() => {
+        r.removeEventListener("mouseenter", on);
+        r.removeEventListener("focusin", on);
+        r.removeEventListener("mouseleave", off);
+        r.removeEventListener("focusout", off);
+      });
+    });
+
+    return () => {
+      io.disconnect();
+      idles.forEach((a) => a.pause());
+      offs.forEach((o) => o());
+    };
+  }, []);
 
   return (
-    <motion.div
-      className="routes"
-      initial="hidden"
-      viewport={{ once: true, amount: 0.35 }}
-      whileInView="show"
-    >
+    <div className="routes" ref={scope}>
       {ROUTES.map((r) => {
         const Glyph = GLYPHS[r.key];
-        const on = active === r.key;
         return (
-          // biome-ignore lint/a11y/noNoninteractiveTabindex: the panel is a focus stop so keyboard users get the same expansion as hover
-          <div
-            className={`route${on ? " on" : ""}${active && !on ? " off" : ""}`}
-            key={r.key}
-            onBlur={() => setActive((c) => (c === r.key ? null : c))}
-            onFocus={() => setActive(r.key)}
-            onMouseEnter={() => setActive(r.key)}
-            onMouseLeave={() => setActive((c) => (c === r.key ? null : c))}
-            tabIndex={0}
-          >
+          // biome-ignore lint/a11y/noNoninteractiveTabindex: focus stop so keyboard users get the same reading as hover
+          <div className="route" key={r.key} tabIndex={0}>
             <Glyph />
             <div className="rt-name">{r.label}</div>
             <p className="rt-lede">{r.lede}</p>
-            {/* always in flow — the reveal is opacity + lift, so an expanding
-                route never changes the height of a fixed 100vh screen */}
             <p className="rt-detail">{r.detail}</p>
           </div>
         );
       })}
-    </motion.div>
+    </div>
   );
 }
