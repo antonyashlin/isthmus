@@ -25,34 +25,38 @@ import { ServicesTree } from "@/components/site/ServicesTree";
 import { SignOffFlow } from "@/components/site/SignOffFlow";
 import { TrustBadges } from "@/components/site/TrustBadges";
 
+/* Fund-operations pressure, not deal flow. The previous set (large deals, PE
+   deal value, PE-backed exits, secondaries) measured how busy the market is;
+   what actually lands on a GP's operating bench is LP expectation, scrutiny
+   and scale. */
 const PRESSURE = [
   {
-    key: "large",
-    label: "Large deals",
-    amount: 44,
-    display: "+44%",
-    note: "Growth in deal value at the top of the market, year on year.",
+    key: "reporting",
+    label: "Reporting quality",
+    amount: 72,
+    display: "72%",
+    note: "Of GPs say LPs value clear, timely and accurate reporting above all else.",
   },
   {
-    key: "value",
-    label: "PE deal value",
-    amount: 17,
-    display: "+17%",
-    note: "Growth in total private-equity deal value, year on year.",
+    key: "ir",
+    label: "Investor relations",
+    amount: 69,
+    display: "69%",
+    note: "Say responsive, high-touch investor relations now ranks just behind it.",
   },
   {
-    key: "exits",
-    label: "PE-backed exits",
-    amount: 40,
-    display: "+40%",
-    note: "Growth in exit activity out of PE-backed portfolios.",
+    key: "scrutiny",
+    label: "Fee & expense scrutiny",
+    amount: 90,
+    display: "90%",
+    note: "Were asked about fees and expenses at their most recent SEC examination.",
   },
   {
-    key: "secondaries",
-    label: "Secondaries",
-    amount: 48,
-    display: "+48%",
-    note: "Growth in secondary-market transaction volume.",
+    key: "scale",
+    label: "Next fund is larger",
+    amount: 65,
+    display: "65%",
+    note: "Of CFOs expect the next vehicle to be bigger — more LPs, more diligence.",
   },
 ];
 const DIALS = [
@@ -111,15 +115,18 @@ const OFFERS = [
     ],
   },
 ];
+/* What actually blocks integration. The previous set measured transaction
+   readiness; the barrier is not the model, it is nobody in the building who
+   knows both the technology and the asset class. */
 const BANDS = [
-  { key: "resources", label: "Limited resources", value: 56, display: "56%",
-    note: "Name limited resources as their top transaction-readiness challenge." },
-  { key: "modeling", label: "Adjusted modeling", value: 46, display: "46%",
-    note: "Have adjusted their financial modeling approach for current conditions." },
-  { key: "diligence", label: "Enhanced diligence", value: 40, display: "40%",
-    note: "Have enhanced their due-diligence process." },
-  { key: "ai", label: "AI evaluations", value: 5, display: "5%",
-    note: "Use AI evaluations anywhere in the transaction workflow." },
+  { key: "expertise", label: "In-house expertise", value: 49, display: "49%",
+    note: "Cite a lack of in-house expertise as a primary constraint on AI." },
+  { key: "privacy", label: "Data privacy", value: 43, display: "43%",
+    note: "Name data-privacy concerns over client and portfolio information." },
+  { key: "accuracy", label: "Model accuracy", value: 38, display: "38%",
+    note: "Are held back by accuracy — output nobody will sign their name to." },
+  { key: "talent", label: "Talent", value: 35, display: "35%",
+    note: "Simply cannot hire the people who bridge both sides." },
 ];
 const TREE_SUMMARY =
   "Every function an investment firm needs to run, operated as one tree. Point at a function for what it covers.";
@@ -138,10 +145,14 @@ const BRANCHES = [
     { key: "ai", name: "Data and AI enablement", desc: "Workflow mapping, document processing, templates, and custom tools." },
   ] },
 ];
+/* The integration gap. Replaces a GenAI-in-M&A adoption funnel, which measured
+   the wrong scope entirely — and this reads better: the technology already
+   works, the blocker is domain expertise, and even the best-adopted function
+   is barely a third integrated. */
 const FUNNEL = [
-  { label: "Use GenAI in M&A", value: 90, displayValue: "90%" },
-  { label: "Across multiple stages", value: 37, displayValue: "37%" },
-  { label: "Most value, advisory-led", value: 35, displayValue: "35%" },
+  { label: "Meets the business case", value: 95, displayValue: "95%" },
+  { label: "Held back by expertise", value: 49, displayValue: "49%" },
+  { label: "Actually integrated", value: 31, displayValue: "31%" },
 ];
 const STEPS = [
   ["01", "Understand", "Map the firm's strategy, standards, and recurring requirements."],
@@ -198,14 +209,14 @@ export default function Home() {
         {/* 3 — pressure radar (dark) · C: radar left, heading + desc right */}
         <section className="sec slide-sec">
           <div className="slide lay-c">
-            <h2 className="blk-head h-lg reveal">Private-market pressure is <span className="serif-i">rising</span>.</h2>
-            <p className="blk-desc body reveal">More activity and longer, more complex holding periods create more analytical and operational work for investment teams.</p>
+            <h2 className="blk-head h-lg reveal">The pressure is on the <span className="serif-i">operating side</span>.</h2>
+            <p className="blk-desc body reveal">Reporting, investor relations and regulatory scrutiny now decide how a fund is judged — and every one of them lands on the same bench, every quarter, for the life of the fund.</p>
             <div className="blk-viz">
               <div className="chart-block viz-plate reveal">
                 <InView amount={0.2}>
                   <PressureRadar metrics={PRESSURE} />
                 </InView>
-                <p className="source">Source: <a href="https://www.mckinsey.com/industries/private-capital/our-insights/global-private-markets-report/private-equity" target="_blank" rel="noopener">McKinsey Global Private Equity Report 2026</a>.</p>
+                <p className="source">Source: <a href="https://www.privatefundscfo.com/insights-survey/" target="_blank" rel="noopener">Private Funds CFO Insights Survey 2026</a>.</p>
               </div>
             </div>
           </div>
@@ -274,8 +285,8 @@ export default function Home() {
         {/* 8 — AI adoption / Bklit funnel (light) · D: heading top, desc left, funnel right */}
         <section className="sec slide-sec light">
           <div className="slide lay-e">
-            <h2 className="blk-head h-lg reveal">AI use is active — <span className="serif-i">integration</span> decides the value.</h2>
-            <p className="blk-desc body reveal">Most M&amp;A teams already reach for generative AI, but the value lands only where it is wired into the actual workflow — not left as a tool on the side.</p>
+            <h2 className="blk-head h-lg reveal">The technology works. The <span className="serif-i">expertise</span> is missing.</h2>
+            <p className="blk-desc body reveal">Almost every AI initiative in private equity is meeting its business case. Almost none of it is integrated, and the reason firms give is not the model — it is that nobody in the building knows both the technology and the asset class.</p>
             <div className="blk-viz funnel-on-light">
               <div className="chart-block viz-plate reveal">
                 <InView amount={0.2}>
@@ -289,7 +300,7 @@ export default function Home() {
                     style={{ height: "min(52vh, calc(100vh - 250px))" }}
                   />
                 </InView>
-                <p className="source">Source: <a href="https://www.deloitte.com/us/en/what-we-do/capabilities/mergers-acquisitions-restructuring/articles/m-and-a-generative-ai-study.html" target="_blank" rel="noopener">Deloitte 2026 GenAI in M&amp;A Pulse Study</a>.</p>
+                <p className="source">Source: <a href="https://www.fticonsulting.com/insights/reports/2026-private-equity-ai-radar" target="_blank" rel="noopener">FTI Consulting 2026 Private Equity AI Radar</a>.</p>
               </div>
             </div>
           </div>
@@ -321,7 +332,8 @@ export default function Home() {
         {/* 11 — why isthmus / contrasts (dark) · B: contrasts lead, heading below */}
         <section className="sec slide-sec" id="why">
           <div className="slide lay-b">
-            <h2 className="blk-head h-lg reveal">Built for private-market operating work.</h2>
+            <h2 className="blk-head h-lg reveal">A brain for <span className="serif-i">private equity</span>.</h2>
+            <p className="blk-desc body reveal">A terminal tells you what happened. A platform gives your team something else to operate. We are neither — we bring the technology and the domain expertise together, and run the work with them.</p>
             <div className="blk-viz">
               <ContrastSwitches />
             </div>
@@ -366,14 +378,14 @@ export default function Home() {
         {/* 13 — readiness gap / rose (light) · C: rose left, heading + desc right */}
         <section className="sec slide-sec light">
           <div className="slide lay-c">
-            <h2 className="blk-head h-lg reveal">The transaction-readiness <span className="serif-i">gap</span>.</h2>
-            <p className="blk-desc body reveal">Many firms still run transaction workflows with limited tooling and integration — leaving readiness uneven when a deal moves.</p>
+            <h2 className="blk-head h-lg reveal">What actually <span className="serif-i">blocks it</span>.</h2>
+            <p className="blk-desc body reveal">Every barrier firms name is a people problem wearing a technology costume. You cannot hire one person who is fluent in both — so the work stays manual and the tools stay on the side.</p>
             <div className="blk-viz">
               <div className="chart-block viz-plate reveal">
                 <InView amount={0.2}>
                   <ReadinessRings bands={BANDS} />
                 </InView>
-                <p className="source">Source: <a href="https://corpgov.law.harvard.edu/2025/11/04/ready-for-the-deal-transaction-readiness-in-turbulent-times/" target="_blank" rel="noopener">Harvard Law School Forum transaction-readiness survey</a>.</p>
+                <p className="source">Source: <a href="https://www.fticonsulting.com/insights/reports/2026-private-equity-ai-radar" target="_blank" rel="noopener">FTI Consulting 2026 Private Equity AI Radar</a>.</p>
               </div>
             </div>
           </div>

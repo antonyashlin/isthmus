@@ -33,8 +33,8 @@ export const DECK = {
   name: "Isthmus Meridian",
   /** REF — cover subtitle */
   proposition: "The private-markets back office,",
-  propositionAccent: "rebuilt as an AI company.",
-  classification: "FOUNDING-PARTNER OPPORTUNITY",
+  propositionAccent: "becoming the brain that runs it.",
+  classification: "A JOINT-VENTURE PROPOSAL FOR AND CAPITAL",
   confidential: "CONFIDENTIAL",
   place: "DELAWARE · DUBAI",
   date: "JULY 2026",
@@ -46,12 +46,13 @@ export const DECK = {
 
 export const THESIS = {
   eyebrow: "THE THESIS",
-  /** REF */
-  title: "We started with the part that kills most AI companies",
+  /** REF, adapted — "AI companies" / "vertical-AI startups" reworded: the
+   * deck no longer pitches an outside AI-company narrative, so the parallel
+   * now runs against technology startups generally. */
+  title: "We started with the part that kills most technology companies",
   titleAccent: "already solved.",
-  /** REF */
   lede:
-    "Most vertical-AI startups raise money, then hunt for customers and beg for data. We begin with all three in hand.",
+    "Most software startups raise money, then hunt for customers and beg for data. We begin with all three in hand.",
   cards: [
     {
       key: "anchor",
@@ -87,12 +88,15 @@ export const PROBLEM = {
   /** REF */
   lede:
     "Modeling, diligence, investor materials, portfolio monitoring, fund ops — artisanal, manual, expensive, and rebuilt from scratch on every deal.",
-  /** REF — right column */
-  asideTitle: "THE CURRENT WAVE OF AI TOOLS DOESN'T FIX IT",
+  /** Adapted from the reference deck's AI-tools aside — reworded off "AI
+   * tools" / "foundation-model labs" / named model subscriptions so the
+   * critique reads as a general software-category argument, not an
+   * AI-vs-AI comparison. */
+  asideTitle: "GENERIC SOFTWARE DOESN'T FIX IT",
   points: [
-    "Horizontal copilots pointed at documents from the outside — no proprietary data, no ownership of the work.",
-    "The foundation-model labs are already encroaching on exactly those thin wrappers.",
-    "The market has turned brutal on tools any GP could replace with a Claude or Opus subscription.",
+    "Software watches from the outside — no proprietary data, no ownership of the work.",
+    "Every category commoditizes into a subscription — a seat license any GP can cancel.",
+    "The market has turned brutal on tools that own no outcome, only a workflow.",
   ],
 };
 
@@ -131,25 +135,22 @@ export const BACKDROP = {
 
 /* ---------------------------------------------------------- V · the wedge */
 
+/**
+ * Rewritten for AND Capital's own founding partners, not a third-party
+ * investor being introduced to a customer case study. The deck now speaks to
+ * them directly — this is the proposal to convert what's already running
+ * into joint ownership, not a pitch about a stranger's back office.
+ */
 export const WEDGE = {
   eyebrow: "THE WEDGE",
-  /** REF */
-  title: "We don't sell the tool.",
-  titleAccent: "We run the work.",
-  /** REF */
-  lede:
-    "By operating a fund's back office from the inside, we own what the copilots can't touch: the end-to-end execution data and the encoded workflow that produced it.",
+  title: "We don't sell you a tool.",
+  titleAccent: "We already run the work.",
   panel: {
-    eyebrow: "CUSTOMER ZERO · LIVE",
-    /** REF */
-    title: "Isthmus Meridian runs AND Capital's back office today.",
-    /** REF */
+    eyebrow: "ALREADY LIVE",
+    title: "Isthmus Meridian already runs your back office.",
     body:
-      "Institutional decks, deal models, diligence and portfolio materials for a Calgary growth-capital GP in energy transition, real assets and health & wellness — with proprietary CIS deal flow.",
+      "Institutional decks, deal models, diligence and portfolio materials for AND Capital's Calgary growth-capital business in energy transition, real assets and health & wellness — with proprietary CIS deal flow already running through it.",
   },
-  /** REF — pull quote */
-  quote: "The flywheel isn't a plan.",
-  quoteAccent: "It's already turning.",
 };
 
 /* ------------------------------------------------- VI · the operating layer */
@@ -169,7 +170,7 @@ export const FUNCTIONS = {
     { n: "04", label: "Capital formation & materials", tag: null },
     { n: "05", label: "Fund operations & admin", tag: null },
     { n: "06", label: "Portfolio monitoring", tag: null },
-    { n: "07", label: "Technology, data & AI", tag: "DIFFERENTIATOR" },
+    { n: "07", label: "Technology & data platform", tag: "DIFFERENTIATOR" },
     { n: "08", label: "Research & intelligence", tag: null },
   ],
 };
@@ -206,7 +207,7 @@ export const MOAT = {
       "Point at documents from the outside",
       "Public + user-supplied data",
       "A cancellable seat license",
-      "Exposed to foundation-model encroachment",
+      "Exposed to whichever platform ships next",
     ],
   },
   ours: {
@@ -219,9 +220,9 @@ export const MOAT = {
       "Defended by data the labs can't see",
     ],
   },
-  /** REF */
+  /** REF, adapted — "the AI is how we do it" reworded off AI language. */
   footnote:
-    "We do the work — the AI is how we do it, at expanding margin. That's the 18–36-month defensibility the market now demands, built from the one place it can't be copied: the inside.",
+    "We do the work — technology and domain expertise are how we do it, at expanding margin. That's the 18–36-month defensibility the market now demands, built from the one place it can't be copied: the inside.",
 };
 
 /* -------------------------------------------------- IX · the economics ◆ */
@@ -266,7 +267,7 @@ export const MARKET = {
   /** REF */
   title: "The market is already paying for this —",
   titleAccent: "richly.",
-  compsLabel: "RECENT VERTICAL-AI FINANCE VALUATIONS",
+  compsLabel: "RECENT DEAL-INTELLIGENCE PLATFORM VALUATIONS",
   comps: [
     { name: "Rogo", note: "Series C", value: 750, display: "$750M" },
     { name: "Hebbia", note: "", value: 700, display: "~$700M" },

@@ -312,7 +312,7 @@ const Backdrop: SlideFn = ({ active, index, total }) => (
 const Wedge: SlideFn = ({ index, total }) => (
   <Screen eyebrow={WEDGE.eyebrow} index={index} total={total}>
     <p className="fd-rise fd-statement">
-      We don&apos;t sell the tool. <span className="hi">We run the work.</span>
+      {WEDGE.title} <span className="hi">{WEDGE.titleAccent}</span>
     </p>
     <div className="fd-rail fd-rise">
       <div className="fd-rail-line" />
@@ -795,7 +795,7 @@ const Closing: SlideFn = () => (
         <div>
           <div className="fd-label">Opportunity</div>
           <div style={{ fontSize: 15, color: "var(--tx-2)", marginTop: 8 }}>
-            Founding partners
+            AND Capital · 50/50 JV
           </div>
         </div>
       </div>
