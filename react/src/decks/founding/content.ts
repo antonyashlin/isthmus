@@ -496,24 +496,55 @@ export const RISKS = {
 /* -------------------------------------------------------------- XVI · ask ◆ */
 
 /**
- * CANNOT SHIP AS A PLACEHOLDER. This is the ask; the client has not supplied
- * terms. Every figure here is TBD and renders as a labelled gap, and the slide
- * carries a standing warning until the numbers arrive.
+ * The ask: a fifty-fifty joint venture, not a raise.
+ *
+ * This is the one slide whose shape is set by the client rather than derived
+ * from the reference deck. The split is real and stated; what each side puts
+ * in is real; the mechanics underneath it — vehicle, vesting, close — are not
+ * supplied yet and render as labelled gaps rather than plausible numbers.
+ *
+ * The 50/50 framing is what makes the rest of the deck cohere: a partner is
+ * not buying into a services business, they are taking half of the operating
+ * layer the services business is funding.
  */
 export const ASK = {
   eyebrow: "THE ASK",
-  title: "Founding partners,",
-  titleAccent: "before the second anchor.",
+  title: "Not a raise.",
+  titleAccent: "A fifty-fifty joint venture.",
   lede:
-    "We are not raising to find a customer. We are adding the partners who take the operating layer from one fund to many.",
+    "The customer is already found. We want the partner who takes the operating layer from one fund to many — owned together, equally.",
+  split: { ours: 50, theirs: 50 },
+  splitLabels: { ours: "Isthmus Meridian", theirs: "Founding partners" },
+  /** What each side contributes to the venture. */
+  contributions: {
+    ours: {
+      label: "WE CONTRIBUTE",
+      items: [
+        "A live, paying anchor — AND Capital's back office, running today",
+        "The operating layer: models, templates, eval sets and the platform",
+        "The delivery bench and the workflow that produced the corpus",
+        "Data rights engineered up front, surviving any single client",
+      ],
+    },
+    theirs: {
+      label: "YOU CONTRIBUTE",
+      items: [
+        "Capital sized to the second anchor and the delivery build",
+        "The commercial reach to reach fund two, three and four",
+        "Domain standing with GPs and LPs in your market",
+        "Equal ownership means equal accountability for the outcome",
+      ],
+    },
+  },
+  /** Mechanics the client has not supplied. Rendered as gaps, never invented. */
   terms: [
-    { label: "Equity offered", value: TBD as Figure, unit: "%" },
-    { label: "Cash component", value: TBD as Figure, unit: "" },
-    { label: "Vesting", value: TBD as Figure, unit: "" },
+    { label: "Ownership", value: 50 as Figure, unit: "/50" },
+    { label: "Capital committed", value: TBD as Figure, unit: "" },
+    { label: "Vehicle", value: TBD as Figure, unit: "" },
     { label: "Target close", value: TBD as Figure, unit: "" },
   ],
-  useOfEquity: [] as Array<{ label: string; pct: number }>,
-  warning:
-    "TERMS PENDING — this slide cannot be presented until equity, cash and close are supplied.",
+  governance:
+    "Equal ownership, equal board, reserved matters agreed at signing — neither side dilutable out of the layer it built.",
+  warning: "Capital, vehicle and close come from you before this is presented.",
   cta: "Take the crossing",
 };

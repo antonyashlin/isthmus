@@ -716,36 +716,59 @@ const Risks: SlideFn = ({ index, total }) => (
 const Ask: SlideFn = ({ index, total }) => (
   <Screen eyebrow={ASK.eyebrow} index={index} total={total}>
     <H accent={ASK.titleAccent} head={ASK.title} />
-    <p className="fd-rise fd-lede">{ASK.lede}</p>
-    <div className="fd-rail fd-rise">
-      <div className="fd-rail-line" />
-      <div className="fd-rail-cols" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
+    <p className="fd-rise fd-lede" style={{ marginTop: 22, maxWidth: "46ch" }}>{ASK.lede}</p>
+
+    {/* The proposal drawn as one rail in two equal halves. If the halves are
+        not equal the slide is lying, so the geometry carries the claim and the
+        numbers only label it. */}
+    <div className="fd-rise fd-split-bar">
+      <div className="sb-track">
+        <span className="sb-ours" style={{ flexBasis: `${ASK.split.ours}%` }} />
+        <span className="sb-theirs" style={{ flexBasis: `${ASK.split.theirs}%` }} />
+      </div>
+      <div className="sb-legend">
+        <span>
+          <b>{ASK.split.ours}%</b> {ASK.splitLabels.ours}
+        </span>
+        <span>
+          <b>{ASK.split.theirs}%</b> {ASK.splitLabels.theirs}
+        </span>
+      </div>
+    </div>
+
+    <div className="fd-rise fd-contribs">
+      {[ASK.contributions.ours, ASK.contributions.theirs].map((side) => (
+        <div key={side.label}>
+          <div className="fd-label">{side.label}</div>
+          <ul className="fd-contrib-list">
+            {side.items.map((it) => (
+              <li key={it}>{it}</li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+
+    <div className="fd-rise fd-ask-foot">
+      <div>
+        <p className="fd-note" style={{ maxWidth: "56ch" }}>
+          {ASK.governance}
+        </p>
+        <div className="fd-ask-warn">
+          <span className="fd-chip warn">TERMS PENDING</span>
+          <p className="fd-note">{ASK.warning}</p>
+        </div>
+      </div>
+      <div className="fd-ask-terms">
         {ASK.terms.map((t) => (
-          <div key={t.label} style={{ position: "relative" }}>
-            <span className="fd-node" style={{ left: 0, top: -5 }} />
-            <div style={{ paddingTop: 26 }}>
-              <div className="fd-label">{t.label}</div>
-              <div
-                style={{
-                  fontSize: 34,
-                  fontWeight: 200,
-                  color: "var(--heading)",
-                  marginTop: 14,
-                  lineHeight: 1.1,
-                }}
-              >
-                {t.value === null ? <Gap /> : `${t.value}${t.unit}`}
-              </div>
+          <div key={t.label}>
+            <div className="fd-label">{t.label}</div>
+            <div className="fd-term-v">
+              {t.value === null ? <Gap width={5} /> : `${t.value}${t.unit}`}
             </div>
           </div>
         ))}
       </div>
-    </div>
-    <div className="fd-rise" style={{ marginTop: 24 }}>
-      <span className="fd-chip warn">TERMS PENDING</span>
-      <p className="fd-note" style={{ marginTop: 12 }}>
-        {ASK.warning}
-      </p>
     </div>
   </Screen>
 );

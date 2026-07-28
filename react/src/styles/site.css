@@ -563,14 +563,14 @@ html.js .funnel{opacity:0}
    The opening half sits above the routes as a sans subheading; the closing
    half sits below them in serif italic, which is where the brand puts every
    emphasis. Both are the same size so they read as one line interrupted. */
-.blk-sub{font-weight:300;font-size:clamp(23px,3.3vw,46px);line-height:1.15;
-  letter-spacing:-0.012em;color:var(--heading);max-width:none;text-wrap:nowrap}
+.blk-sub{font-weight:300;font-size:clamp(19px,2.4vw,34px);line-height:1.2;
+  letter-spacing:-0.01em;color:var(--heading);max-width:none;text-wrap:nowrap}
 .routes-coda{margin:clamp(26px,3.2vh,40px) 0 0;font-family:var(--serif);font-style:italic;
-  font-weight:400;font-size:clamp(23px,3.3vw,46px);line-height:1.15;letter-spacing:-0.01em;
+  font-weight:400;font-size:clamp(19px,2.4vw,34px);line-height:1.2;letter-spacing:-0.01em;
   color:var(--accent-ink)}
 @media (max-width:760px){
-  .blk-sub{font-size:clamp(23px,5.2vw,34px);text-wrap:balance}
-  .routes-coda{font-size:clamp(23px,5.2vw,34px);margin-top:23px}
+  .blk-sub{font-size:clamp(19px,4.6vw,23px);text-wrap:balance}
+  .routes-coda{font-size:clamp(19px,4.6vw,23px);margin-top:23px}
 }
 
 /* ---- interactive liquid glass (offers + metrics) ----
