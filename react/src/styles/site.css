@@ -525,6 +525,39 @@ html.js .funnel{opacity:0}
   will-change:transform}
 @media (prefers-reduced-motion:reduce){ .flow-packet,.flow-fill{display:none} .flow .fstep{opacity:1} }
 
+/* ---- sign-off: a four-step flow on the meridian line ---- */
+.soflow{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:var(--stack-lg)}
+.soflow-track{position:absolute;top:8px;left:14px;right:15%;height:1.5px;
+  background:linear-gradient(90deg,var(--deep),var(--steel) 50%,var(--sky));opacity:.7}
+.sostep{position:relative;padding:0 26px 0 0}
+.sodot{position:absolute;top:1px;left:8px;width:15px;height:15px;border-radius:50%;
+  background:var(--bg);border:2px solid var(--sky);box-shadow:0 0 0 4px var(--bg),0 0 16px -2px var(--sky)}
+.sodot.feat{background:var(--sky)}
+.sok{margin-top:40px;font-family:var(--serif);font-style:italic;font-weight:500;font-size:21px;color:var(--accent-ink)}
+.sostep p{margin-top:13px;font-size:14px;line-height:1.5;color:var(--tx-2);max-width:22ch}
+.soflow .sostep{opacity:.6;transition:opacity .35s var(--ease)}
+.soflow .sostep.lit{opacity:1}
+.sostep.lit .sodot{background:var(--sky);box-shadow:0 0 0 4px var(--bg),0 0 24px 1px var(--sky)}
+.soflow-fill{position:absolute;top:8px;left:14px;height:1.5px;width:0;z-index:1;
+  background:linear-gradient(90deg,var(--steel),var(--sky));
+  box-shadow:0 0 12px 1px rgba(136,193,237,0.5);pointer-events:none}
+.soflow-packet{position:absolute;top:1px;z-index:2;width:15px;height:15px;margin-left:-7.5px;
+  border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,#FFFFFF 0%,var(--sky) 46%,rgba(136,193,237,0) 72%);
+  box-shadow:0 0 20px 5px rgba(136,193,237,0.45);
+  will-change:transform}
+@media (prefers-reduced-motion:reduce){ .soflow-packet,.soflow-fill{display:none} .soflow .sostep{opacity:1} }
+
+/* ---- trust badges: four quiet proof points under the sign-off flow ---- */
+.badges{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(12px,1.6vw,22px);margin-top:26px}
+.badge{display:flex;flex-direction:column;gap:10px;padding:16px 16px 18px;border-radius:14px;
+  border:1px solid var(--line);background:var(--card);
+  transition:border-color .3s var(--ease),transform .3s var(--ease)}
+.badge:hover,.badge:focus-visible{border-color:var(--line-3);transform:translateY(-3px)}
+.badge-icon{display:block;color:var(--accent-ink)}
+.badge-label{font-family:var(--sans);font-weight:500;font-size:13.5px;letter-spacing:-0.005em;color:var(--heading)}
+.badge-note{font-size:12px;line-height:1.44;color:var(--tx-2)}
+
 /* ---- interactive liquid glass (offers + metrics) ----
    The Kokonut card is a shadcn Card (flex column, overflow hidden); its only
    in-flow child is the content wrapper, so that is what has to grow. */

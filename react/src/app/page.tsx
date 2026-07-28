@@ -22,6 +22,8 @@ import { InView } from "@/components/site/InView";
 import { Nav } from "@/components/site/Nav";
 import { ScrollFx } from "@/components/site/ScrollFx";
 import { ServicesTree } from "@/components/site/ServicesTree";
+import { SignOffFlow } from "@/components/site/SignOffFlow";
+import { TrustBadges } from "@/components/site/TrustBadges";
 
 const PRESSURE = [
   {
@@ -324,7 +326,21 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 12 — readiness gap / rose (light) · C: rose left, heading + desc right */}
+        {/* 12 — trust & oversight / sign-off flow (light) · B: flow leads, desc, heading below */}
+        <section className="sec slide-sec light">
+          <div className="slide lay-b">
+            <h2 className="blk-head h-lg reveal">Nothing reaches your desk without a <span className="serif-i">sign-off</span>.</h2>
+            <p className="blk-desc body reveal">Every deliverable is AI-drafted, bench-reviewed, and approved by your team before it reaches an IC or an LP. Client work is segregated by design, covered by NDA, and handled under a SOC 2 Type II audit currently in progress.</p>
+            <div className="blk-viz">
+              <div className="viz-plate">
+                <SignOffFlow />
+                <TrustBadges />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 13 — readiness gap / rose (light) · C: rose left, heading + desc right */}
         <section className="sec slide-sec light">
           <div className="slide lay-c">
             <h2 className="blk-head h-lg reveal">The transaction-readiness <span className="serif-i">gap</span>.</h2>
@@ -340,7 +356,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 13 — company / CTA (dark), heading top-right + liquid-glass bar */}
+        {/* 14 — company / CTA (dark), heading top-right + liquid-glass bar */}
         <section className="sec cta-sec" id="company">
           <div className="wrap company-wrap">
             <h2 className="h-lg reveal company-head">We run the back office behind <span className="serif-i">private-market investors</span>.</h2>
