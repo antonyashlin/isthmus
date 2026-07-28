@@ -1,14 +1,26 @@
-import { FunnelChart } from "@/components/charts/funnel-chart";
 import { ApproachRoutes } from "@/components/site/ApproachRoutes";
+import dynamic from "next/dynamic";
+
+/* The Bklit charts pull in visx + their own runtime. Each is behind an <InView>
+   already, so splitting them means a screen's chart JS arrives when you reach
+   that screen instead of all of it landing on first paint. */
+const FunnelChart = dynamic(() =>
+  import("@/components/charts/funnel-chart").then((m) => m.FunnelChart));
+const PainGauges = dynamic(() =>
+  import("@/components/site/PainGauges").then((m) => m.PainGauges));
+const PressureRadar = dynamic(() =>
+  import("@/components/site/PressureRadar").then((m) => m.PressureRadar));
+const ReadinessRings = dynamic(() =>
+  import("@/components/site/ReadinessRings").then((m) => m.ReadinessRings));
+
+import { ContrastSwitches } from "@/components/site/ContrastSwitches";
+import { ExpectationPanels } from "@/components/site/ExpectationPanels";
 import { FlowDiagram } from "@/components/site/FlowDiagram";
-import { MetricCards, OfferCards } from "@/components/site/GlassCards";
+import { OfferCards } from "@/components/site/OfferCards";
 import { Globe } from "@/components/site/Globe";
 import { GlobeSparks } from "@/components/site/GlobeSparks";
 import { InView } from "@/components/site/InView";
 import { Nav } from "@/components/site/Nav";
-import { PainGauges } from "@/components/site/PainGauges";
-import { PressureRadar } from "@/components/site/PressureRadar";
-import { ReadinessRings } from "@/components/site/ReadinessRings";
 import { ScrollFx } from "@/components/site/ScrollFx";
 import { ServicesTree } from "@/components/site/ServicesTree";
 
@@ -96,29 +108,6 @@ const OFFERS = [
       "Board and portfolio company packs",
       "Recurring analysis and dashboards",
     ],
-  },
-];
-const METRICS = [
-  {
-    key: "detail",
-    value: "58%",
-    count: 58,
-    suffix: "%",
-    blurb: "of CFOs report more detailed LP information requests.",
-    detail: "The ask is finer-grained, not simply more frequent.",
-  },
-  {
-    key: "speed",
-    value: "Hours",
-    blurb: "Expected response speed is compressing from days toward hours.",
-    detail: "Turnaround is now part of the answer, not a caveat on it.",
-  },
-  {
-    key: "baseline",
-    value: "Baseline",
-    blurb:
-      "Granular, standardized reporting is becoming the expectation, not the exception.",
-    detail: "What used to differentiate a manager is now table stakes.",
   },
 ];
 const BANDS = [
@@ -295,7 +284,7 @@ export default function Home() {
                     showValues
                     showLabels
                     showPercentage
-                    style={{ height: "calc(100vh - 250px)" }}
+                    style={{ height: "min(52vh, calc(100vh - 250px))" }}
                   />
                 </InView>
                 <p className="source">Source: <a href="https://www.deloitte.com/us/en/what-we-do/capabilities/mergers-acquisitions-restructuring/articles/m-and-a-generative-ai-study.html" target="_blank" rel="noopener">Deloitte 2026 GenAI in M&amp;A Pulse Study</a>.</p>
@@ -320,7 +309,7 @@ export default function Home() {
             <h2 className="blk-head h-lg reveal">From periodic reporting to <span className="serif-i">on-demand analysis</span>.</h2>
             <div className="blk-viz">
               <div className="chart-block viz-plate reveal">
-                <MetricCards metrics={METRICS} />
+                <ExpectationPanels />
                 <p className="source">Source: <a href="https://www.maybern.com/post/meeting-the-growing-demands-of-in-flight-lp-information-requests" target="_blank" rel="noopener">Maybern summary of Private Funds CFO Insights Survey 2025</a>.</p>
               </div>
             </div>
@@ -332,14 +321,7 @@ export default function Home() {
           <div className="slide lay-b">
             <h2 className="blk-head h-lg reveal">Built for private-market operating work.</h2>
             <div className="blk-viz">
-              <div className="contrasts">
-                <div className="reveal"><span className="yes">Integrated</span><span className="no">not fragmented</span></div>
-                <div className="reveal"><span className="yes">Embedded</span><span className="no">not external</span></div>
-                <div className="reveal"><span className="yes">Execution</span><span className="no">not software licenses</span></div>
-                <div className="reveal"><span className="yes">Investment-specific</span><span className="no">not generic</span></div>
-                <div className="reveal"><span className="yes">AI-enabled</span><span className="no">not labor-only</span></div>
-                <div className="reveal"><span className="yes">Scalable</span><span className="no">not dependent on internal hiring</span></div>
-              </div>
+              <ContrastSwitches />
             </div>
           </div>
         </section>

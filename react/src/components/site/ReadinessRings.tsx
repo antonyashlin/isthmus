@@ -38,12 +38,12 @@ export function ReadinessRings({ bands }: { bands: ReadinessBand[] }) {
     <div className="rings">
       <div className="rings-plot">
         <RingChart
-          baseInnerRadius={54}
+          baseInnerRadius={60}
           data={data}
           hoveredIndex={active}
           onHoverChange={setActive}
           ringGap={7}
-          size={292}
+          size={321}
           strokeWidth={16}
         >
           {data.map((d, i) => (

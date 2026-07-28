@@ -6,9 +6,13 @@
 :root{
   --sky:#88C1ED; --sky-2:#C9E2F6; --steel:#4686B7; --steel-2:#63A6D9; --deep:#274F6F;
   --ink-0:#000000; --ink-1:#05070A; --ink-2:#0B0F14; --ink-3:#101720;
-  --sans:"Helvetica Neue","Helvetica","Arimo",Arial,sans-serif;
-  --serif:"Newsreader",Georgia,"Times New Roman",serif;
-  --mono:"SFMono-Regular","SF Mono",ui-monospace,Menlo,Consolas,"Liberation Mono",monospace;
+  /* typography/README.md §3. Self-hosted via next/font (see layout.tsx).
+     ONE serif: Source Serif 4 is variable on opsz, so the family retunes itself
+     from a 19px inline italic to a 120px wordmark and the old display/text
+     split is unnecessary. The mono stack is gone: nav, eyebrows, tags, sources and journey numbers are
+     labels, not data, so they are sans 500 uppercase tracked instead. */
+  --sans:var(--font-archivo),"Helvetica Neue",Arial,sans-serif;
+  --serif:var(--font-serif),Georgia,"Times New Roman",serif;
   --max:1200px; --ease:cubic-bezier(0.22,1,0.36,1);
   /* vertical rhythm — one deliberate two-tier scale for caption->evidence gaps.
      --stack: a component follows its caption. --stack-lg: a distinct beat (diagram groups). */
@@ -65,15 +69,18 @@ main>section,footer{position:relative;overflow:hidden;background:transparent;col
    the shadow are what read as one screen resting on the one before it */
 .hero::after,main>section::before{content:"";position:absolute;inset:0;z-index:-2;
   background:var(--bg);border-radius:26px 26px 0 0;
-  box-shadow:0 -26px 60px -28px rgba(0,0,0,0.6)}
+  /* tinted to the deck's own ink rather than pure black — a neutral-black
+     shadow reads muddy against the navy and grey against the paper */
+  box-shadow:0 -26px 60px -28px color-mix(in srgb,var(--ink-1) 62%,transparent)}
 .hero::after{border-radius:0;box-shadow:none}
-h1,h2,h3,h4{margin:0;font-weight:300;letter-spacing:-0.02em;text-wrap:pretty;color:var(--heading)}
+h1,h2,h3,h4{margin:0;font-weight:300;letter-spacing:-0.01em;text-wrap:pretty;color:var(--heading)}
 p{margin:0}
 .serif-i{font-family:var(--serif);font-style:italic;font-weight:500;letter-spacing:0;color:var(--accent-ink)}
 
-/* meta labels in mono, cartographer's-instrument style */
-.eyebrow{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:0.18em;
-  text-transform:uppercase;color:var(--tx-3);font-weight:400}
+/* meta labels: sans 500, uppercase, tracked — the instrument register without
+   an unowned mono face (typography/README.md §3.4) */
+.eyebrow{display:inline-block;font-family:var(--sans);font-size:11px;letter-spacing:0.22em;
+  text-transform:uppercase;color:var(--tx-3);font-weight:500}
 .lead{font-size:20px;line-height:1.6;color:var(--tx-2);max-width:60ch}
 .body{font-size:17px;line-height:1.62;color:var(--tx-2);max-width:62ch}
 
@@ -92,7 +99,7 @@ p{margin:0}
 .brand .wm b{font-weight:700;color:#fff}
 .brand .wm i{font-style:normal;font-weight:300;color:rgba(255,255,255,0.66)}
 .nav-links{display:flex;align-items:center;gap:30px}
-.nav-links a{font-family:var(--mono);font-size:12px;letter-spacing:0.02em;color:rgba(255,255,255,0.6)}
+.nav-links a{font-family:var(--sans);font-weight:500;font-size:12px;letter-spacing:0.02em;color:rgba(255,255,255,0.6)}
 .nav-links a:hover{color:#fff}
 .nav-cta{display:flex;align-items:center;gap:16px}
 
@@ -122,11 +129,11 @@ p{margin:0}
 .hero-bottom{margin-top:auto;display:flex;justify-content:flex-end}
 .wordmark{display:flex;flex-direction:column;align-items:flex-end;text-align:right;gap:0;line-height:0.9}
 .wordmark .w-isth{font-family:var(--sans);font-weight:200;font-size:clamp(52px,11vw,150px);
-  letter-spacing:0.02em;text-transform:uppercase;color:#fff;
+  font-variation-settings:"wdth" 108;letter-spacing:0;text-transform:uppercase;color:#fff;
   background:linear-gradient(176deg,#FFFFFF 0%,#EAF1F8 20%,#C2D0DD 48%,#FFFFFF 60%,#96A6B4 86%,#C4D2DF 100%);
   -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.wordmark .w-mer{font-family:"Cormorant",Georgia,serif;font-style:italic;font-weight:600;
-  font-size:clamp(46px,9.6vw,132px);letter-spacing:0;color:var(--sky);margin-top:-0.06em}
+.wordmark .w-mer{font-family:var(--serif);font-style:italic;font-weight:400;
+  font-size:clamp(46px,9.5vw,132px);letter-spacing:0;color:var(--sky);margin-top:-0.05em}
 
 /* ---- one continuous globe field, fixed & UNDER the text (z-index:-1), panned by scroll ---- */
 /* 300vh tall: the hero sees the top third, screen 2 the middle, the last screen the bottom */
@@ -203,8 +210,8 @@ body.at-hero .gf-rule{display:none}
 .sec{height:100vh;display:flex;flex-direction:column;justify-content:center;
   padding:104px 0 64px;overflow:hidden}
 .eyebrow + .h-xl,.eyebrow + .h-lg{margin-top:20px}
-.h-xl{font-size:clamp(40px,6.2vw,82px);font-weight:400;line-height:1.0;letter-spacing:-0.025em;max-width:17ch}
-.h-lg{font-size:clamp(34px,5vw,64px);font-weight:400;line-height:1.02;letter-spacing:-0.025em;max-width:19ch}
+.h-xl{font-size:clamp(40px,6.2vw,82px);font-weight:400;line-height:1.0;letter-spacing:-0.012em;max-width:17ch}
+.h-lg{font-size:clamp(34px,5vw,64px);font-weight:400;line-height:1.02;letter-spacing:-0.012em;max-width:19ch}
 .h-md{font-size:clamp(22px,2.6vw,32px);line-height:1.12}
 .mt-s{margin-top:24px}.mt-m{margin-top:34px}.mt-l{margin-top:72px}.mt-xl{margin-top:96px}
 
@@ -287,7 +294,7 @@ body.at-hero .gf-rule{display:none}
 .route:first-child{border-left:none;padding-left:0}
 .route.off{opacity:.42}
 .route.on{transform:translateY(-5px)}
-.rt-glyph{width:100%;max-width:212px;height:auto;overflow:visible}
+.rt-glyph{width:100%;max-width:233px;height:auto;overflow:visible}
 .rt-base{stroke:var(--line-2);stroke-width:1;fill:none}
 .rt-dash{stroke:var(--accent-ink);stroke-width:1;stroke-dasharray:4 5;opacity:.5;fill:none}
 .rt-bar{fill:none;stroke:var(--accent-ink);stroke-width:1.2;opacity:.72;transition:opacity .3s var(--ease)}
@@ -296,7 +303,7 @@ body.at-hero .gf-rule{display:none}
 .rt-funnel{fill:none;stroke:var(--accent-ink);stroke-width:1.2;opacity:.78;transition:opacity .3s var(--ease)}
 .rt-drop{fill:var(--accent-ink);stroke:none}
 /* same mono caption step as .eyebrow — 11 user units in a 200-wide viewBox */
-.rt-deskmark{fill:var(--tx-3);font-family:var(--mono);font-size:11px;letter-spacing:0.14em;text-transform:uppercase}
+.rt-deskmark{fill:var(--tx-3);font-family:var(--sans);font-weight:500;font-size:11px;letter-spacing:0.14em;text-transform:uppercase}
 .route.on .rt-bar,.route.on .rt-funnel{opacity:1}
 .rt-name{margin-top:20px;font-family:var(--serif);font-style:italic;font-weight:500;font-size:26px;color:var(--accent-ink)}
 .rt-lede{margin-top:14px;font-size:16px;line-height:1.55;color:var(--tx-2)}
@@ -314,9 +321,9 @@ body.at-hero .gf-rule{display:none}
 
 /* ---- pressure radar (Bklit) — plot and key share one active index ---- */
 .radarw{width:100%}
-.radarw-plot{width:100%;max-width:352px;margin-left:0;margin-right:auto}
+.radarw-plot{width:100%;max-width:387px;margin-left:0;margin-right:auto}
 .rdr-lab{fill:var(--tx-2);font-family:var(--sans);font-size:12.5px;transition:fill .2s var(--ease)}
-.rdr-val{fill:var(--accent-ink);font-family:var(--mono);font-size:12px;transition:fill .2s var(--ease)}
+.rdr-val{fill:var(--accent-ink);font-family:var(--sans);font-weight:500;font-size:12px;transition:fill .2s var(--ease)}
 .rdr-lab.on{fill:var(--heading)}
 .rdr-val.on{fill:var(--sky)}
 .rdr-dot{fill:var(--sky);stroke:var(--bg);stroke-width:2}
@@ -329,7 +336,7 @@ body.at-hero .gf-rule{display:none}
 .rk.on{background:color-mix(in srgb,var(--accent-ink) 13%,transparent)}
 .rk-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
 .rk-label{font-size:14px;color:var(--tx-2)}
-.rk-val{font-family:var(--mono);font-size:13px;color:var(--accent-ink)}
+.rk-val{font-family:var(--sans);font-weight:500;font-size:13px;color:var(--accent-ink)}
 .rk-note{display:block;margin-top:6px;font-size:12.5px;line-height:1.45;color:var(--tx-3);
   opacity:0;transform:translateY(4px);transition:opacity .28s var(--ease),transform .28s var(--ease)}
 .rk.on .rk-note{opacity:1;transform:none}
@@ -337,19 +344,20 @@ body.at-hero .gf-rule{display:none}
 /* ---- glass plate behind a graph ----
    A ~35% fill so the line-work reads as a plate resting on the globe field
    rather than floating loose over it. */
+/* Fill + rim only. A backdrop-filter here re-ran the blur over the constantly
+   animating globe field on every repaint inside the plate — measured as a 32ms
+   frame on hover vs 18ms without it. The 30-40% fill is what makes it read as
+   glass; the blur was costing a dropped frame for very little. */
 .viz-plate{position:relative;border-radius:20px;padding:clamp(20px,2.6vw,38px);
-  background:rgba(11,20,32,0.34);border:1px solid var(--line);
-  -webkit-backdrop-filter:blur(10px) saturate(130%);backdrop-filter:blur(10px) saturate(130%);
+  background:rgba(11,20,32,0.38);border:1px solid var(--line);
   box-shadow:inset 0 1px 0 rgba(255,255,255,0.06)}
-.light .viz-plate{background:rgba(255,255,255,0.38);
+.light .viz-plate{background:rgba(255,255,255,0.42);
   box-shadow:inset 0 1px 0 rgba(255,255,255,0.72)}
-@media (prefers-reduced-transparency: reduce){
-  .viz-plate{background:var(--panel);backdrop-filter:none;-webkit-backdrop-filter:none}
-}
+@media (prefers-reduced-transparency: reduce){ .viz-plate{background:var(--panel)} }
 
 /* ---- services tree (replaces the ECharts tree) ---- */
 .tree{display:flex;flex-direction:column;gap:20px;width:100%}
-.tree-plot{position:relative;width:100%;height:clamp(300px,40vh,420px)}
+.tree-plot{position:relative;width:100%;height:clamp(330px,44vh,462px)}
 .tree-links{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .tr-link{fill:none;stroke:var(--line-2);stroke-width:1.1;vector-effect:non-scaling-stroke;
   transition:stroke .25s var(--ease)}
@@ -369,7 +377,8 @@ html.js .tree:not(.ready) .tr-node{opacity:0}
   font-size:clamp(16px,1.4vw,20px);color:var(--heading);letter-spacing:-0.01em;line-height:1.25;
   transition:color .25s var(--ease)}
 .tr-leaf.lit{color:var(--accent-ink)}
-.tree-detail{min-height:3em;margin:0;padding-top:16px;border-top:1px solid var(--line);
+.tree-detail.swapping{opacity:.35}
+.tree-detail{height:4.6em;overflow:hidden;transition:opacity .2s var(--ease);margin:0;padding-top:16px;border-top:1px solid var(--line);
   font-size:clamp(15px,1.35vw,19px);line-height:1.5;color:var(--tx-2);max-width:64ch}
 
 /* ---- readiness rings (Bklit RingChart, replaces the ECharts rose) ---- */
@@ -378,13 +387,15 @@ html.js .tree:not(.ready) .tr-node{opacity:0}
 .rings-center{position:absolute;inset:0;display:flex;flex-direction:column;
   align-items:center;justify-content:center;text-align:center;pointer-events:none}
 .rings-key{list-style:none;margin:0;padding:0;display:grid;gap:2px;align-content:center}
-.rings-figure{display:block;font-size:30px;font-weight:200;color:var(--heading);
+/* same figure treatment as .xp-figure, scaled to fit the ring's inner hole —
+   one "big number" style across the deck, not two that scale differently */
+.rings-figure{display:block;font-size:clamp(24px,2.2vw,32px);font-weight:200;color:var(--heading);
   letter-spacing:-0.02em;font-variant-numeric:tabular-nums;line-height:1.05}
 .rings-cap{display:block;margin-top:6px;max-width:11ch;font-size:12.5px;line-height:1.35;color:var(--tx-3)}
 
 /* ---- back-office dials (Bklit gauge) ---- */
-.dials{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;align-items:start}
-.dial{display:flex;flex-direction:column;align-items:center;text-align:center;
+.dials{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-items:start}
+.dial{display:flex;min-width:0;flex-direction:column;align-items:center;text-align:center;
   background:none;border:0;border-radius:16px;padding:14px 16px 20px;font:inherit;color:inherit;cursor:pointer;
   transition:background .3s var(--ease),transform .3s var(--ease),opacity .3s var(--ease)}
 .dial.on{background:color-mix(in srgb,var(--accent-ink) 10%,transparent);transform:translateY(-5px)}
@@ -406,6 +417,12 @@ html.js .tree:not(.ready) .tr-node{opacity:0}
    hero and every heading) so the plot fills its box and sits under its caption, not adrift */
 .echart.radial{max-width:560px;margin-left:0;margin-right:auto}
 
+/* Bklit spreads the stage labels to the outer edges of the chart box and sets
+   them nowrap, so the long ones ran past the plate (measured 57px over on the
+   right). Inset the chart itself — the labels then land inside the card and the
+   funnel body stays centred. */
+.funnel-on-light .chart-block > div:first-child{padding-inline:clamp(48px,6vw,86px)}
+
 /* ---- Bklit-style funnel ---- */
 .funnel{width:100%;margin-top:var(--stack);--fn:#4686B7;--fn-line:rgba(13,28,43,0.16)}
 .funnel svg{width:100%;height:auto;display:block;overflow:visible}
@@ -417,7 +434,7 @@ html.js .funnel{opacity:0}
 .fn-bot{fill:var(--tx-2);font-family:var(--sans);font-size:14.5px}
 @media (prefers-reduced-motion: reduce){ html.js .funnel{opacity:1} }
 .echart canvas{cursor:default}
-.source{margin-top:26px;font-family:var(--mono);font-size:11.5px;letter-spacing:0.01em;color:var(--tx-3);line-height:1.6}
+.source{margin-top:26px;font-family:var(--sans);font-weight:500;font-size:11.5px;letter-spacing:0.01em;color:var(--tx-3);line-height:1.6}
 .source a{color:var(--tx-3);text-decoration:underline;text-decoration-color:var(--line-2);text-underline-offset:3px}
 .source a:hover{color:var(--accent-ink)}
 
@@ -440,7 +457,7 @@ html.js .funnel{opacity:0}
 .jdot{position:absolute;top:1px;left:8px;width:15px;height:15px;border-radius:50%;
   background:var(--bg);border:2px solid var(--sky);
   box-shadow:0 0 0 4px var(--bg),0 0 16px -2px var(--sky)}
-.jn{margin-top:44px;font-family:var(--mono);font-size:12px;letter-spacing:0.1em;color:var(--accent-ink)}
+.jn{margin-top:44px;font-family:var(--sans);font-weight:500;font-size:12px;letter-spacing:0.1em;color:var(--accent-ink)}
 .jstep h3{margin-top:16px;font-size:20px;font-weight:400;color:var(--heading);letter-spacing:-0.01em}
 .jstep p{margin-top:12px;font-size:14.5px;line-height:1.52;color:var(--tx-2);max-width:22ch}
 
@@ -474,7 +491,12 @@ html.js .funnel{opacity:0}
    in-flow child is the content wrapper, so that is what has to grow. */
 .glass-slot{position:relative;display:flex;min-width:0}
 .glass-slot > *{width:100%}
-.glass-spot{position:absolute;inset:-48px;z-index:0;pointer-events:none}
+.glass-sheen{position:absolute;top:-30%;left:-40%;width:34%;height:160%;z-index:0;opacity:0;
+  pointer-events:none;transform:skewX(-16deg);
+  background:linear-gradient(90deg,transparent,
+    color-mix(in srgb,var(--sky-2) 16%,transparent),transparent)}
+.light .glass-sheen{background:linear-gradient(90deg,transparent,
+  color-mix(in srgb,var(--steel) 18%,transparent),transparent)}
 .glass-detail{display:block;opacity:0;transform:translateY(7px);
   transition:opacity .3s var(--ease),transform .3s var(--ease)}
 .glass-detail.on{opacity:1;transform:none}
@@ -491,11 +513,11 @@ html.js .funnel{opacity:0}
 .offer p{margin-top:13px;font-size:15.5px;line-height:1.55;color:var(--tx-2)}
 .offer .btn{margin-top:auto;align-self:flex-start}
 .glass-detail{margin-top:14px}
-.offer .glass-detail{list-style:none;margin:14px 0 24px;padding:0}
-.offer .glass-detail li{position:relative;padding-left:16px;font-size:13.5px;line-height:1.5;color:var(--tx-3)}
+.offer .glass-detail{list-style:none;margin:16px 0 4px;padding:0;opacity:1}
+.offer .glass-detail li{position:relative;opacity:0;padding-left:16px;font-size:13.5px;line-height:1.5;color:var(--tx-3)}
 .offer .glass-detail li + li{margin-top:7px}
 .offer .glass-detail li::before{content:"";position:absolute;left:0;top:8px;width:6px;height:1px;background:var(--accent-ink)}
-.feat-tag{font-family:var(--mono);font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:16px}
+.feat-tag{font-family:var(--sans);font-weight:500;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:16px}
 
 /* ---- LP expectations: metric cards ---- */
 .mcards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:stretch}
@@ -507,6 +529,55 @@ html.js .funnel{opacity:0}
 .mcard-blurb{display:block;margin-top:14px;font-size:14px;line-height:1.5;color:var(--tx-2)}
 .mcard .glass-detail{margin-top:12px;font-size:13px;line-height:1.45;color:var(--tx-3)}
 
+/* ---- LP expectations: three panels that show their own claim ---- */
+.xpanels{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(18px,2.4vw,40px)}
+.xpanel{display:flex;flex-direction:column;gap:16px;padding:22px 22px 24px;border-radius:16px;
+  border:1px solid var(--line);background:var(--card);
+  transition:border-color .3s var(--ease),transform .3s var(--ease)}
+.xpanel:hover,.xpanel:focus-visible{border-color:var(--line-3);transform:translateY(-4px)}
+.xp-figure{font-size:clamp(28px,3vw,40px);font-weight:200;color:var(--heading);
+  letter-spacing:-0.02em;font-variant-numeric:tabular-nums;line-height:1}
+.xp-unit{font-size:0.62em;margin-left:2px}
+.xp-ticks{display:flex;align-items:flex-end;gap:3px;height:48px}
+.xp-tick{flex:1;height:100%;border-radius:1px;background:var(--accent-ink);
+  transform-origin:50% 100%}
+.xp-bar{position:relative;height:48px;display:flex;align-items:center}
+.xp-bar-fill{position:absolute;left:0;top:50%;height:6px;margin-top:-3px;border-radius:3px;
+  background:linear-gradient(90deg,var(--steel),var(--sky))}
+.xp-bar-from,.xp-bar-to{position:absolute;top:0;font-family:var(--sans);font-weight:500;font-size:11px;
+  letter-spacing:0.12em;text-transform:uppercase;color:var(--tx-3)}
+.xp-bar-from{right:0}
+.xp-bar-to{left:0;color:var(--accent-ink)}
+.xp-rows{display:flex;flex-direction:column;gap:3px;height:48px;justify-content:center}
+.xp-row{height:3px;border-radius:2px;background:var(--accent-ink);opacity:.75;
+  transform-origin:0 50%}
+.xp-row.fine{height:2px;opacity:.4}
+.xp-cap{font-size:14px;line-height:1.5;color:var(--tx-2)}
+
+/* ---- why: six switches from the usual way to ours ---- */
+.switches{display:grid;grid-template-columns:1fr;gap:2px;width:100%;max-width:920px}
+.cs-head{display:grid;grid-template-columns:minmax(0,1fr) clamp(90px,10vw,150px) minmax(0,1fr);
+  align-items:center;gap:20px;padding:0 18px 10px;border-bottom:1px solid var(--line);margin-bottom:8px}
+.cs-head span{font-family:var(--sans);font-weight:500;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:var(--tx-3)}
+.cs-head span:first-child{text-align:right}
+.cs-head span:last-child{grid-column:3;color:var(--accent-ink)}
+.cs-row{display:grid;grid-template-columns:minmax(0,1fr) clamp(90px,10vw,150px) minmax(0,1fr);
+  align-items:center;gap:20px;padding:13px 18px;border-radius:12px;
+  transition:background .3s var(--ease)}
+.cs-row:hover,.cs-row:focus-visible{background:color-mix(in srgb,var(--accent-ink) 10%,transparent)}
+.cs-no{font-family:var(--serif);font-style:italic;font-size:clamp(15px,1.4vw,19px);
+  color:var(--tx-3);text-align:right;text-decoration:line-through;
+  text-decoration-color:var(--line-2);text-decoration-thickness:1px}
+.cs-track{position:relative;height:3px;border-radius:2px;background:var(--line-2)}
+.cs-fill{position:absolute;left:0;top:0;height:100%;width:0;border-radius:2px;
+  background:linear-gradient(90deg,var(--steel),var(--sky))}
+.cs-knob{position:absolute;top:50%;left:0;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;
+  background:var(--bg);border:2px solid var(--line-2);
+  transition:border-color .3s var(--ease),box-shadow .3s var(--ease),background .3s var(--ease)}
+.cs-row.landed .cs-knob{background:var(--sky);border-color:var(--sky);
+  box-shadow:0 0 0 3px var(--bg),0 0 20px -1px var(--sky)}
+.cs-yes{font-size:clamp(18px,1.75vw,25px);color:var(--heading);letter-spacing:-0.01em}
+
 /* ---- why: contrasts ---- */
 .contrasts{display:grid;grid-template-columns:1fr 1fr;gap:1px 0;margin-top:var(--stack-lg);background:var(--line);border:1px solid var(--line);border-radius:18px;overflow:hidden}
 .contrasts div{background:var(--card);padding:28px 32px;display:flex;align-items:baseline;gap:18px}
@@ -514,7 +585,7 @@ html.js .funnel{opacity:0}
 .contrasts .no{font-family:var(--serif);font-style:italic;font-size:16px;color:var(--tx-3)}
 
 /* ---- pull quote ---- */
-.pull{font-family:var(--serif);font-style:italic;font-weight:500;font-size:clamp(26px,3.8vw,46px);
+.pull{font-family:var(--serif);font-style:italic;font-weight:400;font-size:clamp(26px,3.8vw,46px);
   line-height:1.22;letter-spacing:-0.01em;color:var(--heading);max-width:18ch}
 /* the statement page carries the screen — it gets the display size, not the body size */
 .pull-xl{font-size:clamp(32px,5.1vw,64px);line-height:1.16;max-width:19ch}
@@ -534,7 +605,7 @@ html.js .funnel{opacity:0}
   border-top:1px solid rgba(255,255,255,0.16);box-shadow:inset 0 1px 0 rgba(255,255,255,0.08)}
 .glassbar .wm{font-size:12px;letter-spacing:0.22em}
 .glassbar .wm b{color:var(--heading);font-weight:700}.glassbar .wm i{font-style:normal;font-weight:300;color:var(--tx-3)}
-.contact{display:flex;align-items:center;gap:clamp(16px,2vw,28px);flex-wrap:wrap;font-family:var(--mono);font-size:12.5px}
+.contact{display:flex;align-items:center;gap:clamp(16px,2vw,28px);flex-wrap:wrap;font-family:var(--sans);font-weight:500;font-size:12.5px}
 .contact-label{color:var(--tx-3);text-transform:uppercase;letter-spacing:0.16em;font-size:11px}
 .contact a{color:var(--tx);text-decoration:none;transition:color .2s var(--ease)}
 .contact a:hover{color:var(--sky)}
@@ -590,16 +661,154 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
   .lay-b .blk-viz{order:1}.lay-b .blk-desc{order:2}.lay-b .blk-head{order:3}
 }
 @media (max-width:760px){
-  .wrap{padding:0 24px}
-  .nav{padding:0 24px}
+  /* ---------------------------------------------------------------
+     Mobile: every screen is a 9:16 panel, scrolled continuously (no
+     snap), with the globe field reserved for the first and last
+     screens only. Inside a panel the order is always
+     heading -> description -> illustration.
+     --------------------------------------------------------------- */
+  html{scroll-snap-type:none;scroll-behavior:auto}
+  .hero,main>section{scroll-snap-align:none}
+
+  .wrap{padding:0 22px}
+  .nav{padding:0 20px}
   .nav-links{display:none}
   .wbr{display:none}
-  .sec{height:auto;min-height:auto;justify-content:flex-start;padding:96px 0;overflow:visible}
-  .slide{height:auto;padding:0 24px;row-gap:26px}
-  html{scroll-snap-type:none}
-  .hero{padding:104px 24px 64px}
-  .journey{grid-template-columns:1fr;gap:30px 0}
-  .flow{grid-template-columns:1fr;gap:34px 0}
-  .flow-track,.flow-packet,.flow-fill{display:none}
-  .flow .fstep{opacity:1}
+
+  /* --- 9:16 panels --- */
+  /* 9:16 is the FLOOR now, not a fixed ratio — capping it forced content to be
+     hidden, so screens grow past it whenever the content needs the room. */
+  .hero,.sec{height:auto;min-height:calc(100vw * 16 / 9);overflow:hidden}
+  .sec{display:flex;justify-content:center;padding:0}
+  .sec.slide-sec{padding:0}
+  .hero{padding:84px 22px 40px}
+  /* the lockup moves up out of a space-between and sits just under the tagline,
+     leaving the lower half of the panel to the meridian field */
+  /* the panel is 177.8vw tall, so a vw-based offset keeps the lockup at a
+     consistent fraction of it — this lands it just past the halfway mark */
+  .hero-inner{height:auto;min-height:calc(100vw * 16 / 9 - 124px);
+    justify-content:flex-start;gap:0}
+  .hero-top{max-width:none}
+  .hero-tag{font-family:var(--serif);font-style:normal;
+    font-size:clamp(15px,4.1vw,19px);line-height:1.5;letter-spacing:0;
+    text-align:left;color:var(--tx-2)}
+  .hero-bottom{margin-top:clamp(250px,74vw,520px)}
+  .wordmark .w-isth{font-size:clamp(44px,13vw,62px)}
+  .wordmark .w-mer{font-size:clamp(40px,11.6vw,56px)}
+
+  /* --- heading on top, then description, then the illustration --- */
+  .slide{height:auto;width:100%;padding:96px 22px 56px;row-gap:24px;
+    grid-template-columns:minmax(0,1fr);align-content:start}
+  .slide.low{align-content:start;padding-top:96px}
+  .slide .blk-head{order:1;grid-column:1;grid-row:auto;align-self:start;margin-left:0}
+  .slide .blk-desc{order:2;grid-column:1;grid-row:auto;align-self:start}
+  .slide .blk-viz{order:3;grid-column:1;grid-row:auto;align-self:start;min-width:0;min-height:0}
+  .h-xl{font-size:clamp(28px,7.8vw,38px);max-width:none}
+  .h-lg{font-size:clamp(26px,7.2vw,34px);max-width:none}
+  .pull,.pull-xl{font-size:clamp(24px,6.6vw,32px);max-width:none}
+  .body{font-size:15px;line-height:1.55}
+  .source{margin-top:14px;font-size:10.5px}
+
+  /* --- the field: full screen, still, and only on the first and last --- */
+  .fg{height:118vh;transform:translateY(14vh);animation:none;opacity:0;
+    transition:opacity .45s var(--ease)}
+  body.at-hero .fg,body.at-end .fg{opacity:1}
+  .gf-rule{display:none}
+
+  /* --- charts sized to the panel --- */
+  .viz-plate{padding:14px 12px;border-radius:14px}
+  .routes,.dials,.offers,.mcards,.xpanels{grid-template-columns:1fr;gap:10px}
+  .route{border-left:none;border-top:1px solid var(--line);padding:14px 0}
+  .route:first-child{border-top:none}
+  .rt-glyph{max-width:150px}
+  .rt-lede,.rt-detail{font-size:13px}
+  .radarw-plot{max-width:min(300px,74vw);margin-inline:auto}
+  .radarw-key{grid-template-columns:1fr;gap:0}
+  .rings{grid-template-columns:1fr;justify-items:center}
+  .rings-key{width:100%}
+  .funnel-on-light .chart-block > div:first-child{padding-inline:34px}
+  /* two up, one centred beneath — a triangle, each dial with its label under it
+     and far bigger than the row layout allowed */
+  .dials{grid-template-columns:1fr 1fr;gap:20px 12px;justify-items:center}
+  .dial{display:flex;flex-direction:column;align-items:center;text-align:center;
+    width:100%;padding:0}
+  .dial:last-child{grid-column:1 / -1;max-width:58%}
+  .dial-label{margin-top:10px;font-size:14.5px}
+  .dial-note{margin-top:5px;font-size:11.5px;max-width:24ch;opacity:1;transform:none}
+  /* each switch gets its own card, two per row — the three-column row layout
+     wasted most of the width on a phone */
+  .switches{grid-template-columns:1fr 1fr;gap:10px;max-width:none}
+  .cs-head{display:none}
+  .cs-row{display:flex;flex-direction:column;align-items:stretch;gap:9px;
+    grid-template-columns:none;background:var(--card);
+    border:1px solid var(--line);border-radius:12px;padding:13px 12px}
+  .cs-no{text-align:left;font-size:11.5px}
+  .cs-track{width:100%}
+  .cs-yes{font-size:15px;line-height:1.2}
+  .xp-cap{font-size:12.5px}
+
+  /* the tree keeps its connectors; the percentage geometry scales, so only the
+     type needs to come down to fit the narrower leaf column */
+  .tree-plot{height:clamp(360px,54vh,480px)}
+  .tr-root{font-size:15px}
+  .tr-branch{font-size:11.5px}
+  .tr-leaf{font-size:12.5px}
+  .tree-detail{height:auto;min-height:3.4em;font-size:13.5px;padding-top:10px}
+
+  .journey{grid-template-columns:1fr;gap:22px 0}
+  /* the rail turns vertical and the packet runs DOWN it (FlowDiagram measures
+     and animates on the cross axis below 760px) */
+  .flow{grid-template-columns:1fr;gap:32px 0;padding-left:32px}
+  .flow-track{top:8px;bottom:8px;left:8px;right:auto;width:1.5px;height:auto;
+    background:linear-gradient(180deg,var(--deep),var(--steel) 50%,var(--sky))}
+  .flow-fill{top:0;left:8px;margin-left:-0.75px;width:1.5px;height:0;
+    background:linear-gradient(180deg,var(--steel),var(--sky))}
+  .flow-packet{top:0;left:8px;margin-left:-7.5px;margin-top:-7.5px}
+  .fstep{position:relative;padding:0}
+  .fdot{left:-32px;top:4px;width:16px;height:16px}
+  .fk{margin-top:0;font-size:24px}
+  .fstep p{margin-top:9px;font-size:15.5px;line-height:1.5;max-width:none}
+
+  /* Four panels overflowed their 9:16 bound (routes 225px, journey 237px,
+     offers 91px, funnel 33px). On touch there is no hover, so the reveal-only
+     copy is dead weight — drop it, and lay the repeated items out as compact
+     rows instead of stacked cards. */
+  /* full cards again: glyph, name, lede AND detail, with room around them */
+  /* the glyph column scales with the viewport rather than sitting at a fixed
+     94px, so the illustration grows without starving the copy beside it */
+  .route{display:grid;grid-template-columns:clamp(108px,33vw,158px) minmax(0,1fr);
+    gap:4px 14px;align-items:start;padding:20px 0 22px}
+  .rt-glyph{grid-column:1;grid-row:1 / span 3;width:100%;max-width:none;margin-top:4px}
+  .rt-name,.rt-lede,.rt-detail{grid-column:2}
+  .rt-name{grid-row:1;margin-top:0;font-size:19px}
+  .rt-lede{grid-row:2}
+  .rt-detail{grid-row:3}
+  .rt-lede{margin-top:8px;font-size:13.5px}
+  .rt-detail{display:block;opacity:1;transform:none;margin-top:7px;font-size:12.5px}
+
+  /* the journey rail turns vertical rather than disappearing */
+  .journey{position:relative;gap:22px 0}
+  .journey-track{display:block;top:8px;bottom:8px;left:7px;right:auto;
+    width:1.5px;height:auto;
+    background:linear-gradient(180deg,var(--deep),var(--steel) 45%,var(--sky))}
+  .jstep{position:relative;padding:0 0 0 30px}
+  .jdot{display:block;top:3px;left:0}
+  .jn{margin-top:0;font-size:11px}
+  .jstep h3{margin-top:6px;font-size:18px}
+  .jstep p{margin-top:6px;font-size:13.5px;max-width:none}
+
+  /* the capability list is the card's substance — it stays, and since touch has
+     no hover it is simply always shown */
+  .offers{gap:14px}
+  .offer{padding:22px 20px 24px}
+  .offer h3{font-size:20px}
+  .offer p{margin-top:10px;font-size:14px}
+  .offer .glass-detail{display:block;opacity:1;transform:none;margin:14px 0 0}
+  .offer .glass-detail li{opacity:1;font-size:13px}
+  .feat-tag{margin-bottom:10px}
+
+  .lay-e .blk-viz .chart-block{padding-bottom:8px}
+  .company-head{max-width:14ch;margin-top:44vh;margin-left:auto;text-align:right}
+  .glassbar{padding:14px 20px;gap:10px}
+  .contact{font-size:11.5px;gap:10px}
 }

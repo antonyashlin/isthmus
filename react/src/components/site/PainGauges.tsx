@@ -36,11 +36,13 @@ export function PainGauges({ dials }: { dials: PainDial[] }) {
               activeFill="var(--chart-1)"
               centerValue={d.value}
               defaultLabel=""
-              height={236}
+              /* responsive rather than a fixed 341×260: three fixed dials plus
+                 their padding overflowed the plate by 83px. ParentSize keeps the
+                 21/16 arc and fills whatever the column gives it. */
+              minWidth={104}
               suffix="%"
               totalNotches={48}
               value={d.value}
-              width={310}
             />
             <span className="dial-label">{d.label}</span>
             <span className="dial-note">{d.note}</span>
