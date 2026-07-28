@@ -684,13 +684,15 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
   .hero{padding:84px 22px 40px}
   /* the lockup moves up out of a space-between and sits just under the tagline,
      leaving the lower half of the panel to the meridian field */
+  /* the panel is 177.8vw tall, so a vw-based offset keeps the lockup at a
+     consistent fraction of it — this lands it just past the halfway mark */
   .hero-inner{height:auto;min-height:calc(100vw * 16 / 9 - 124px);
-    justify-content:flex-start;gap:clamp(28px,7vh,64px)}
+    justify-content:flex-start;gap:0}
   .hero-top{max-width:none}
   .hero-tag{font-family:var(--serif);font-style:normal;
     font-size:clamp(15px,4.1vw,19px);line-height:1.5;letter-spacing:0;
     text-align:left;color:var(--tx-2)}
-  .hero-bottom{margin-top:0}
+  .hero-bottom{margin-top:clamp(250px,74vw,520px)}
   .wordmark .w-isth{font-size:clamp(44px,13vw,62px)}
   .wordmark .w-mer{font-size:clamp(40px,11.6vw,56px)}
 
@@ -756,16 +758,16 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
   .journey{grid-template-columns:1fr;gap:22px 0}
   /* the rail turns vertical and the packet runs DOWN it (FlowDiagram measures
      and animates on the cross axis below 760px) */
-  .flow{grid-template-columns:1fr;gap:26px 0;padding-left:30px}
-  .flow-track{top:6px;bottom:6px;left:7px;right:auto;width:1.5px;height:auto;
+  .flow{grid-template-columns:1fr;gap:32px 0;padding-left:32px}
+  .flow-track{top:8px;bottom:8px;left:8px;right:auto;width:1.5px;height:auto;
     background:linear-gradient(180deg,var(--deep),var(--steel) 50%,var(--sky))}
-  .flow-fill{top:0;left:7px;margin-left:-0.75px;width:1.5px;height:0;
+  .flow-fill{top:0;left:8px;margin-left:-0.75px;width:1.5px;height:0;
     background:linear-gradient(180deg,var(--steel),var(--sky))}
-  .flow-packet{top:0;left:7px;margin-left:-7.5px;margin-top:-7.5px}
+  .flow-packet{top:0;left:8px;margin-left:-7.5px;margin-top:-7.5px}
   .fstep{position:relative;padding:0}
-  .fdot{left:-30px;top:2px;width:14px;height:14px}
-  .fk{margin-top:0;font-size:19px}
-  .fstep p{margin-top:7px;font-size:13.5px;max-width:none}
+  .fdot{left:-32px;top:4px;width:16px;height:16px}
+  .fk{margin-top:0;font-size:24px}
+  .fstep p{margin-top:9px;font-size:15.5px;line-height:1.5;max-width:none}
 
   /* Four panels overflowed their 9:16 bound (routes 225px, journey 237px,
      offers 91px, funnel 33px). On touch there is no hover, so the reveal-only
@@ -773,9 +775,12 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
      rows instead of stacked cards. */
   /* full cards again: glyph, name, lede AND detail, with room around them */
   .route{display:grid;grid-template-columns:94px minmax(0,1fr);
-    gap:16px;align-items:start;padding:18px 0 20px}
-  .rt-glyph{max-width:94px;margin-top:4px}
-  .rt-name{margin-top:0;font-size:19px}
+    gap:4px 16px;align-items:start;padding:18px 0 20px}
+  .rt-glyph{grid-column:1;grid-row:1 / span 3;max-width:94px;margin-top:4px}
+  .rt-name,.rt-lede,.rt-detail{grid-column:2}
+  .rt-name{grid-row:1;margin-top:0;font-size:19px}
+  .rt-lede{grid-row:2}
+  .rt-detail{grid-row:3}
   .rt-lede{margin-top:8px;font-size:13.5px}
   .rt-detail{display:block;opacity:1;transform:none;margin-top:7px;font-size:12.5px}
 
