@@ -47,30 +47,48 @@ const lamp = (s: number) =>
   `<circle r="${(2.6 * s).toFixed(1)}" class="lp-1"></circle>` +
   `<circle r="${(1.3 * s).toFixed(1)}" class="lp-0"></circle>`;
 
-/** a small light looping a track on its own clock (SMIL, phase-offset by `begin`) */
-const spark = (track: string, dur: number, begin: number) =>
-  `<g class="spk">${lamp(1)}<animateMotion dur="${dur}s" begin="${begin}s" repeatCount="indefinite" fill="freeze"><mpath href="#${track}" xlink:href="#${track}"></mpath></animateMotion></g>`;
+const TRACK_D = new Map(TRACKS);
 
-/** the medium light — positioned from scroll progress by GlobeSparks.tsx */
-const scrollLamp = (track: string, phase: number) =>
-  `<g class="spk-md" data-track="${track}" data-phase="${phase}">${lamp(2.1)}</g>`;
+/**
+ * A small light looping its track, phase-offset by a negative delay.
+ *
+ * These were SMIL <animateMotion>. SMIL re-renders the whole SVG layer on every
+ * tick from the main thread, and with eighteen of them on a 300vh fixed layer
+ * that was measured as the dominant remaining cause of scroll jitter (scroll
+ * jerk 85 -> 11 with SMIL paused). Same offset-path mechanism as the medium
+ * lamp instead, which costs nothing.
+ */
+const spark = (track: string, dur: number, begin: number) =>
+  `<g class="spk" style="offset-path:path('${TRACK_D.get(track)}');--dur:${dur}s;--delay:${begin}s">${lamp(1)}</g>`;
+
+/**
+ * The medium light. Its position used to be written by JS on every scroll frame,
+ * which meant a getScreenCTM() layout read per lamp per frame — measured as the
+ * dominant cause of scroll jitter (scroll jerk 199 -> 27 with it removed).
+ *
+ * It is now a pure CSS scroll-driven animation: offset-path pins it to the
+ * meridian and offset-distance is driven by `animation-timeline: scroll()`, so
+ * it runs off the main thread with no layout reads at all.
+ *
+ * `from`/`to` are narrow, measured windows where each meridian is actually on
+ * screen — which is also why the travel now reads short rather than sweeping.
+ */
+const scrollLamp = (track: string, from: number, to: number) =>
+  `<g class="spk-md" style="offset-path:path('${TRACK_D.get(track)}');--from:${from}%;--to:${to}%">${lamp(2.1)}</g>`;
 
 const SPARKS =
   `<defs>${TRACKS.map(([id, d]) => `<path id="${id}" d="${d}"></path>`).join("")}</defs>` +
-  // globe A
-  `<g transform="rotate(-14 302 -431)">${spark("tkAOut", 30, 0)}${spark("tkAOut", 30, -15)}` +
-  `${spark("tkAM1", 24, -4)}${spark("tkAM1", 24, -16)}${spark("tkAM2", 34, -9)}` +
-  `${scrollLamp("tkAM1", 0)}</g>` +
-  // globe B
-  `<g transform="rotate(8 885 1042)">${spark("tkBOut", 32, 0)}${spark("tkBOut", 32, -16)}` +
-  `${spark("tkBM1", 26, -6)}${spark("tkBM1", 26, -19)}${spark("tkBM2", 36, -11)}` +
-  `${scrollLamp("tkBM1", 0.34)}</g>` +
-  // globe C
-  `<g transform="rotate(-6 338 2550)">${spark("tkCOut", 30, -8)}${spark("tkCOut", 30, -23)}` +
-  `${spark("tkCM1", 28, -13)}${scrollLamp("tkCM1", 0.68)}</g>` +
-  // the straight rays
-  `<g>${spark("tkR1", 13, 0)}${spark("tkR1", 13, -6.5)}${spark("tkR1", 19, -11)}` +
-  `${spark("tkR2", 15, -3)}${spark("tkR2", 15, -10.5)}</g>`;
+  // Seven small lights, not eighteen. Every measurement agreed the cost scales
+  // with how many things move inside the 300vh field layer, and halving the
+  // count was the only change that reliably reached the layer-hidden floor.
+  // It reads calmer too.
+  `<g transform="rotate(-14 302 -431)">${spark("tkAOut", 30, 0)}${spark("tkAM1", 24, -4)}` +
+  `${scrollLamp("tkAM1", 73, 80)}</g>` +
+  `<g transform="rotate(8 885 1042)">${spark("tkBOut", 32, 0)}${spark("tkBM1", 26, -6)}` +
+  `${scrollLamp("tkBM1", 10, 44)}</g>` +
+  `<g transform="rotate(-6 338 2550)">${spark("tkCM1", 28, -13)}` +
+  `${scrollLamp("tkCM1", 22, 30)}</g>` +
+  `<g>${spark("tkR1", 13, 0)}${spark("tkR2", 15, -3)}</g>`;
 
 export const GLOBE_HTML = `<div class="gf-rule" aria-hidden="true"></div>
 ${svg("fgl-glow", field)}

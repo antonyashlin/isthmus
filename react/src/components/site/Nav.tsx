@@ -1,6 +1,6 @@
 export function Nav() {
   return (
-    <nav className="nav">
+    <nav className="nav liquid-glass">
       <a className="brand" href="#top" aria-label="Isthmus Meridian home">
         <svg viewBox="0 0 48 48" width="26" height="26" aria-hidden="true">
           <g fill="none" stroke="#F2F6FA" strokeWidth="1.5" strokeLinecap="round">
@@ -21,8 +21,8 @@ export function Nav() {
         <a href="#company">Company</a>
       </div>
       <div className="nav-cta">
-        <a className="btn btn-primary btn-sm" href="#company">
-          Request access
+        <a className="btn btn-glass btn-sm liquid-glass" href="#company">
+          Reach out to us
         </a>
       </div>
     </nav>

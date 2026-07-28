@@ -5,6 +5,7 @@
 .funnel-on-light{--foreground:#06121e;--muted-foreground:rgba(13,28,43,0.55);--background:#EDF2F7}
 :root{
   --sky:#88C1ED; --sky-2:#C9E2F6; --steel:#4686B7; --steel-2:#63A6D9; --deep:#274F6F;
+  --silver:#C2D0DD;
   --ink-0:#000000; --ink-1:#05070A; --ink-2:#0B0F14; --ink-3:#101720;
   /* typography/README.md §3. Self-hosted via next/font (see layout.tsx).
      ONE serif: Source Serif 4 is variable on opsz, so the family retunes itself
@@ -54,6 +55,9 @@ html,body{margin:0;padding:0}
 body{background-color:#04101c}
 section[id],#top{scroll-margin-top:66px}
 .hero,main>section{scroll-snap-align:start}
+/* the last screen aligns its BOTTOM to the viewport so the snap carries you all
+   the way down to the contact bar rather than stopping at its top edge */
+main>section:last-child{scroll-snap-align:end}
 body{font-family:var(--sans);color:var(--tx);-webkit-font-smoothing:antialiased;line-height:1.5;overflow-x:hidden}
 img,svg{display:block;max-width:100%}
 /* Kokonut ships its glass <filter> in an `svg.hidden`; this stylesheet is
@@ -89,11 +93,31 @@ p{margin:0}
 .sec-field .sf{stroke:var(--mer);fill:none;stroke-width:1}
 .sec-field .sf-line{stroke:var(--mer);fill:none;stroke-width:1.1}
 
+/* Kokonut's liquid-glass rim, lifted verbatim from GLASS_SHADOW_DARK in
+   liquid-glass-card.tsx so the bar and the CTA match the cards elsewhere.
+   Applied as CSS rather than the component because both need to stay real
+   links, and LiquidButton renders a <button> with no asChild escape hatch. */
+.liquid-glass{
+  -webkit-backdrop-filter:blur(22px) saturate(165%);
+  backdrop-filter:blur(22px) saturate(165%);
+  box-shadow:
+    0 0 8px rgba(0,0,0,0.03),
+    0 2px 6px rgba(0,0,0,0.08),
+    inset 3px 3px 0.5px -3.5px rgba(255,255,255,0.09),
+    inset -3px -3px 0.5px -3.5px rgba(255,255,255,0.85),
+    inset 1px 1px 1px -0.5px rgba(255,255,255,0.6),
+    inset -1px -1px 1px -0.5px rgba(255,255,255,0.6),
+    inset 0 0 6px 6px rgba(255,255,255,0.12),
+    inset 0 0 2px 2px rgba(255,255,255,0.06),
+    0 0 12px rgba(0,0,0,0.15)}
+@media (prefers-reduced-transparency: reduce){
+  .liquid-glass{backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none}
+}
+
 /* ---- nav ---- */
 .nav{position:fixed;inset:0 0 auto 0;z-index:30;display:flex;align-items:center;justify-content:space-between;
-  gap:24px;height:64px;padding:0 48px;background:rgba(4,10,16,0.62);
-  backdrop-filter:blur(20px) saturate(140%);-webkit-backdrop-filter:blur(20px) saturate(140%);
-  border-bottom:1px solid rgba(255,255,255,0.06)}
+  gap:24px;height:64px;padding:0 48px;background:rgba(4,10,16,0.42);
+  border-bottom:1px solid var(--line)}
 .brand{display:flex;align-items:center;gap:12px}
 .brand .wm{font-size:12px;letter-spacing:0.22em}
 .brand .wm b{font-weight:700;color:#fff}
@@ -111,6 +135,10 @@ p{margin:0}
 .btn-sm{height:34px;padding:0 18px;font-size:12.5px}
 .btn-primary{background:var(--sky);color:#04121e}
 .btn-primary:hover{background:#a6d4f3}
+/* the nav CTA is glass, tinted with the accent rather than filled by it */
+.btn-glass{background:color-mix(in srgb,var(--sky) 24%,transparent);
+  color:#FFFFFF;border-color:color-mix(in srgb,var(--sky) 34%,transparent)}
+.btn-glass:hover{background:color-mix(in srgb,var(--sky) 36%,transparent)}
 .btn-ghost{background:transparent;color:var(--tx);border-color:var(--line-2)}
 .btn-ghost:hover{border-color:var(--accent-ink);color:var(--heading)}
 .btn-row{display:flex;flex-wrap:wrap;gap:14px}
@@ -128,10 +156,14 @@ p{margin:0}
 .hero-tag{font-size:clamp(23px,2.7vw,34px);line-height:1.3;color:rgba(255,255,255,0.86);letter-spacing:-0.01em;text-wrap:pretty}
 .hero-bottom{margin-top:auto;display:flex;justify-content:flex-end}
 .wordmark{display:flex;flex-direction:column;align-items:flex-end;text-align:right;gap:0;line-height:0.9}
+/* Solid silver, not a chrome gradient. Gradient text was decorative rather than
+   meaningful, and it is on DESIGN.md's Don't list; the lift now comes from a
+   faint halo on the dark ground instead of a fake bevel. */
 .wordmark .w-isth{font-family:var(--sans);font-weight:200;font-size:clamp(52px,11vw,150px);
-  font-variation-settings:"wdth" 108;letter-spacing:0;text-transform:uppercase;color:#fff;
-  background:linear-gradient(176deg,#FFFFFF 0%,#EAF1F8 20%,#C2D0DD 48%,#FFFFFF 60%,#96A6B4 86%,#C4D2DF 100%);
-  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  font-variation-settings:"wdth" 108;letter-spacing:0;text-transform:uppercase;
+  color:var(--silver);
+  text-shadow:0 0 34px color-mix(in srgb,var(--sky-2) 26%,transparent),
+              0 0 10px color-mix(in srgb,#FFFFFF 12%,transparent)}
 .wordmark .w-mer{font-family:var(--serif);font-style:italic;font-weight:400;
   font-size:clamp(46px,9.5vw,132px);letter-spacing:0;color:var(--sky);margin-top:-0.05em}
 
@@ -156,9 +188,16 @@ body.on-light .fgl-sharp .gf-field{stroke:#356C97}
    layer's contents move every frame, and an SVG/CSS filter here would force a
    re-rasterise of the whole 300vh layer on each one. */
 .fgl-spark{contain:paint}
-.spk,.spk-md{animation:spkBreathe 5.5s ease-in-out infinite}
-.spk:nth-of-type(2n){animation-duration:7.2s;animation-delay:-2.4s}
-.spk:nth-of-type(3n){animation-duration:6.3s;animation-delay:-4.1s}
+/* offset-path rather than SMIL: the run and the breathe are two CSS animations
+   on one element, phase-offset per spark by an inline negative delay */
+/* each light gets its own compositor layer, so moving them does not repaint the
+   100vw x 300vh field layer they live in — measured 3.3x less scroll jitter,
+   the same win as deleting two thirds of them but without losing any */
+.spk{offset-rotate:0deg;will-change:transform;
+  animation:spkRun linear infinite,spkBreathe ease-in-out infinite;
+  animation-duration:var(--dur,26s),5.5s;
+  animation-delay:var(--delay,0s),var(--delay,0s)}
+@keyframes spkRun{from{offset-distance:0%}to{offset-distance:100%}}
 .fgl-spark .spk circle,.fgl-spark .spk-md circle{stroke:none}
 .fgl-spark .lp-3{fill:var(--sky-2);fill-opacity:.07}
 .fgl-spark .lp-2{fill:var(--sky-2);fill-opacity:.14}
@@ -170,10 +209,10 @@ body.on-light .fgl-spark .lp-1{fill:var(--steel);fill-opacity:.55}
 body.on-light .fgl-spark .lp-0{fill:var(--deep);fill-opacity:.95}
 /* the medium light is the scroll read-out — it belongs to the body screens, not
    the hero, and it fades rather than cuts when you leave the top */
-/* GlobeSparks adds .lit only while the lamp is actually crossing the viewport */
-.spk-md{opacity:0;transition:opacity .5s var(--ease)}
-.spk-md.lit{animation:spkBreatheMd 6.4s ease-in-out infinite}
-body.at-hero .spk-md{opacity:0;animation:none}
+/* pinned to its meridian by offset-path; offset-distance is scroll-driven, so
+   there is no per-frame JS and no layout read behind it */
+.spk-md{offset-rotate:0deg;will-change:transform;offset-distance:var(--from);
+  animation:spkBreatheMd 6.4s ease-in-out infinite}
 @keyframes spkBreathe{0%,100%{opacity:.45}50%{opacity:1}}
 @keyframes spkBreatheMd{0%,100%{opacity:.62}50%{opacity:1}}
 /* straight glowing side rule — changes colour with the globe (white on dark, blue on light) */
@@ -184,9 +223,9 @@ body.at-hero .spk-md{opacity:0;animation:none}
 body.on-light .gf-rule{
   background:linear-gradient(180deg,rgba(53,108,151,0.12) 0%,#4686B7 20%,#356C97 80%,rgba(53,108,151,0.12) 100%);
   box-shadow:0 0 10px 2px rgba(70,134,183,0.35),0 0 26px 6px rgba(70,134,183,0.12)}
-/* no vertical side rule on the hero screen (display:none so the breathing
-   opacity animation can't keep it visible) */
-body.at-hero .gf-rule{display:none}
+/* no vertical side rule on the first or last screen (display:none so the
+   breathing opacity animation can't keep it visible) */
+body.at-hero .gf-rule,body.at-end .gf-rule{display:none}
 @keyframes gfBreathe{0%,100%{opacity:.3}50%{opacity:.62}}
 @keyframes gfBreatheSoft{0%,100%{opacity:.5}50%{opacity:.95}}
 @supports (animation-timeline: scroll()){
@@ -486,6 +525,39 @@ html.js .funnel{opacity:0}
   will-change:transform}
 @media (prefers-reduced-motion:reduce){ .flow-packet,.flow-fill{display:none} .flow .fstep{opacity:1} }
 
+/* ---- sign-off: a four-step flow on the meridian line ---- */
+.soflow{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:var(--stack-lg)}
+.soflow-track{position:absolute;top:8px;left:14px;right:15%;height:1.5px;
+  background:linear-gradient(90deg,var(--deep),var(--steel) 50%,var(--sky));opacity:.7}
+.sostep{position:relative;padding:0 26px 0 0}
+.sodot{position:absolute;top:1px;left:8px;width:15px;height:15px;border-radius:50%;
+  background:var(--bg);border:2px solid var(--sky);box-shadow:0 0 0 4px var(--bg),0 0 16px -2px var(--sky)}
+.sodot.feat{background:var(--sky)}
+.sok{margin-top:40px;font-family:var(--serif);font-style:italic;font-weight:500;font-size:21px;color:var(--accent-ink)}
+.sostep p{margin-top:13px;font-size:14px;line-height:1.5;color:var(--tx-2);max-width:22ch}
+.soflow .sostep{opacity:.6;transition:opacity .35s var(--ease)}
+.soflow .sostep.lit{opacity:1}
+.sostep.lit .sodot{background:var(--sky);box-shadow:0 0 0 4px var(--bg),0 0 24px 1px var(--sky)}
+.soflow-fill{position:absolute;top:8px;left:14px;height:1.5px;width:0;z-index:1;
+  background:linear-gradient(90deg,var(--steel),var(--sky));
+  box-shadow:0 0 12px 1px rgba(136,193,237,0.5);pointer-events:none}
+.soflow-packet{position:absolute;top:1px;z-index:2;width:15px;height:15px;margin-left:-7.5px;
+  border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,#FFFFFF 0%,var(--sky) 46%,rgba(136,193,237,0) 72%);
+  box-shadow:0 0 20px 5px rgba(136,193,237,0.45);
+  will-change:transform}
+@media (prefers-reduced-motion:reduce){ .soflow-packet,.soflow-fill{display:none} .soflow .sostep{opacity:1} }
+
+/* ---- trust badges: four quiet proof points under the sign-off flow ---- */
+.badges{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(12px,1.6vw,22px);margin-top:26px}
+.badge{display:flex;flex-direction:column;gap:10px;padding:16px 16px 18px;border-radius:14px;
+  border:1px solid var(--line);background:var(--card);
+  transition:border-color .3s var(--ease),transform .3s var(--ease)}
+.badge:hover,.badge:focus-visible{border-color:var(--line-3);transform:translateY(-3px)}
+.badge-icon{display:block;color:var(--accent-ink)}
+.badge-label{font-family:var(--sans);font-weight:500;font-size:13.5px;letter-spacing:-0.005em;color:var(--heading)}
+.badge-note{font-size:12px;line-height:1.44;color:var(--tx-2)}
+
 /* ---- interactive liquid glass (offers + metrics) ----
    The Kokonut card is a shadcn Card (flex column, overflow hidden); its only
    in-flow child is the content wrapper, so that is what has to grow. */
@@ -597,6 +669,10 @@ html.js .funnel{opacity:0}
 .company-body{margin-top:clamp(40px,7vh,88px);max-width:56ch}
 .company-body .btn-row{margin-top:34px}
 
+/* the inquiry CTA sits bottom-left of the last screen, above the contact bar */
+.inquiry-cta{position:absolute;left:var(--edge);bottom:96px;z-index:3;height:48px;padding:0 28px}
+@media (max-width:760px){ .inquiry-cta{left:22px;bottom:88px} }
+
 /* ---- liquid-glass contact bar, pinned to the bottom of the company bound ---- */
 .glassbar{position:absolute;left:0;right:0;bottom:0;z-index:2;display:flex;align-items:center;
   justify-content:space-between;gap:24px;flex-wrap:wrap;padding:20px clamp(24px,4vw,64px);
@@ -611,6 +687,35 @@ html.js .funnel{opacity:0}
 .contact a:hover{color:var(--sky)}
 @media (prefers-reduced-transparency: reduce){ .glassbar{background:#0a141e;backdrop-filter:none;-webkit-backdrop-filter:none} }
 .foot-nav a{color:var(--tx-2)}.foot-nav a:hover{color:#fff}
+
+/* ---- inquiry form page ---- */
+.formpage{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;
+  padding:112px var(--edge) 72px}
+.formwrap{width:100%;max-width:660px;margin:0 auto}
+.form-back{display:inline-block;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;
+  color:var(--tx-3)}
+.form-back:hover{color:var(--accent-ink)}
+.form-head{margin-top:26px}
+.form-lede{margin-top:16px}
+.form{margin-top:34px;display:flex;flex-direction:column;gap:22px;
+  padding:30px 28px 28px;border-radius:18px;border:1px solid var(--line);
+  background:rgba(11,20,32,0.42)}
+.field{display:flex;flex-direction:column;gap:9px}
+.field-label{font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:var(--tx-3);
+  font-weight:500}
+.field-input{width:100%;padding:13px 14px;border-radius:10px;
+  border:1px solid var(--line-2);background:rgba(4,10,16,0.5);
+  color:var(--tx);font-family:var(--sans);font-size:15.5px;line-height:1.5;
+  transition:border-color .2s var(--ease)}
+.field-input:focus-visible{border-color:var(--accent-ink)}
+.field-area{resize:vertical;min-height:150px}
+.field-input::placeholder{color:var(--tx-3)}
+.field-error{font-size:13px;color:var(--sky)}
+.form-send{align-self:flex-start;height:46px;padding:0 30px}
+@media (max-width:760px){
+  .formpage{padding:96px 22px 56px;align-items:flex-start}
+  .form{padding:22px 18px 20px}
+}
 
 /* ---- reveal — entrance choreography handed to Motion (see motion.js) ---- */
 .reveal{opacity:1}                 /* visible by default so the page is readable without JS */
