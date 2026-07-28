@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "isthmus-site-build",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["--yes", "serve", "--listen", "4321", "react/out"],
+      "port": 4321
+    },
+    {
+      "name": "isthmus-site-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "react", "run", "dev"],
+      "port": 3000
+    }
+  ]
+}

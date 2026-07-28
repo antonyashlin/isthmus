@@ -1,0 +1,22 @@
+# dependencies
+node_modules/
+
+# next
+.next/
+out/
+next-env.d.ts
+
+# storybook
+storybook-static/
+
+# build artefacts
+*.tsbuildinfo
+
+# env
+.env
+.env.local
+.env*.local
+
+# os / editor
+.DS_Store
+*.swp

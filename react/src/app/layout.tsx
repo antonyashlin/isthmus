@@ -36,10 +36,35 @@ const sourceSerif = Source_Serif_4({
   variable: "--font-serif",
 });
 
+const SITE_URL = "https://isthmusmeridian.com";
+const TITLE =
+  "Isthmus Meridian · The private-markets back office, rebuilt with AI";
+const DESCRIPTION =
+  "Isthmus Meridian operates the analytical, operational, and reporting functions behind private-market investment firms, from active deal execution through portfolio monitoring.";
+
 export const metadata: Metadata = {
-  title: "Isthmus Meridian · The private-markets back office, rebuilt with AI",
-  description:
-    "Isthmus Meridian operates the analytical, operational, and reporting functions behind private-market investment firms, from active deal execution through portfolio monitoring.",
+  // Resolves every relative URL below — and the OG image — against the live
+  // origin. Without it the crawler-facing URLs come out relative and unusable.
+  metadataBase: new URL(SITE_URL),
+  title: TITLE,
+  description: DESCRIPTION,
+  alternates: { canonical: "/" },
+  icons: { icon: "/favicon.svg", apple: "/favicon.svg" },
+  openGraph: {
+    type: "website",
+    siteName: "Isthmus Meridian",
+    url: SITE_URL,
+    title: TITLE,
+    description: DESCRIPTION,
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: TITLE }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+    images: ["/og.png"],
+  },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
