@@ -22,65 +22,66 @@ import {
   THESIS,
   WEDGE,
 } from "./content";
-import { LiquidGlassCard } from "@/components/kokonutui/liquid-glass-card";
 import { BackdropChart, CompsChart, CorridorMap, EconomicsChart } from "./echart-charts";
-import { drawPaths, runFlywheel } from "./motion";
+import { runFlywheel } from "./motion";
 
 /**
- * The seventeen slides.
+ * The seventeen slides, in the marketing site's layout language.
  *
- * Every slide states one conclusion, and its title is that conclusion written
- * as a claim — never a topic. Read the titles in order and you get the whole
- * argument. Nothing here inlines a figure or a sentence; all of it comes from
+ * Each screen carries a heading and ONE piece of evidence, with the emphasis
+ * set as a whole serif-italic phrase. Evidence is a rail — a hairline with
+ * glowing nodes and columns beneath — not a grid of cards. Roughly half of
+ * every canvas is deliberately empty.
+ *
+ * Screens alternate navy and paper, as the site does; the cover and the close
+ * are both navy so the deck opens and lands on the same ground.
+ *
+ * Nothing here inlines a figure or a sentence — all of it comes from
  * `content.ts`, so the argument can be corrected without touching a component.
- *
- * Slides marked NEW do not exist in the reference deck. Four of them close the
- * holes a founding-partner document cannot have: economics, roadmap, team and
- * risks. The structure slide is a revision of the reference deck's, at the
- * client's instruction, and carries its own counter-argument.
  */
 
 export type SlideProps = { active: boolean; index: number; total: number };
-type Slide = (p: SlideProps) => React.ReactElement;
+type SlideFn = (p: SlideProps) => React.ReactElement;
 
 const ROMAN = [
-  "",
-  "I",
-  "II",
-  "III",
-  "IV",
-  "V",
-  "VI",
-  "VII",
-  "VIII",
-  "IX",
-  "X",
-  "XI",
-  "XII",
-  "XIII",
-  "XIV",
-  "XV",
-  "XVI",
-  "XVII",
+  "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX",
+  "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII",
 ];
 
-/* -------------------------------------------------------------- primitives */
+/* -------------------------------------------------------------- the arc */
 
-function Mark({ size = 22, className }: { size?: number; className?: string }) {
+const ARC_A = "M 470 -180 A 620 620 0 0 0 470 900";
+const ARC_B = "M 372 -180 A 548 548 0 0 0 372 900";
+const RAY = "M -40 640 L 560 -60";
+
+/**
+ * The meridian sweeping the left edge — the site's signature, and the reason
+ * every slide indents its content to 300px.
+ */
+function Arc() {
   return (
-    <svg
-      aria-hidden="true"
-      className={className}
-      height={size}
-      viewBox="0 0 48 48"
-      width={size}
-    >
-      <g
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="1.4"
-      >
+    <div aria-hidden="true" className="fd-arc">
+      <svg preserveAspectRatio="none" viewBox="0 0 1280 720">
+        <path className="arc-glow" d={ARC_A} strokeOpacity="0.34" strokeWidth="3" />
+        <path className="arc-line" d={ARC_A} strokeOpacity="0.72" strokeWidth="1" />
+        <path className="arc-line" d={ARC_B} strokeOpacity="0.3" strokeWidth="1" />
+        <path className="arc-line" d={RAY} strokeOpacity="0.2" strokeWidth="1" />
+        <g className="fd-lamp" style={{ offsetPath: `path("${ARC_A}")` }}>
+          <circle fill="var(--mer)" fillOpacity="0.16" r="9" />
+          <circle fill="var(--mer)" fillOpacity="0.4" r="4.4" />
+          <circle fill="var(--mer)" r="1.8" />
+        </g>
+      </svg>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------- primitives */
+
+function Mark({ size = 22 }: { size?: number }) {
+  return (
+    <svg aria-hidden="true" height={size} viewBox="0 0 48 48" width={size}>
+      <g fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="1.4">
         <line x1="24" x2="24" y1="9" y2="39" />
         <path d="M12.5 12 C 24 18, 24 30, 12.5 38" />
         <path d="M35.5 12 C 24 18, 24 30, 35.5 38" />
@@ -89,66 +90,47 @@ function Mark({ size = 22, className }: { size?: number; className?: string }) {
   );
 }
 
-/** Slide chrome: roman numeral + section left, mark right, running foot below. */
-function Frame({
+/** Section label, arc, page number. That is the entire slide furniture. */
+function Screen({
   eyebrow,
-  foot,
   index,
   total,
   children,
 }: {
-  eyebrow: string;
-  foot?: string;
+  eyebrow?: string;
   index: number;
   total: number;
   children: React.ReactNode;
 }) {
   return (
     <>
-      <header className="fd-head">
+      <Arc />
+      {eyebrow ? (
         <div className="fd-eyebrow">
-          <span className="fd-num">{ROMAN[index + 1]}</span>
-          <span className="fd-bar">|</span>
+          <span>{ROMAN[index]}</span>
           <span className="fd-sec">{eyebrow}</span>
         </div>
-        <Mark className="fd-mark" />
-      </header>
-
-      <div className="fd-body-wrap">{children}</div>
-
-      <footer className="fd-foot">
-        <span>
-          {DECK.name} · {foot ?? eyebrow}
-        </span>
-        <span>
-          {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
-        </span>
-      </footer>
+      ) : null}
+      <div className="fd-body">{children}</div>
+      <div className="fd-page">
+        {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
+      </div>
     </>
   );
 }
 
-/** Fires off a `source` of ILLUSTRATIVE. An unsourced figure must look it. */
-function Provenance({ source, note }: { source: Source; note?: string }) {
-  if (isIllustrative(source)) {
-    return (
-      <div className="fd-rise" style={{ marginTop: "var(--s-3)" }}>
-        <span className="fd-illustrative">Illustrative — not sourced</span>
-        {note ? <p className="fd-source">{note}</p> : null}
-      </div>
-    );
-  }
-  return <p className="fd-rise fd-source">{source}</p>;
-}
-
-/** A figure the client has not supplied. Never a plausible-looking number. */
-function Gap({ width = 5 }: { width?: number }) {
-  return <span aria-label="pending" className="fd-gap" style={{ minWidth: `${width}ch` }} />;
-}
-
-function Title({ head, accent }: { head: string; accent?: string }) {
+/** Heading. `accent` is a whole phrase, not a word — that is the point. */
+function H({
+  head,
+  accent,
+  size,
+}: {
+  head: string;
+  accent?: string;
+  size?: "sm" | "wide";
+}) {
   return (
-    <h2 className="fd-rise fd-title">
+    <h2 className={`fd-rise fd-h${size ? ` ${size}` : ""}`}>
       {head}
       {accent ? (
         <>
@@ -160,7 +142,65 @@ function Title({ head, accent }: { head: string; accent?: string }) {
   );
 }
 
-/** Runs a one-shot effect when the slide first becomes active. */
+/**
+ * The evidence pattern: one hairline, a glowing node per column, copy beneath.
+ * This replaces every grid of cards in the deck.
+ */
+function Rail({
+  cols,
+  serif = false,
+}: {
+  cols: Array<{ key: string; n?: string; title: string; body?: string }>;
+  serif?: boolean;
+}) {
+  return (
+    <div className="fd-rail fd-rise">
+      <div className="fd-rail-line" />
+      <div
+        className="fd-rail-cols"
+        style={{ gridTemplateColumns: `repeat(${cols.length}, 1fr)` }}
+      >
+        {cols.map((c) => (
+          <div key={c.key} style={{ position: "relative" }}>
+            <span className="fd-node" style={{ left: 0, top: -5 }} />
+            <div style={{ paddingTop: 26 }}>
+              {c.n ? <div className="fd-col-n">{c.n}</div> : null}
+              <div className={`fd-col-t${serif ? " serif" : ""}`}>{c.title}</div>
+              {c.body ? <p className="fd-col-b">{c.body}</p> : null}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Fires off a `source` of ILLUSTRATIVE. An unsourced figure must look it. */
+function Provenance({ source, note }: { source: Source; note?: string }) {
+  if (isIllustrative(source)) {
+    return (
+      <div className="fd-rise" style={{ marginTop: 18 }}>
+        <span className="fd-illustrative">Illustrative — not sourced</span>
+        {note ? (
+          <p className="fd-note" style={{ marginTop: 10 }}>
+            {note}
+          </p>
+        ) : null}
+      </div>
+    );
+  }
+  return (
+    <p className="fd-rise fd-note" style={{ marginTop: 18 }}>
+      {source}
+    </p>
+  );
+}
+
+/** A figure the client has not supplied. Never a plausible-looking number. */
+function Gap({ width = 6 }: { width?: number }) {
+  return <span aria-label="pending" className="fd-gap" style={{ minWidth: `${width}ch` }} />;
+}
+
 function useOnActive(active: boolean, run: (el: HTMLElement) => () => void) {
   const ref = React.useRef<HTMLDivElement>(null);
   const played = React.useRef(false);
@@ -174,340 +214,200 @@ function useOnActive(active: boolean, run: (el: HTMLElement) => () => void) {
   return ref;
 }
 
-/* ------------------------------------------------------------- I · cover */
+/* ============================================================== I · cover */
 
-const Cover: Slide = () => (
-  <div className="fd-cover">
-    <header className="fd-cover-top">
-      <div className="fd-wordmark">
-        <Mark size={26} />
-        <span>
-          <b>ISTHMUS</b> <i>MERIDIAN</i>
-        </span>
-      </div>
-      <div className="fd-label">
-        {DECK.classification} <span className="fd-bar">·</span> {DECK.confidential}
-      </div>
-    </header>
-
-    <div className="fd-cover-mid">
-      <CoverGlobe />
-      <h1 className="fd-rise fd-cover-name">
-        <b>ISTHMUS</b>
-        <i>MERIDIAN</i>
-      </h1>
-      <p className="fd-rise fd-cover-sub">
-        {DECK.proposition} <span className="serif-i">{DECK.propositionAccent}</span>
-      </p>
-      <p className="fd-rise fd-label fd-cover-meta">
-        {DECK.classification} <span className="fd-bar">·</span> {DECK.place}{" "}
-        <span className="fd-bar">·</span> {DECK.date}
-      </p>
-      <p className="fd-rise fd-cover-tag">{DECK.tagline}</p>
+const Cover: SlideFn = () => (
+  <>
+    <Arc />
+    <h1 className="fd-rise fd-cover-h">
+      {DECK.proposition} <span className="serif-i">{DECK.propositionAccent}</span>
+    </h1>
+    <div className="fd-rise fd-lockup">
+      <span className="lk-1">ISTHMUS</span>
+      <span className="lk-2">Meridian</span>
     </div>
-  </div>
+    <div className="fd-rise fd-cover-meta">
+      <span>{DECK.classification}</span>
+      <span>·</span>
+      <span>{DECK.place}</span>
+      <span>·</span>
+      <span>{DECK.date}</span>
+    </div>
+  </>
 );
 
-/** The brand globe: a wireframe sphere with the mark at its crossing. */
-function CoverGlobe() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="fd-rise fd-globe"
-      height="200"
-      viewBox="0 0 200 200"
-      width="200"
-    >
-      <g fill="none" stroke="var(--steel)" strokeWidth="0.9" opacity="0.75">
-        <circle cx="100" cy="100" r="96" />
-        <ellipse cx="100" cy="100" rx="38" ry="96" />
-        <line x1="4" x2="196" y1="100" y2="100" />
-        <line x1="100" x2="100" y1="4" y2="196" />
-      </g>
-      <g
-        fill="none"
-        stroke="var(--heading)"
-        strokeLinecap="round"
-        strokeWidth="1.6"
-        transform="translate(62 62) scale(1.6)"
-      >
-        <line x1="24" x2="24" y1="9" y2="39" />
-        <path d="M12.5 12 C 24 18, 24 30, 12.5 38" />
-        <path d="M35.5 12 C 24 18, 24 30, 35.5 38" />
-      </g>
-    </svg>
-  );
-}
+/* ============================================================= II · thesis */
 
-/* ------------------------------------------------------------ II · thesis */
-
-const Thesis: Slide = ({ index, total }) => (
-  <Frame eyebrow={THESIS.eyebrow} index={index} total={total}>
-    <Title accent={THESIS.titleAccent} head={THESIS.title} />
+const Thesis: SlideFn = ({ index, total }) => (
+  <Screen eyebrow={THESIS.eyebrow} index={index} total={total}>
+    <H accent={THESIS.titleAccent} head={THESIS.title} />
     <p className="fd-rise fd-lede">{THESIS.lede}</p>
-
-    <div className="fd-grid-3" style={{ marginTop: "var(--s-6)" }}>
-      {THESIS.cards.map((c, i) => (
-        // `glassEffect={false}`: Kokonut's SVG-displacement backdrop is the
-        // known perf trap, and the site already settled on the shadow recipe
-        // alone. `.liquid-glass` carries that recipe.
-        <LiquidGlassCard
-          className="fd-glass-card fd-rise liquid-glass"
-          glassEffect={false}
-          glassSize="sm"
-          key={c.key}
-        >
-          <div className="fd-icon">{THESIS_ICONS[i]}</div>
-          <h3 className="fd-card-title">{c.title}</h3>
-          <p className="fd-card-body">{c.body}</p>
-        </LiquidGlassCard>
-      ))}
-    </div>
-
-    <div className="fd-quote fd-rise" style={{ marginTop: "auto" }}>
-      {THESIS.quote} <b>{THESIS.quoteAccent}</b>
-    </div>
-  </Frame>
+    <Rail
+      cols={THESIS.cards.map((c) => ({ key: c.key, title: c.title, body: c.body }))}
+      serif
+    />
+  </Screen>
 );
 
-const ICON = {
-  viewBox: "0 0 24 24",
-  fill: "none",
-  stroke: "currentColor",
-  strokeWidth: 1.5,
-  strokeLinecap: "round" as const,
-  strokeLinejoin: "round" as const,
-  width: 18,
-  height: 18,
-  "aria-hidden": true,
-};
+/* ============================================================ III · problem */
 
-const THESIS_ICONS = [
-  // anchor — a live, paying customer holding the whole thing in place
-  <svg key="a" {...ICON}>
-    <circle cx="12" cy="5" r="2.2" />
-    <line x1="12" x2="12" y1="7.2" y2="21" />
-    <path d="M5 13a7 7 0 0 0 14 0" />
-    <line x1="8.5" x2="15.5" y1="10" y2="10" />
-  </svg>,
-  // cycle — recurring revenue
-  <svg key="b" {...ICON}>
-    <path d="M3.5 12a8.5 8.5 0 0 1 14.4-6.1L21 8" />
-    <path d="M20.5 12a8.5 8.5 0 0 1-14.4 6.1L3 16" />
-    <path d="M21 4v4h-4M3 20v-4h4" />
-  </svg>,
-  // stack — a proprietary dataset
-  <svg key="c" {...ICON}>
-    <ellipse cx="12" cy="6" rx="7.5" ry="3" />
-    <path d="M4.5 6v6c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3V6" />
-    <path d="M4.5 12v6c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3v-6" />
-  </svg>,
-];
+const Problem: SlideFn = ({ index, total }) => (
+  <Screen eyebrow={PROBLEM.eyebrow} index={index} total={total}>
+    <H accent={PROBLEM.titleAccent} head={PROBLEM.title} />
+    <p className="fd-rise fd-lede">{PROBLEM.lede}</p>
+    <Rail
+      cols={PROBLEM.points.map((p, i) => ({
+        key: `p${i + 1}`,
+        n: `0${i + 1}`,
+        title: p.split(" — ")[0],
+        body: p.includes(" — ") ? p.split(" — ").slice(1).join(" — ") : undefined,
+      }))}
+    />
+  </Screen>
+);
 
-/* ----------------------------------------------------------- III · problem */
+/* ========================================================== IV · backdrop ◆ */
 
-const Problem: Slide = ({ active, index, total }) => {
-  const ref = useOnActive(active, drawPaths);
-  return (
-    <Frame eyebrow={PROBLEM.eyebrow} index={index} total={total}>
-      <div className="fd-split" ref={ref}>
-        <div>
-          <Title accent={PROBLEM.titleAccent} head={PROBLEM.title} />
-          <p className="fd-rise fd-lede">{PROBLEM.lede}</p>
-          <ByHandIllustration />
-        </div>
-
-        <div className="fd-aside">
-          <div className="fd-rise fd-label" style={{ color: "var(--sky)" }}>
-            {PROBLEM.asideTitle}
-          </div>
-          <ul className="fd-aside-list">
-            {PROBLEM.points.map((p) => (
-              <li className="fd-rise" key={p}>
-                <span className="fd-aside-glyph">→</span>
-                <span>{p}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </Frame>
-  );
-};
-
-/** Doc → analysis → chart → doc, rebuilt by hand on every deal. */
-function ByHandIllustration() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="fd-rise"
-      height="120"
-      style={{ marginTop: "var(--s-7)" }}
-      viewBox="0 0 460 120"
-      width="460"
-    >
-      <g fill="none" stroke="var(--steel)" strokeWidth="1.3">
-        <rect className="fd-draw" height="76" rx="3" width="60" x="2" y="22" />
-        <line className="fd-draw" x1="14" x2="50" y1="42" y2="42" />
-        <line className="fd-draw" x1="14" x2="50" y1="56" y2="56" />
-        <line className="fd-draw" x1="14" x2="38" y1="70" y2="70" />
-
-        <circle className="fd-draw" cx="176" cy="60" r="26" />
-        <line className="fd-draw" x1="176" x2="176" y1="26" y2="94" />
-
-        <rect className="fd-draw" height="76" rx="3" width="60" x="398" y="22" />
-        <line className="fd-draw" x1="410" x2="446" y1="42" y2="42" />
-        <line className="fd-draw" x1="410" x2="446" y1="56" y2="56" />
-        <line className="fd-draw" x1="410" x2="434" y1="70" y2="70" />
-      </g>
-
-      <g
-        fill="none"
-        stroke="var(--sky)"
-        strokeLinecap="round"
-        strokeWidth="1.5"
-      >
-        <polyline className="fd-draw" points="256,86 286,64 310,74 340,34" />
-        <circle cx="256" cy="86" fill="var(--sky)" r="2.6" stroke="none" />
-        <circle cx="286" cy="64" fill="var(--sky)" r="2.6" stroke="none" />
-        <circle cx="310" cy="74" fill="var(--sky)" r="2.6" stroke="none" />
-        <circle cx="340" cy="34" fill="var(--sky)" r="2.6" stroke="none" />
-      </g>
-
-      <g
-        fill="none"
-        stroke="var(--tx-3)"
-        strokeDasharray="3 5"
-        strokeWidth="1.1"
-      >
-        <line x1="66" x2="146" y1="60" y2="60" />
-        <line x1="206" x2="248" y1="60" y2="60" />
-        <line x1="350" x2="394" y1="60" y2="60" />
-      </g>
-    </svg>
-  );
-}
-
-/* -------------------------------------------------------- IV · backdrop ◆ */
-
-const Backdrop: Slide = ({ active, index, total }) => (
-  <Frame eyebrow={BACKDROP.eyebrow} index={index} total={total}>
-    <Title accent={BACKDROP.titleAccent} head={BACKDROP.title} />
-    <p className="fd-rise fd-lede">{BACKDROP.lede}</p>
-    <div className="fd-plot fd-rise" style={{ marginTop: "var(--s-5)" }}>
+const Backdrop: SlideFn = ({ active, index, total }) => (
+  <Screen eyebrow={BACKDROP.eyebrow} index={index} total={total}>
+    <H accent={BACKDROP.titleAccent} head={BACKDROP.title} size="wide" />
+    <div className="fd-plot fd-rise">
       <BackdropChart active={active} />
     </div>
     <Provenance
-      note="Replace with Preqin or McKinsey Global Private Markets Review for AUM and fund count. No clean public series exists for back-office capacity."
+      note="Replace with Preqin or McKinsey Global Private Markets Review. No clean public series exists for back-office capacity."
       source={BACKDROP.source}
     />
-  </Frame>
+  </Screen>
 );
 
-/* -------------------------------------------------------------- V · wedge */
+/* ============================================================== V · wedge */
 
-const Wedge: Slide = ({ index, total }) => (
-  <Frame eyebrow={WEDGE.eyebrow} index={index} total={total}>
-    <div className="fd-split">
-      <div>
-        <h2 className="fd-rise fd-title">
-          {WEDGE.title}
-          <br />
-          <span className="serif-i">{WEDGE.titleAccent}</span>
-        </h2>
-        <p className="fd-rise fd-lede">{WEDGE.lede}</p>
-        <div className="fd-quote fd-rise" style={{ marginTop: "var(--s-7)" }}>
-          {WEDGE.quote} <b>{WEDGE.quoteAccent}</b>
+/** A statement screen: the line is the whole slide. */
+const Wedge: SlideFn = ({ index, total }) => (
+  <Screen eyebrow={WEDGE.eyebrow} index={index} total={total}>
+    <p className="fd-rise fd-statement">
+      We don&apos;t sell the tool. <span className="hi">We run the work.</span>
+    </p>
+    <div className="fd-rail fd-rise">
+      <div className="fd-rail-line" />
+      <div className="fd-rail-cols" style={{ gridTemplateColumns: "1fr 1.4fr" }}>
+        <div style={{ position: "relative" }}>
+          <span className="fd-node" style={{ left: 0, top: -5 }} />
+          <div style={{ paddingTop: 26 }}>
+            <div className="fd-col-n">{WEDGE.panel.eyebrow}</div>
+            <div className="fd-col-t">{WEDGE.panel.title}</div>
+          </div>
+        </div>
+        <div style={{ paddingTop: 52 }}>
+          <p className="fd-col-b" style={{ maxWidth: "48ch", margin: 0 }}>
+            {WEDGE.panel.body}
+          </p>
         </div>
       </div>
-
-      <LiquidGlassCard
-        className="fd-glass-card fd-rise fd-feature liquid-glass"
-        glassEffect={false}
-        glassSize="sm"
-      >
-        <div className="fd-label" style={{ color: "var(--accent-ink)" }}>
-          {WEDGE.panel.eyebrow}
-        </div>
-        <h3 className="fd-feature-title">{WEDGE.panel.title}</h3>
-        <p className="fd-card-body">{WEDGE.panel.body}</p>
-        <svg
-          aria-hidden="true"
-          className="fd-feature-rings"
-          height="110"
-          viewBox="0 0 110 110"
-          width="110"
-        >
-          <g fill="none" stroke="var(--steel)" strokeWidth="1">
-            <circle cx="55" cy="55" opacity="0.5" r="52" />
-            <circle cx="55" cy="55" opacity="0.3" r="38" />
-          </g>
-          <circle cx="55" cy="14" fill="var(--sky)" r="3.4" />
-        </svg>
-      </LiquidGlassCard>
     </div>
-  </Frame>
+  </Screen>
 );
 
-/* -------------------------------------------------------- VI · eight functions */
+/* ========================================================== VI · functions */
 
-const Functions: Slide = ({ index, total }) => (
-  <Frame eyebrow={FUNCTIONS.eyebrow} foot="WHAT WE RUN" index={index} total={total}>
-    <Title accent={FUNCTIONS.titleAccent} head={FUNCTIONS.title} />
-
-    <div className="fd-grid-4" style={{ marginTop: "var(--s-7)" }}>
-      {FUNCTIONS.items.map((f) => (
-        <div className="fd-card fd-rise fd-fn" key={f.n}>
-          {f.tag ? <span className="fd-chip fd-fn-tag">{f.tag}</span> : null}
-          <span className="fd-fn-n">{f.n}</span>
-          <span className="fd-fn-label">{f.label}</span>
-        </div>
-      ))}
-    </div>
-
-    <p className="fd-rise fd-small" style={{ marginTop: "auto", color: "var(--tx-3)" }}>
-      {FUNCTIONS.footnote}{" "}
-      <b style={{ color: "var(--heading)", fontWeight: 500 }}>{FUNCTIONS.footnoteAccent}</b>
+const Functions: SlideFn = ({ index, total }) => (
+  <Screen eyebrow={FUNCTIONS.eyebrow} index={index} total={total}>
+    <H accent={FUNCTIONS.titleAccent} head={FUNCTIONS.title} />
+    <p className="fd-rise fd-lede">
+      {FUNCTIONS.footnote} <span className="serif-i">{FUNCTIONS.footnoteAccent}</span>
     </p>
-  </Frame>
+    {/* Eight items, labels only — no bodies. A rail can carry eight; a grid of
+        eight cards cannot, which is what made the first version airless. */}
+    <div className="fd-rail fd-rise">
+      <div className="fd-rail-line" />
+      <div
+        className="fd-rail-cols"
+        style={{ gridTemplateColumns: "repeat(4, 1fr)", rowGap: 34 }}
+      >
+        {FUNCTIONS.items.map((f, i) => (
+          <div key={f.n} style={{ position: "relative" }}>
+            {i < 4 ? <span className="fd-node" style={{ left: 0, top: -5 }} /> : null}
+            <div style={{ paddingTop: i < 4 ? 26 : 0 }}>
+              <div className="fd-col-n">{f.n}</div>
+              <div className="fd-col-t" style={{ fontSize: 17, marginTop: 10 }}>
+                {f.label}
+              </div>
+              {f.tag ? (
+                <div style={{ marginTop: 10 }}>
+                  <span className="fd-chip">{f.tag}</span>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </Screen>
 );
 
-/* ---------------------------------------------------------- VII · flywheel */
+/* =========================================================== VII · flywheel */
 
-const Flywheel: Slide = ({ active, index, total }) => {
+const Flywheel: SlideFn = ({ active, index, total }) => {
   const ref = useOnActive(active, runFlywheel);
-  const R = 118;
-  const C = 150;
+  const R = 130;
+  const C = 158;
 
   return (
-    <Frame eyebrow={FLYWHEEL.eyebrow} foot="THE FLYWHEEL" index={index} total={total}>
-      <div className="fd-split fd-flywheel" ref={ref}>
-        <div className="fw-stage">
-          <svg aria-hidden="true" height="300" viewBox="0 0 300 300" width="300">
-            <circle
-              cx={C}
-              cy={C}
-              fill="none"
-              opacity="0.55"
-              r={R}
-              stroke="var(--line-3)"
-              strokeWidth="1"
-            />
-            <circle
-              cx={C}
-              cy={C}
-              fill="none"
-              opacity="0.35"
-              r={R - 44}
-              stroke="var(--line-3)"
-              strokeWidth="1"
-            />
+    <Screen eyebrow={FLYWHEEL.eyebrow} index={index} total={total}>
+      <div
+        ref={ref}
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 316px",
+          gap: 64,
+          alignItems: "center",
+          flex: 1,
+          minHeight: 0,
+        }}
+      >
+        <div>
+          <p className="fd-rise fd-statement" style={{ fontSize: 52, maxWidth: "15ch" }}>
+            Enter at a services multiple.{" "}
+            <span className="hi">Exit at a software one.</span>
+          </p>
+          <ol
+            className="fd-rise"
+            style={{
+              listStyle: "none",
+              margin: "34px 0 0",
+              padding: 0,
+              display: "grid",
+              gap: 9,
+            }}
+          >
+            {FLYWHEEL.steps.map((s) => (
+              <li
+                className="fw-step"
+                key={s.n}
+                style={{ fontSize: 13, lineHeight: 1.55, color: "var(--tx-2)" }}
+              >
+                <span style={{ color: "var(--accent-ink)", marginRight: 10 }}>{s.n}</span>
+                {s.text}{" "}
+                <b style={{ color: "var(--heading)", fontWeight: 400 }}>{s.accent}</b>{" "}
+                {s.tail}
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        <div
+          className="fw-stage fd-rise"
+          style={{ position: "relative", width: 316, height: 316 }}
+        >
+          <svg aria-hidden="true" height="316" viewBox="0 0 316 316" width="316">
+            <circle cx={C} cy={C} fill="none" r={R} stroke="var(--line-2)" strokeWidth="1" />
             <g
               fill="none"
               stroke="var(--heading)"
               strokeLinecap="round"
-              strokeWidth="1.4"
-              transform={`translate(${C - 24} ${C - 32}) scale(1.05)`}
+              strokeWidth="1.3"
+              transform={`translate(${C - 22} ${C - 30}) scale(0.95)`}
             >
               <line x1="24" x2="24" y1="9" y2="39" />
               <path d="M12.5 12 C 24 18, 24 30, 12.5 38" />
@@ -519,7 +419,7 @@ const Flywheel: Slide = ({ active, index, total }) => {
               letterSpacing="0.22em"
               textAnchor="middle"
               x={C}
-              y={C + 40}
+              y={C + 42}
             >
               {FLYWHEEL.hub}
             </text>
@@ -532,8 +432,21 @@ const Flywheel: Slide = ({ active, index, total }) => {
                 className="fw-node"
                 key={s.n}
                 style={{
+                  position: "absolute",
                   left: `${C + R * Math.cos(a)}px`,
                   top: `${C + R * Math.sin(a)}px`,
+                  width: 26,
+                  height: 26,
+                  margin: "-13px 0 0 -13px",
+                  borderRadius: "50%",
+                  display: "grid",
+                  placeItems: "center",
+                  fontSize: 11,
+                  color: "var(--tx-3)",
+                  background: "var(--bg)",
+                  border: "1px solid var(--line-2)",
+                  transition:
+                    "color .22s var(--ease), border-color .22s var(--ease), box-shadow .22s var(--ease)",
                 }}
               >
                 {s.n}
@@ -545,416 +458,333 @@ const Flywheel: Slide = ({ active, index, total }) => {
             className="fw-packet"
             style={
               {
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: 9,
+                height: 9,
+                margin: "-4.5px 0 0 -4.5px",
+                borderRadius: "50%",
+                background:
+                  "radial-gradient(circle, var(--heading) 0%, var(--mer) 52%, transparent 74%)",
+                boxShadow: "0 0 16px 3px color-mix(in srgb, var(--mer) 50%, transparent)",
                 offsetPath: `path("M ${C} ${C - R} A ${R} ${R} 0 1 1 ${C - 0.01} ${C - R} Z")`,
+                offsetDistance: "var(--t, 0%)",
+                offsetRotate: "0deg",
+                pointerEvents: "none",
               } as React.CSSProperties
             }
           />
         </div>
-
-        <ol className="fw-steps">
-          {FLYWHEEL.steps.map((s) => (
-            <li className="fw-step" key={s.n}>
-              <span className="fw-step-n">{s.n}</span>
-              <span>
-                {s.text} <b>{s.accent}</b> {s.tail}
-              </span>
-            </li>
-          ))}
-        </ol>
       </div>
-
-      <div className="fd-quote fd-rise" style={{ marginTop: "var(--s-5)" }}>
-        {FLYWHEEL.title} <b>{FLYWHEEL.titleAccent}</b>
-      </div>
-    </Frame>
+    </Screen>
   );
 };
 
-/* --------------------------------------------------------- VIII · the moat */
+/* =============================================================== VIII · moat */
 
-const Moat: Slide = ({ index, total }) => (
-  <Frame eyebrow={MOAT.eyebrow} index={index} total={total}>
-    <Title accent={MOAT.titleAccent} head={MOAT.title} />
-
-    <div className="fd-compare" style={{ marginTop: "var(--s-7)" }}>
-      <div className="fd-card fd-rise fd-col-dim">
+const Moat: SlideFn = ({ index, total }) => (
+  <Screen eyebrow={MOAT.eyebrow} index={index} total={total}>
+    <H accent={MOAT.titleAccent} head={MOAT.title} />
+    {/* Two columns divided by one hairline — no boxes, no ticks and crosses. */}
+    <div
+      className="fd-rise"
+      style={{
+        marginTop: "auto",
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        gap: 64,
+        paddingTop: 38,
+        borderTop: "1px solid var(--line-2)",
+      }}
+    >
+      <div>
         <div className="fd-label">{MOAT.wrappers.label}</div>
-        <ul className="fd-rows">
+        <ul style={{ listStyle: "none", margin: "20px 0 0", padding: 0, display: "grid", gap: 12 }}>
           {MOAT.wrappers.rows.map((r) => (
-            <li key={r}>
-              <span className="fd-x">✕</span>
-              <span>{r}</span>
+            <li key={r} style={{ fontSize: 14, color: "var(--tx-3)" }}>
+              {r}
             </li>
           ))}
         </ul>
       </div>
-
-      <div className="fd-card fd-rise fd-col-lit">
-        <div className="fd-label" style={{ color: "var(--sky)" }}>
+      <div>
+        <div className="fd-label" style={{ color: "var(--accent-ink)" }}>
           {MOAT.ours.label}
         </div>
-        <ul className="fd-rows">
+        <ul style={{ listStyle: "none", margin: "20px 0 0", padding: 0, display: "grid", gap: 12 }}>
           {MOAT.ours.rows.map((r) => (
-            <li key={r}>
-              <span className="fd-check">✓</span>
-              <span>{r}</span>
+            <li key={r} style={{ fontSize: 14, color: "var(--heading)" }}>
+              {r}
             </li>
           ))}
         </ul>
       </div>
     </div>
-
-    <p className="fd-rise fd-small" style={{ marginTop: "auto", maxWidth: "96ch" }}>
-      {MOAT.footnote}
-    </p>
-  </Frame>
+  </Screen>
 );
 
-/* ------------------------------------------------------- IX · economics ◆ */
+/* ========================================================= IX · economics ◆ */
 
-const Economics: Slide = ({ active, index, total }) => (
-  <Frame eyebrow={ECONOMICS.eyebrow} index={index} total={total}>
-    <Title accent={ECONOMICS.titleAccent} head={ECONOMICS.title} />
-    <p className="fd-rise fd-lede">{ECONOMICS.lede}</p>
-    <div className="fd-plot fd-rise" style={{ marginTop: "var(--s-4)" }}>
+const Economics: SlideFn = ({ active, index, total }) => (
+  <Screen eyebrow={ECONOMICS.eyebrow} index={index} total={total}>
+    <H accent={ECONOMICS.titleAccent} head={ECONOMICS.title} size="wide" />
+    <div className="fd-plot fd-rise">
       <EconomicsChart active={active} />
     </div>
     <Provenance
       note="Needs AND Capital revenue, delivery cost, and the automation rate actually observed per workflow."
       source={ECONOMICS.source}
     />
-  </Frame>
+  </Screen>
 );
 
-/* ---------------------------------------------------------- X · the market */
+/* ============================================================== X · market */
 
-const Market: Slide = ({ active, index, total }) => (
-  <Frame eyebrow={MARKET.eyebrow} foot="THE MARKET · COMPS" index={index} total={total}>
-    <Title accent={MARKET.titleAccent} head={MARKET.title} />
-
-    <div className="fd-market" style={{ marginTop: "var(--s-6)" }}>
-      <div className="fd-frame fd-rise">
-        <div className="fd-label">{MARKET.compsLabel}</div>
-        <div style={{ height: 150, marginTop: "var(--s-4)" }}>
-          <CompsChart active={active} />
-        </div>
-        <p className="fd-source">{MARKET.compsSource}</p>
-        <p className="fd-source" style={{ color: "var(--gold)" }}>
-          {MARKET.compsStale}
-        </p>
+const Market: SlideFn = ({ active, index, total }) => (
+  <Screen eyebrow={MARKET.eyebrow} index={index} total={total}>
+    <H accent={MARKET.titleAccent} head={MARKET.title} />
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "1.5fr 1fr",
+        gap: 64,
+        alignItems: "center",
+        flex: 1,
+        minHeight: 0,
+        marginTop: 22,
+      }}
+    >
+      <div className="fd-plot fd-rise" style={{ marginTop: 0 }}>
+        <CompsChart active={active} />
       </div>
-
-      <div className="fd-frame fd-rise fd-multiple">
+      <div className="fd-rise">
         <div className="fd-label">{MARKET.multiple.label}</div>
-        <div className="fd-multiple-figure">{MARKET.multiple.display}</div>
-        <MultipleTrack />
-        <p className="fd-small" style={{ color: "var(--tx-3)" }}>
+        <div
+          style={{
+            fontFamily: "var(--serif)",
+            fontStyle: "italic",
+            fontSize: 68,
+            lineHeight: 1,
+            color: "var(--accent-ink)",
+            marginTop: 14,
+          }}
+        >
+          {MARKET.multiple.display}
+        </div>
+        <p className="fd-col-b" style={{ marginTop: 16 }}>
           {MARKET.multiple.caption}
         </p>
-        <Provenance source={MARKET.multiple.source} />
       </div>
     </div>
-
-    <p className="fd-rise fd-small" style={{ marginTop: "auto", maxWidth: "100ch" }}>
-      {MARKET.footnote}{" "}
-      <b style={{ color: "var(--heading)", fontWeight: 500 }}>{MARKET.footnoteAccent}</b>
-      {MARKET.footnoteTail}
+    <p className="fd-rise fd-note">{MARKET.compsSource}</p>
+    <p className="fd-rise fd-note" style={{ color: "var(--gold)", marginTop: 6 }}>
+      {MARKET.compsStale}
     </p>
-  </Frame>
+  </Screen>
 );
 
-/** The 20–38× band on a 0–50× track. */
-function MultipleTrack() {
-  const { low, high, scaleMax } = MARKET.multiple;
-  const pct = (v: number) => (v / scaleMax) * 100;
+/* ========================================================== XI · structure ◆ */
+
+const Structure: SlideFn = ({ index, total }) => {
+  const { tree, counter, pending } = STRUCTURE;
+  const entities = [tree.parent, ...tree.children];
+
   return (
-    <div className="fd-track">
-      <div className="fd-track-rail" />
-      <div
-        className="fd-track-band"
-        style={{ left: `${pct(low)}%`, width: `${pct(high) - pct(low)}%` }}
+    <Screen eyebrow={STRUCTURE.eyebrow} index={index} total={total}>
+      <H accent={STRUCTURE.titleAccent} head={STRUCTURE.title} />
+      <p className="fd-rise fd-lede">{STRUCTURE.lede}</p>
+      {/* The entity sequence as a rail — a tree diagram was three boxes and a
+          wire doing the work one timeline does better. */}
+      <Rail
+        cols={entities.map((e) => ({
+          key: e.key,
+          n: e.timing,
+          title: e.label,
+          body: e.note,
+        }))}
       />
-      <div className="fd-track-ticks">
-        {[0, 20, 38, 50].map((t) => (
-          <span key={t} style={{ left: `${pct(t)}%` }}>
-            {t}×
-          </span>
-        ))}
+      <div
+        className="fd-rise"
+        style={{ marginTop: 24, display: "flex", gap: 18, alignItems: "flex-start" }}
+      >
+        <span className="fd-chip warn" style={{ flex: "none" }}>
+          {counter.label}
+        </span>
+        <p className="fd-note" style={{ maxWidth: "76ch" }}>
+          {counter.body} {pending}
+        </p>
       </div>
-    </div>
-  );
-}
-
-/* ------------------------------------------------------- XI · structure ◆ */
-
-const Structure: Slide = ({ active, index, total }) => {
-  const ref = useOnActive(active, drawPaths);
-  const { tree, rationale, counter, pending } = STRUCTURE;
-
-  return (
-    <Frame eyebrow={STRUCTURE.eyebrow} foot="STRUCTURE" index={index} total={total}>
-      <Title accent={STRUCTURE.titleAccent} head={STRUCTURE.title} />
-      <p className="fd-rise fd-lede fd-lede-tight">{STRUCTURE.lede}</p>
-
-      <div className="fd-structure" ref={ref}>
-        <div className="fd-tree">
-          <div className="fd-entity fd-rise fd-entity-parent">
-            <span className="fd-chip">{tree.parent.timing}</span>
-            <div className="fd-entity-name">{tree.parent.label}</div>
-            <div className="fd-entity-role">{tree.parent.role}</div>
-            <p className="fd-entity-note">{tree.parent.note}</p>
-          </div>
-
-          <svg aria-hidden="true" className="fd-tree-wire" height="30" viewBox="0 0 420 30" width="420">
-            <g fill="none" stroke="var(--line-3)" strokeWidth="1.1">
-              <path className="fd-draw" d="M210 0 L210 14" />
-              <path className="fd-draw" d="M105 30 L105 14 L315 14 L315 30" />
-            </g>
-          </svg>
-
-          <div className="fd-tree-children">
-            {tree.children.map((c) => (
-              <div className="fd-entity fd-rise" key={c.key}>
-                <span className="fd-chip">{c.timing}</span>
-                <div className="fd-entity-name">{c.label}</div>
-                <div className="fd-entity-role">{c.role}</div>
-                <p className="fd-entity-note">{c.note}</p>
-              </div>
-            ))}
-          </div>
-
-          <p className="fd-rise fd-source fd-pending">{pending}</p>
-        </div>
-
-        <div className="fd-rationale">
-          {rationale.map((r) => (
-            <div className="fd-rise fd-reason" key={r.n}>
-              <span className="fd-reason-n">{r.n}</span>
-              <div>
-                <div className="fd-reason-title">{r.title}</div>
-                <p className="fd-reason-body">{r.body}</p>
-                {r.caveat ? <p className="fd-reason-caveat">{r.caveat}</p> : null}
-              </div>
-            </div>
-          ))}
-
-          {/* The honest counter ships on the slide, not in a footnote — this
-              structure argues against the client's own prior deck. */}
-          <div className="fd-counter fd-rise">
-            <span className="fd-chip warn">{counter.label}</span>
-            <p className="fd-counter-body">{counter.body}</p>
-          </div>
-        </div>
-      </div>
-    </Frame>
+    </Screen>
   );
 };
 
-/* -------------------------------------------------------- XII · corridor ◆ */
+/* ========================================================== XII · corridor ◆ */
 
-const Corridor: Slide = ({ active, index, total }) => (
-  <Frame eyebrow={CORRIDOR.eyebrow} index={index} total={total}>
-    <div className="fd-corridor-head">
-      <div>
-        <Title accent={CORRIDOR.titleAccent} head={CORRIDOR.title} />
-        <p className="fd-rise fd-lede" style={{ maxWidth: "48ch" }}>
-          {CORRIDOR.lede}
-        </p>
-      </div>
-      <ul className="fd-rise fd-legend">
-        {CORRIDOR.legend.map((l) => (
-          <li key={l.kind}>
-            <span className={`fd-dot k-${l.kind}`} />
-            {l.label}
-          </li>
-        ))}
-      </ul>
-    </div>
-
+const Corridor: SlideFn = ({ active, index, total }) => (
+  <Screen eyebrow={CORRIDOR.eyebrow} index={index} total={total}>
+    <H accent={CORRIDOR.titleAccent} head={CORRIDOR.title} size="wide" />
     <div className="fd-plot fd-plot-mask fd-rise">
       <CorridorMap active={active} />
     </div>
-    <p className="fd-rise fd-source">{CORRIDOR.caption}</p>
-  </Frame>
+    <p className="fd-rise fd-note">{CORRIDOR.caption}</p>
+  </Screen>
 );
 
-/* --------------------------------------------------------- XIII · roadmap ◆ */
+/* ========================================================= XIII · roadmap ◆ */
 
-const Roadmap: Slide = ({ index, total }) => (
-  <Frame eyebrow={ROADMAP.eyebrow} index={index} total={total}>
-    <Title accent={ROADMAP.titleAccent} head={ROADMAP.title} />
-
-    <div className="fd-timeline">
-      <div className="fd-timeline-rail" />
-      {ROADMAP.milestones.map((m) => (
-        <div className="fd-rise fd-milestone" key={m.when}>
-          <span className="fd-milestone-dot" />
-          <div className="fd-milestone-when">{m.when}</div>
-          <div className="fd-milestone-title">{m.title}</div>
-          <p className="fd-milestone-body">{m.body}</p>
-        </div>
-      ))}
-    </div>
-
+const Roadmap: SlideFn = ({ index, total }) => (
+  <Screen eyebrow={ROADMAP.eyebrow} index={index} total={total}>
+    <H accent={ROADMAP.titleAccent} head={ROADMAP.title} />
+    <Rail
+      cols={ROADMAP.milestones.map((m) => ({
+        key: m.when,
+        n: m.when,
+        title: m.title,
+        body: m.body,
+      }))}
+    />
     <Provenance source={ROADMAP.source} />
-  </Frame>
+  </Screen>
 );
 
-/* ------------------------------------------------------------ XIV · team ◆ */
+/* ============================================================== XIV · team ◆ */
 
-const Team: Slide = ({ index, total }) => (
-  <Frame eyebrow={TEAM.eyebrow} index={index} total={total}>
-    <Title head={TEAM.title} />
-    <p className="fd-rise fd-lede">{TEAM.lede}</p>
-
-    <div className="fd-grid-3" style={{ marginTop: "var(--s-6)" }}>
-      {TEAM.members.length > 0
-        ? TEAM.members.map((m) => (
-            <div className="fd-card fd-rise" key={m.name}>
-              <h3 className="fd-card-title">{m.name}</h3>
-              <div className="fd-label">{m.role}</div>
-              <p className="fd-card-body" style={{ marginTop: "var(--s-3)" }}>
-                {m.bio}
-              </p>
-            </div>
-          ))
-        : // No names supplied. A founding-partner deck with invented founders
-          // would be the worst fabrication this deck could contain, so the
-          // slide shows labelled gaps instead.
-          [0, 1, 2].map((i) => (
-            <div className="fd-card fd-rise fd-card-empty" key={i}>
-              <div className="fd-card-title">
-                <Gap width={12} />
-              </div>
-              <div className="fd-label">
-                <Gap width={9} />
-              </div>
-              <p className="fd-card-body" style={{ marginTop: "var(--s-3)" }}>
-                <Gap width={20} />
-              </p>
-            </div>
-          ))}
-    </div>
-
-    <div className="fd-grid-2" style={{ marginTop: "var(--s-5)" }}>
-      {TEAM.openSeats.map((s) => (
-        <div className="fd-card fd-rise fd-seat" key={s.role}>
-          <span className="fd-chip">OPEN</span>
-          <div className="fd-card-title" style={{ margin: 0 }}>
-            {s.role}
-          </div>
-          <p className="fd-card-body">{s.note}</p>
-        </div>
-      ))}
-    </div>
-
-    <p className="fd-rise fd-source" style={{ marginTop: "auto", color: "var(--gold)" }}>
-      {TEAM.emptyNote}
-    </p>
-  </Frame>
+const Team: SlideFn = ({ index, total }) => (
+  <Screen eyebrow={TEAM.eyebrow} index={index} total={total}>
+    <H accent="still open." head="The bench behind customer zero, and the seats" />
+    {/* No names supplied. Inventing founders in a founding-partner deck would
+        be the worst fabrication this document could contain, so the seats are
+        named and the people stay labelled gaps. */}
+    <Rail
+      cols={[
+        ...TEAM.openSeats.map((s) => ({
+          key: s.role,
+          n: "OPEN",
+          title: s.role,
+          body: s.note,
+        })),
+        { key: "pending", n: "PENDING", title: "—", body: TEAM.emptyNote },
+      ]}
+    />
+  </Screen>
 );
 
-/* ----------------------------------------------------------- XV · risks ◆ */
+/* ============================================================= XV · risks ◆ */
 
-const Risks: Slide = ({ index, total }) => (
-  <Frame eyebrow={RISKS.eyebrow} index={index} total={total}>
-    <Title accent={RISKS.titleAccent} head={RISKS.title} />
-
-    <div className="fd-risks">
-      {RISKS.items.map((r) => (
-        <div className="fd-card fd-rise fd-risk" key={r.risk}>
-          <h3 className="fd-card-title">{r.risk}</h3>
-          <p className="fd-card-body">{r.body}</p>
-          <div className="fd-mitigation">
-            <span className="fd-label">Mitigation</span>
-            <p className="fd-card-body">{r.mitigation}</p>
-          </div>
-        </div>
-      ))}
-    </div>
-  </Frame>
+const Risks: SlideFn = ({ index, total }) => (
+  <Screen eyebrow={RISKS.eyebrow} index={index} total={total}>
+    <H accent={RISKS.titleAccent} head={RISKS.title} />
+    <Rail
+      cols={RISKS.items.map((r, i) => ({
+        key: r.risk,
+        n: `0${i + 1}`,
+        title: r.risk,
+        body: r.mitigation,
+      }))}
+    />
+  </Screen>
 );
 
-/* ------------------------------------------------------------- XVI · ask ◆ */
+/* =============================================================== XVI · ask ◆ */
 
-const Ask: Slide = ({ index, total }) => (
-  <Frame eyebrow={ASK.eyebrow} index={index} total={total}>
-    <Title accent={ASK.titleAccent} head={ASK.title} />
+const Ask: SlideFn = ({ index, total }) => (
+  <Screen eyebrow={ASK.eyebrow} index={index} total={total}>
+    <H accent={ASK.titleAccent} head={ASK.title} />
     <p className="fd-rise fd-lede">{ASK.lede}</p>
-
-    <div className="fd-terms">
-      {ASK.terms.map((t) => (
-        <div className="fd-rise fd-term" key={t.label}>
-          <div className="fd-label">{t.label}</div>
-          <div className="fd-term-value">
-            {t.value === null ? <Gap width={7} /> : `${t.value}${t.unit}`}
+    <div className="fd-rail fd-rise">
+      <div className="fd-rail-line" />
+      <div className="fd-rail-cols" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
+        {ASK.terms.map((t) => (
+          <div key={t.label} style={{ position: "relative" }}>
+            <span className="fd-node" style={{ left: 0, top: -5 }} />
+            <div style={{ paddingTop: 26 }}>
+              <div className="fd-label">{t.label}</div>
+              <div
+                style={{
+                  fontSize: 34,
+                  fontWeight: 200,
+                  color: "var(--heading)",
+                  marginTop: 14,
+                  lineHeight: 1.1,
+                }}
+              >
+                {t.value === null ? <Gap /> : `${t.value}${t.unit}`}
+              </div>
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
-
-    <div className="fd-rise fd-warning">
+    <div className="fd-rise" style={{ marginTop: 24 }}>
       <span className="fd-chip warn">TERMS PENDING</span>
-      <p className="fd-card-body">{ASK.warning}</p>
+      <p className="fd-note" style={{ marginTop: 12 }}>
+        {ASK.warning}
+      </p>
     </div>
-
-    <div className="fd-rise fd-cta-row">
-      <span className="fd-cta">{ASK.cta}</span>
-    </div>
-  </Frame>
+  </Screen>
 );
 
-/* ---------------------------------------------------------- XVII · closing */
+/* ============================================================ XVII · closing */
 
-const Closing: Slide = () => (
-  <div className="fd-cover fd-closing">
-    <div className="fd-cover-mid">
-      <Mark className="fd-rise" size={72} />
-      <p className="fd-rise fd-label" style={{ color: "var(--sky)", marginTop: 28 }}>
-        THANK YOU
+const Closing: SlideFn = () => (
+  <>
+    <Arc />
+    <div className="fd-body" style={{ justifyContent: "center" }}>
+      <p className="fd-rise fd-statement">
+        The crossing, and the <span className="hi">line you cross it by.</span>
       </p>
-      <h2 className="fd-rise fd-display fd-closing-line">
-        The crossing, and the
-        <br />
-        <span className="serif-i">line you cross it by.</span>
-      </h2>
-      <div className="fd-rise fd-wordmark" style={{ justifyContent: "center", marginTop: 26 }}>
-        <span>
-          <b>ISTHMUS</b> <i>MERIDIAN</i>
-        </span>
-      </div>
-      <div className="fd-rise fd-closing-meta">
+      <div
+        className="fd-rise"
+        style={{ marginTop: 52, display: "flex", gap: 64 }}
+      >
         <div>
           <div className="fd-label">Structure</div>
-          <div className="fd-small">Delaware · Abu Dhabi</div>
+          <div style={{ fontSize: 15, color: "var(--tx-2)", marginTop: 8 }}>
+            Delaware · Abu Dhabi
+          </div>
         </div>
         <div>
           <div className="fd-label">Opportunity</div>
-          <div className="fd-small">Founding partners</div>
+          <div style={{ fontSize: 15, color: "var(--tx-2)", marginTop: 8 }}>
+            Founding partners
+          </div>
         </div>
       </div>
     </div>
-  </div>
+    <div
+      className="fd-rise"
+      style={{ position: "absolute", right: 84, bottom: 92, zIndex: 1, color: "var(--silver)" }}
+    >
+      <Mark size={54} />
+    </div>
+  </>
 );
 
 /* ------------------------------------------------------------------ export */
 
+export type Slide = { render: SlideFn; light?: boolean };
+
+/**
+ * Screens alternate navy and paper, as the site does. The cover and the close
+ * are both navy so the deck opens and lands on the same ground.
+ */
 export const SLIDES: Slide[] = [
-  Cover,
-  Thesis,
-  Problem,
-  Backdrop,
-  Wedge,
-  Functions,
-  Flywheel,
-  Moat,
-  Economics,
-  Market,
-  Structure,
-  Corridor,
-  Roadmap,
-  Team,
-  Risks,
-  Ask,
-  Closing,
+  { render: Cover },
+  { render: Thesis },
+  { render: Problem, light: true },
+  { render: Backdrop },
+  { render: Wedge, light: true },
+  { render: Functions },
+  { render: Flywheel, light: true },
+  { render: Moat },
+  { render: Economics, light: true },
+  { render: Market },
+  { render: Structure, light: true },
+  { render: Corridor },
+  { render: Roadmap, light: true },
+  { render: Team },
+  { render: Risks, light: true },
+  { render: Ask },
+  { render: Closing },
 ];

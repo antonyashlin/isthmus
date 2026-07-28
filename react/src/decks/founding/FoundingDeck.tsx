@@ -102,18 +102,21 @@ export function FoundingDeck() {
           transform: `translate(${fit.ox}px, ${fit.oy}px) scale(${fit.s})`,
         }}
       >
-        {SLIDES.map((Slide, i) => (
-          <section
-            aria-hidden={i === index ? undefined : true}
-            className="fdeck-slide"
-            data-active={i === index}
-            data-slide-index={i}
-            // biome-ignore lint/suspicious/noArrayIndexKey: slide order is the identity
-            key={i}
-          >
-            <Slide active={i === index} index={i} total={SLIDES.length} />
-          </section>
-        ))}
+        {SLIDES.map((slide, i) => {
+          const Body = slide.render;
+          return (
+            <section
+              aria-hidden={i === index ? undefined : true}
+              className={`fdeck-slide${slide.light ? " light" : ""}`}
+              data-active={i === index}
+              data-slide-index={i}
+              // biome-ignore lint/suspicious/noArrayIndexKey: slide order is the identity
+              key={i}
+            >
+              <Body active={i === index} index={i} total={SLIDES.length} />
+            </section>
+          );
+        })}
       </div>
 
       <nav aria-label="Slides" className="fdeck-nav">

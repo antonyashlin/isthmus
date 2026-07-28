@@ -1,22 +1,23 @@
 /* =====================================================================
  * Isthmus Meridian — founding-partner deck.
  *
- * The design system here is THE WEBSITE'S, not DESIGN.md's.
+ * This is the marketing site's design language, not a deck system that
+ * borrowed its colours. The rules that actually define it:
  *
- * DESIGN.md describes the old master deck: Helvetica Neue, one family, flat
- * cards, hairline borders, and an explicit ban on both serif and glass. The
- * live site went a different way and is the current expression of the brand —
- * Archivo with Source Serif 4 italic carrying emphasis, deep navy grounds,
- * Kokonut liquid glass as the card material, generous radii, and a sky accent
- * that glows rather than merely tints. This deck follows the site, so the two
- * surfaces read as one company.
+ *   1. ONE IDEA PER SCREEN. A slide carries a heading and a single piece of
+ *      evidence. If it needs two, it is two slides.
+ *   2. THE HEADING IS THE SCREEN. 60px, weight 300, and the emphasis is a
+ *      whole phrase set in Source Serif 4 italic — a full line, not one word.
+ *   3. NEGATIVE SPACE IS THE MATERIAL. Roughly half the canvas stays empty.
+ *      Content is indented clear of the meridian arc and never fills the frame.
+ *   4. EVIDENCE IS A RAIL, NOT A GRID. Steps and columns sit on one hairline
+ *      rail with glowing nodes. Cards are rare and never stacked.
+ *   5. THE ARC IS ALWAYS THERE. The meridian sweeps the left edge of every
+ *      screen, faint, behind everything.
+ *   6. SCREENS ALTERNATE dark navy and paper.
  *
- * Tokens below are lifted from `src/styles/site.css` verbatim rather than
- * re-picked, so the deck cannot drift from the site: change a value there and
- * the intent stays legible here. Fonts come from the app layout's next/font
- * variables (`--font-archivo`, `--font-serif`), already self-hosted.
- *
- * Scoped to `.fdeck` so nothing leaks either direction.
+ * Tokens are lifted from `src/styles/site.css` verbatim so the two surfaces
+ * cannot drift. Fonts come from the app layout's next/font variables.
  * ===================================================================== */
 
 .fdeck {
@@ -30,10 +31,8 @@
 
   --ink-0: #000000;
   --ink-1: #05070a;
-  --ink-2: #0b0f14;
-  --ink-3: #101720;
 
-  /* ---- theme: the site's dark screen ---- */
+  /* dark is the default screen */
   --bg: #04101c;
   --heading: #ffffff;
   --tx: rgba(255, 255, 255, 0.94);
@@ -44,36 +43,34 @@
   --line-3: rgba(136, 193, 237, 0.24);
   --panel: #0b0f14;
   --card: #080d13;
-  --card-hover: #111a24;
   --accent-ink: var(--sky);
+  --mer: #88c1ed;
 
   --gold: #d9a441;
   --danger: #c96f6f;
 
-  /* ---- type: the site's two families ---- */
   --sans: var(--font-archivo), "Helvetica Neue", Arial, sans-serif;
   --serif: var(--font-serif), Georgia, "Times New Roman", serif;
-
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 
-  /* ---- rhythm ----
-     The site scales with the viewport; a slide canvas is fixed, so the fluid
-     clamps resolve to their 1280-wide values and are frozen here. */
-  --s-1: 4px;
-  --s-2: 8px;
-  --s-3: 12px;
-  --s-4: 16px;
-  --s-5: 24px;
-  --s-6: 32px;
-  --s-7: 48px;
-  --s-8: 64px;
-  --s-9: 76px; /* slide safe margin */
-
-  --r-sm: 8px;
-  --r-md: 16px;
-  --r-lg: 26px; /* the site's screen-card radius */
-
   color-scheme: dark;
+}
+
+/* The paper screen — site.css `.light`, verbatim. */
+.fdeck-slide.light {
+  --bg: #edf2f7;
+  --heading: #06121e;
+  --tx: #0d1c2b;
+  --tx-2: rgba(13, 28, 43, 0.66);
+  --tx-3: rgba(13, 28, 43, 0.46);
+  --line: rgba(13, 28, 43, 0.12);
+  --line-2: rgba(13, 28, 43, 0.22);
+  --line-3: rgba(70, 134, 183, 0.32);
+  --panel: #ffffff;
+  --card: #ffffff;
+  --accent-ink: #2f628a;
+  --mer: #4686b7;
+  color-scheme: light;
 }
 
 /* ---------------------------------------------------------------- viewer */
@@ -84,27 +81,22 @@
   background: var(--ink-0);
   overflow: hidden;
   font-family: var(--sans);
-  color: var(--tx);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
 /* Kokonut ships its glass <filter> inside an `svg.hidden`. This stylesheet is
-   unlayered, so a bare `svg{display:block}` would beat Tailwind's `hidden` and
-   leave an empty block inside every card — the same trap the site hit. */
+   unlayered, so a bare `svg { display: block }` would beat Tailwind's `hidden`
+   and leave an empty block inside every card — the trap the site already hit. */
 .fdeck svg.hidden {
   display: none;
 }
-
 .fdeck img,
 .fdeck svg {
   display: block;
   max-width: 100%;
 }
 
-/* Fixed 1280x720 scaled to fit, with an explicit pixel offset. A top-left
-   origin plus px offsets — rather than translate(-50%) or flexbox centring —
-   avoids the oversized-item cases that clip a slide's leading edge. */
 .fdeck-stage {
   position: absolute;
   top: 0;
@@ -114,16 +106,13 @@
   transform-origin: 0 0;
 }
 
-/* Each slide is one of the site's cards: navy ground, generous radius, and the
-   ink-tinted lift the site uses instead of a neutral-black shadow. */
 .fdeck-slide {
   position: absolute;
   inset: 0;
   width: 1280px;
   height: 720px;
   background: var(--bg);
-  padding: var(--s-9);
-  box-sizing: border-box;
+  color: var(--tx);
   overflow: hidden;
   visibility: hidden;
 }
@@ -131,23 +120,230 @@
   visibility: visible;
 }
 
-/* The meridian field, faint, behind every slide — the site's signature. */
-.fd-field {
+/* ---------------------------------------------------------------- the arc ---
+ * The meridian sweeping the left edge. Faint, enormous, behind everything —
+ * the site's signature and the reason content is indented.
+ */
+.fd-arc {
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.5;
 }
-.fd-field svg {
+.fd-arc svg {
   width: 100%;
   height: 100%;
 }
+.fd-arc .arc-line {
+  fill: none;
+  stroke: var(--mer);
+  vector-effect: non-scaling-stroke;
+}
+/* A soft companion stroke under the sharp one, so the arc reads as light
+   rather than as a hairline. Rasterised once — it never animates. */
+.fd-arc .arc-glow {
+  fill: none;
+  stroke: var(--mer);
+  filter: blur(3px);
+  vector-effect: non-scaling-stroke;
+}
+/* A travelling light on the arc. Pure CSS offset-path, so it costs nothing
+   and never reads the layout — the fix the site landed on for scroll jitter. */
+.fd-lamp {
+  offset-rotate: 0deg;
+  animation: fdRun 16s linear infinite;
+  will-change: transform;
+}
+@keyframes fdRun {
+  from { offset-distance: 0%; }
+  to   { offset-distance: 100%; }
+}
 
-/* ---------------------------------------------------------------- glass ----
- * Kokonut's GLASS_SHADOW_DARK recipe, the same one the site lifted. Applied to
- * a surface it reads as a real material rather than a tinted rectangle.
+/* ---------------------------------------------------------------- chrome ---
+ * Almost nothing: a section label top-left and a page number bottom-right.
+ * The site has no slide furniture and neither does this.
  */
+.fd-eyebrow {
+  position: absolute;
+  top: 56px;
+  left: 300px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--tx-3);
+}
+.fd-eyebrow .fd-sec {
+  color: var(--accent-ink);
+}
+
+.fd-page {
+  position: absolute;
+  right: 64px;
+  bottom: 48px;
+  z-index: 2;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  color: var(--tx-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------- canvas ---
+ * Content is indented 300px to clear the arc and stops 96px from the right.
+ * That leaves the left fifth and a generous right margin as pure air.
+ */
+.fd-body {
+  position: absolute;
+  top: 118px;
+  left: 300px;
+  right: 96px;
+  bottom: 92px;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------------------------------------------------------------- type */
+
+/* The screen. 60px, weight 300, tight. The emphasis phrase is serif italic
+   and usually occupies its own line — that contrast IS the brand. */
+.fd-h {
+  font-family: var(--sans);
+  font-size: 60px;
+  font-weight: 300;
+  line-height: 1.06;
+  letter-spacing: -0.014em;
+  color: var(--heading);
+  margin: 0;
+  max-width: 16ch;
+  text-wrap: pretty;
+}
+.fd-h.wide { max-width: 21ch; }
+.fd-h.sm { font-size: 46px; max-width: 22ch; }
+
+.serif-i {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--accent-ink);
+}
+
+/* A slide that is one serif sentence — the site's pull-quote screens. */
+.fd-statement {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 72px;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--heading);
+  margin: 0;
+  max-width: 17ch;
+}
+.fd-statement .hi { color: var(--accent-ink); }
+
+.fd-lede {
+  font-size: 16px;
+  line-height: 1.66;
+  color: var(--tx-2);
+  margin: 28px 0 0;
+  max-width: 52ch;
+}
+
+.fd-note {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--tx-3);
+  margin: 0;
+  max-width: 88ch;
+}
+
+.fd-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--tx-3);
+}
+
+/* ---------------------------------------------------------------- rail ----
+ * The site's evidence pattern: one hairline with glowing ring nodes and
+ * columns hanging beneath it. Replaces every grid of cards.
+ */
+.fd-rail {
+  position: relative;
+  margin-top: auto;
+  padding-top: 44px;
+}
+.fd-rail-line {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  right: 7%;
+  height: 1px;
+  background: var(--line-2);
+}
+.fd-rail-cols {
+  display: grid;
+  gap: 36px;
+}
+.fd-node {
+  position: absolute;
+  top: 0;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 1.5px solid var(--mer);
+  background: var(--bg);
+  box-shadow: 0 0 14px -1px var(--mer);
+}
+.fd-col-n {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  color: var(--accent-ink);
+  font-variant-numeric: tabular-nums;
+}
+.fd-col-t {
+  font-size: 19px;
+  font-weight: 400;
+  color: var(--heading);
+  letter-spacing: -0.008em;
+  margin-top: 14px;
+}
+/* Serif-italic column heads, as on the "You send / We operate" screen. */
+.fd-col-t.serif {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 23px;
+  color: var(--accent-ink);
+}
+.fd-col-b {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--tx-2);
+  margin: 12px 0 0;
+  max-width: 26ch;
+}
+
+/* ---------------------------------------------------------------- panel ---
+ * The one surface type. A single soft plate, never a row of cards.
+ */
+.fd-panel {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--panel) 58%, transparent);
+  padding: 38px 42px;
+  box-sizing: border-box;
+}
 .liquid-glass {
   -webkit-backdrop-filter: blur(22px) saturate(165%);
   backdrop-filter: blur(22px) saturate(165%);
@@ -163,200 +359,8 @@
     0 0 12px rgba(0, 0, 0, 0.15);
 }
 
-/* ---------------------------------------------------------------- chrome */
-
-.fd-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: absolute;
-  top: var(--s-7);
-  left: var(--s-9);
-  right: var(--s-9);
-  z-index: 2;
-}
-
-.fd-eyebrow {
-  display: flex;
-  align-items: center;
-  gap: var(--s-3);
-  font-family: var(--sans);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--tx-3);
-}
-.fd-eyebrow .fd-sec {
-  color: var(--accent-ink);
-}
-.fd-eyebrow .fd-num,
-.fd-eyebrow .fd-bar {
-  color: var(--tx-3);
-}
-
-.fd-mark {
-  color: var(--silver);
-  opacity: 0.75;
-}
-
-.fd-foot {
-  position: absolute;
-  bottom: var(--s-7);
-  left: var(--s-9);
-  right: var(--s-9);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--tx-3);
-  border-top: 1px solid var(--line);
-  padding-top: var(--s-3);
-  z-index: 2;
-}
-
-.fd-body-wrap {
-  position: absolute;
-  top: 116px;
-  left: var(--s-9);
-  right: var(--s-9);
-  bottom: 100px;
-  display: flex;
-  flex-direction: column;
-  z-index: 1;
-}
-
-/* ---------------------------------------------------------------- type ----
- * The site's ramp, resolved at 1280. Headings are light-weight and tight;
- * emphasis is a serif italic in sky, never a bolder sans.
- */
-
-.fd-title {
-  font-family: var(--sans);
-  font-size: 38px;
-  font-weight: 300;
-  line-height: 1.08;
-  letter-spacing: -0.012em;
-  color: var(--heading);
-  margin: 0;
-  max-width: 26ch;
-  text-wrap: pretty;
-}
-.fd-title.wide {
-  max-width: none;
-}
-
-.fd-display {
-  font-family: var(--sans);
-  font-size: 48px;
-  font-weight: 300;
-  line-height: 1.0;
-  letter-spacing: -0.012em;
-  color: var(--heading);
-  margin: 0;
-}
-
-/* The signature. Source Serif 4 is variable on opsz, so it retunes itself from
-   a 17px inline italic to a 90px wordmark without a second family. */
-.serif-i {
-  font-family: var(--serif);
-  font-style: italic;
-  font-weight: 500;
-  letter-spacing: 0;
-  color: var(--accent-ink);
-}
-
-.fd-lede {
-  font-size: 17px;
-  line-height: 1.62;
-  color: var(--tx-2);
-  margin: var(--s-5) 0 0;
-  max-width: 62ch;
-}
-.fd-lede-tight {
-  max-width: 44ch;
-  margin-top: var(--s-4);
-}
-
-.fd-small {
-  font-size: 14px;
-  line-height: 1.55;
-  color: var(--tx-2);
-  margin: 0;
-}
-
-.fd-label {
-  display: inline-block;
-  font-family: var(--sans);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--tx-3);
-}
-
-/* ---------------------------------------------------------------- surfaces */
-
-/* The site's card: near-black fill, hairline, generous radius, and a hover
-   lift. Glass is layered on where a surface should read as material. */
-.fd-card {
-  position: relative;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  padding: var(--s-5);
-  box-sizing: border-box;
-  transition:
-    border-color 0.3s var(--ease),
-    background 0.3s var(--ease),
-    transform 0.3s var(--ease);
-}
-.fd-card-glass {
-  background: color-mix(in srgb, var(--panel) 55%, transparent);
-  border-color: var(--line-2);
-}
-
-/* Surface only — Kokonut's `glassSize` owns the padding. */
-.fd-glass-card {
-  position: relative;
-  background: color-mix(in srgb, var(--panel) 55%, transparent);
-  border: 1px solid var(--line-2);
-  border-radius: var(--r-md);
-  box-sizing: border-box;
-}
-
-.fd-card-title {
-  font-size: 17px;
-  font-weight: 400;
-  letter-spacing: -0.008em;
-  color: var(--heading);
-  margin: 0 0 var(--s-3);
-}
-.fd-card-body {
-  font-size: 14px;
-  line-height: 1.55;
-  color: var(--tx-2);
-  margin: 0;
-}
-
-.fd-icon {
-  width: 38px;
-  height: 38px;
-  border-radius: var(--r-sm);
-  border: 1px solid var(--line-3);
-  background: color-mix(in srgb, var(--sky) 7%, transparent);
-  display: grid;
-  place-items: center;
-  color: var(--accent-ink);
-  margin-bottom: var(--s-4);
-}
-
 .fd-chip {
   display: inline-block;
-  font-family: var(--sans);
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.18em;
@@ -364,61 +368,11 @@
   color: var(--accent-ink);
   border: 1px solid var(--line-3);
   border-radius: 999px;
-  padding: 4px 10px;
-  white-space: nowrap;
+  padding: 5px 12px;
 }
 .fd-chip.warn {
   color: var(--gold);
-  border-color: color-mix(in srgb, var(--gold) 34%, transparent);
-}
-
-/* The pull quote — a glass band with an accent rule, the deck's loudest voice. */
-.fd-quote {
-  position: relative;
-  background: color-mix(in srgb, var(--panel) 62%, transparent);
-  border: 1px solid var(--line);
-  border-left: 2px solid var(--sky);
-  border-radius: var(--r-md);
-  padding: var(--s-4) var(--s-5);
-  font-size: 20px;
-  font-weight: 300;
-  letter-spacing: -0.008em;
-  color: var(--tx-2);
-}
-.fd-quote b {
-  color: var(--heading);
-  font-weight: 400;
-}
-
-/* ---------------------------------------------------------------- provenance */
-
-.fd-illustrative {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--s-2);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--gold);
-  border: 1px dashed color-mix(in srgb, var(--gold) 45%, transparent);
-  border-radius: 999px;
-  padding: 5px 11px;
-}
-
-.fd-source {
-  font-size: 11px;
-  line-height: 1.45;
-  color: var(--tx-3);
-  margin: var(--s-3) 0 0;
-  max-width: 92ch;
-}
-
-.fd-gap {
-  display: inline-block;
-  min-width: 4ch;
-  border-bottom: 1px dashed var(--tx-3);
-  color: var(--tx-3);
+  border-color: color-mix(in srgb, var(--gold) 38%, transparent);
 }
 
 /* ---------------------------------------------------------------- charts */
@@ -427,579 +381,151 @@
   position: relative;
   flex: 1;
   min-height: 0;
+  margin-top: 30px;
 }
-
-/* The corridor map is cropped to the band the business occupies, which cuts
-   the top off the northern landmasses. Fading the frame edges dissolves those
-   cut coastlines instead of terminating them in a hard line. */
 .fd-plot-mask {
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    #000 9%,
-    #000 88%,
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    #000 9%,
-    #000 88%,
-    transparent 100%
-  );
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 10%, #000 88%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 10%, #000 88%, transparent 100%);
 }
 
-.fd-frame {
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  padding: var(--s-5);
-  background: color-mix(in srgb, var(--panel) 55%, transparent);
-  box-sizing: border-box;
+/* ---------------------------------------------------------------- provenance */
+
+.fd-illustrative {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  border: 1px dashed color-mix(in srgb, var(--gold) 42%, transparent);
+  border-radius: 999px;
+  padding: 5px 12px;
+}
+.fd-gap {
+  display: inline-block;
+  min-width: 4ch;
+  border-bottom: 1px dashed var(--tx-3);
+  color: var(--tx-3);
+}
+
+/* ---------------------------------------------------------------- cover */
+
+.fd-cover-h {
+  position: absolute;
+  top: 128px;
+  left: 300px;
+  right: 96px;
+  z-index: 1;
+  font-size: 34px;
+  font-weight: 300;
+  line-height: 1.26;
+  letter-spacing: -0.01em;
+  color: var(--heading);
+  margin: 0;
+  max-width: 26ch;
+}
+
+/* The wordmark, huge, bottom-right — exactly the site's hero lockup. */
+.fd-lockup {
+  position: absolute;
+  right: 84px;
+  bottom: 96px;
+  z-index: 1;
+  text-align: right;
+  line-height: 0.92;
+}
+.fd-lockup .lk-1 {
+  display: block;
+  font-size: 92px;
+  font-weight: 200;
+  letter-spacing: 0.06em;
+  color: var(--silver);
+}
+.fd-lockup .lk-2 {
+  display: block;
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 92px;
+  letter-spacing: -0.01em;
+  color: var(--sky);
+  margin-top: 4px;
+}
+
+.fd-cover-meta {
+  position: absolute;
+  left: 300px;
+  top: 258px;
+  z-index: 1;
+  display: flex;
+  gap: 18px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--tx-3);
 }
 
 /* ---------------------------------------------------------------- reveal */
 
-.fd-rise {
-  will-change: transform, opacity;
-}
+.fd-rise { will-change: transform, opacity; }
 
 @media (prefers-reduced-motion: reduce) {
-  .fdeck * {
-    animation-duration: 0ms !important;
-    transition-duration: 0ms !important;
-  }
-  .fd-rise {
-    opacity: 1 !important;
-    transform: none !important;
-  }
+  .fdeck * { animation-duration: 0ms !important; transition-duration: 0ms !important; }
+  .fd-rise { opacity: 1 !important; transform: none !important; }
+  .fd-lamp { display: none; }
 }
 
 /* ---------------------------------------------------------------- nav */
 
 .fdeck-nav {
   position: absolute;
-  bottom: 18px;
+  bottom: 16px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: var(--s-3);
-  padding: 7px 12px;
+  gap: 11px;
+  padding: 7px 13px;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--panel) 70%, transparent);
-  border: 1px solid var(--line-2);
+  background: rgba(11, 15, 20, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   opacity: 0;
   transition: opacity 0.22s var(--ease);
   z-index: 5;
 }
 .fdeck:hover .fdeck-nav,
-.fdeck-nav:focus-within {
-  opacity: 1;
-}
+.fdeck-nav:focus-within { opacity: 1; }
 
 .fdeck-dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   padding: 0;
   border: 0;
   border-radius: 50%;
-  background: var(--tx-3);
+  background: rgba(255, 255, 255, 0.34);
   cursor: pointer;
   transition: background 0.16s var(--ease);
 }
 .fdeck-dot[data-on="true"] {
-  background: var(--sky);
-  box-shadow: 0 0 10px 0 color-mix(in srgb, var(--sky) 70%, transparent);
-}
-.fdeck-dot:hover {
-  background: var(--steel-2);
+  background: #88c1ed;
+  box-shadow: 0 0 10px 0 rgba(136, 193, 237, 0.8);
 }
 
 .fdeck-count {
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  color: var(--tx-3);
-  font-variant-numeric: tabular-nums;
-  margin-left: var(--s-2);
-}
-
-/* =====================================================================
- * Slide layouts
- * ===================================================================== */
-
-.fd-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--s-4); }
-.fd-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-4); }
-.fd-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s-4); }
-
-.fd-split {
-  display: grid;
-  grid-template-columns: 1.15fr 1fr;
-  gap: var(--s-8);
-  align-items: start;
-  flex: 1;
-  min-height: 0;
-}
-
-/* ---------------------------------------------------------------- cover */
-
-.fd-cover {
-  position: absolute;
-  inset: 0;
-  padding: var(--s-7) var(--s-9);
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-  z-index: 1;
-}
-
-.fd-cover-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.fd-wordmark {
-  display: flex;
-  align-items: center;
-  gap: var(--s-3);
-  font-size: 14px;
-  letter-spacing: 0.14em;
-  color: var(--silver);
-}
-.fd-wordmark b { font-weight: 600; color: var(--heading); }
-.fd-wordmark i { font-style: normal; font-weight: 300; color: var(--tx-3); }
-
-.fd-cover-mid {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-
-.fd-globe { margin-bottom: var(--s-6); }
-
-/* The wordmark at display size: sans small-caps weight against the serif
-   italic, the same lockup the site's hero uses. */
-.fd-cover-name {
-  display: flex;
-  align-items: baseline;
-  gap: var(--s-5);
-  font-size: 68px;
-  line-height: 1;
-  margin: 0;
-  color: var(--heading);
-}
-.fd-cover-name b {
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  /* the site's silver wordmark */
-  color: var(--silver);
-  text-shadow: 0 0 22px rgba(194, 208, 221, 0.18);
-}
-.fd-cover-name i {
-  font-family: var(--serif);
-  font-style: italic;
-  font-weight: 400;
-  letter-spacing: 0;
-  color: var(--silver);
-  text-shadow: 0 0 22px rgba(194, 208, 221, 0.18);
-}
-
-.fd-cover-sub {
-  font-size: 20px;
-  font-weight: 300;
-  color: var(--tx-2);
-  margin: var(--s-6) 0 0;
-}
-
-.fd-cover-meta { margin-top: var(--s-7); color: var(--tx-3); }
-.fd-cover-tag {
-  font-family: var(--serif);
-  font-style: italic;
-  font-size: 14px;
-  color: var(--tx-3);
-  margin: var(--s-4) 0 0;
-}
-
-/* ---------------------------------------------------------------- problem */
-
-.fd-aside { padding-top: var(--s-2); }
-
-.fd-aside-list { list-style: none; margin: var(--s-5) 0 0; padding: 0; }
-.fd-aside-list li {
-  display: grid;
-  grid-template-columns: 22px 1fr;
-  gap: var(--s-3);
-  padding: var(--s-4) 0;
-  border-top: 1px solid var(--line);
-  font-size: 14px;
-  line-height: 1.55;
-  color: var(--tx-2);
-}
-.fd-aside-glyph { color: var(--accent-ink); }
-
-/* ---------------------------------------------------------------- wedge */
-
-.fd-feature { overflow: hidden; }
-.fd-feature-title {
-  font-size: 24px;
-  font-weight: 300;
-  line-height: 1.15;
-  letter-spacing: -0.01em;
-  color: var(--heading);
-  margin: var(--s-4) 0;
-  max-width: 18ch;
-}
-.fd-feature-rings {
-  position: absolute;
-  top: -16px;
-  right: -16px;
-  opacity: 0.55;
-  pointer-events: none;
-}
-
-/* ---------------------------------------------------------------- functions */
-
-.fd-fn {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  min-height: 128px;
-}
-.fd-fn:hover { border-color: var(--line-3); transform: translateY(-3px); }
-.fd-fn-tag { position: absolute; top: var(--s-4); right: var(--s-4); }
-.fd-fn-n {
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  color: var(--tx-3);
-  font-variant-numeric: tabular-nums;
-  margin-bottom: var(--s-2);
-}
-.fd-fn-label {
-  font-size: 15px;
-  font-weight: 400;
-  color: var(--heading);
-  line-height: 1.25;
-  letter-spacing: -0.006em;
-}
-
-/* ---------------------------------------------------------------- flywheel */
-
-.fd-flywheel { grid-template-columns: 300px 1fr; gap: var(--s-8); align-items: center; }
-.fw-stage { position: relative; width: 300px; height: 300px; }
-
-.fw-node {
-  position: absolute;
-  width: 30px;
-  height: 30px;
-  margin: -15px 0 0 -15px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--tx-3);
-  background: var(--bg);
-  border: 1px solid var(--line-2);
-  transition:
-    color 0.22s var(--ease),
-    border-color 0.22s var(--ease),
-    box-shadow 0.22s var(--ease);
-}
-.fw-node.lit {
-  color: var(--heading);
-  border-color: var(--sky);
-  box-shadow: 0 0 20px -4px var(--sky);
-}
-
-@property --t {
-  syntax: "<percentage>";
-  inherits: false;
-  initial-value: 0%;
-}
-.fw-packet {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 10px;
-  height: 10px;
-  margin: -5px 0 0 -5px;
-  border-radius: 50%;
-  background: radial-gradient(circle, var(--heading) 0%, var(--sky) 52%, transparent 74%);
-  box-shadow: 0 0 18px 4px color-mix(in srgb, var(--sky) 52%, transparent);
-  offset-distance: var(--t, 0%);
-  offset-rotate: 0deg;
-  will-change: transform;
-  pointer-events: none;
-}
-
-.fw-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-3); }
-.fw-step {
-  display: grid;
-  grid-template-columns: 24px 1fr;
-  gap: var(--s-3);
-  align-items: start;
-  font-size: 14px;
-  line-height: 1.5;
-  color: var(--tx-2);
-  will-change: transform, opacity;
-}
-.fw-step b { color: var(--heading); font-weight: 400; }
-.fw-step-n {
-  width: 21px;
-  height: 21px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
   font-size: 10px;
-  font-weight: 500;
-  color: var(--bg);
-  background: var(--sky);
-  margin-top: 1px;
-}
-
-/* ---------------------------------------------------------------- moat */
-
-.fd-compare { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-5); }
-.fd-col-dim { background: transparent; }
-.fd-col-lit { border-color: var(--line-3); }
-
-.fd-rows { list-style: none; margin: var(--s-4) 0 0; padding: 0; }
-.fd-rows li {
-  display: grid;
-  grid-template-columns: 20px 1fr;
-  gap: var(--s-3);
-  padding: var(--s-4) 0;
-  border-top: 1px solid var(--line);
-  font-size: 14px;
-  color: var(--tx-2);
-}
-.fd-col-lit .fd-rows li { color: var(--tx); }
-.fd-x { color: var(--danger); }
-.fd-check { color: var(--accent-ink); }
-
-/* ---------------------------------------------------------------- market */
-
-.fd-market { display: grid; grid-template-columns: 1.35fr 1fr; gap: var(--s-5); }
-.fd-multiple { display: flex; flex-direction: column; gap: var(--s-3); }
-.fd-multiple-figure {
-  font-size: 48px;
-  font-weight: 200;
-  line-height: 1;
-  color: var(--heading);
-  letter-spacing: -0.02em;
-}
-
-.fd-track { position: relative; height: 34px; margin-top: var(--s-2); }
-.fd-track-rail {
-  position: absolute;
-  top: 6px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--line);
-  border-radius: 1px;
-}
-.fd-track-band {
-  position: absolute;
-  top: 6px;
-  height: 2px;
-  background: var(--sky);
-  border-radius: 1px;
-  box-shadow: 0 0 14px 0 color-mix(in srgb, var(--sky) 60%, transparent);
-}
-.fd-track-ticks { position: absolute; top: 14px; left: 0; right: 0; }
-.fd-track-ticks span {
-  position: absolute;
-  transform: translateX(-50%);
-  font-size: 10px;
-  color: var(--tx-3);
+  letter-spacing: 0.16em;
+  color: rgba(255, 255, 255, 0.42);
   font-variant-numeric: tabular-nums;
+  margin-left: 6px;
 }
-
-/* ---------------------------------------------------------------- structure */
-
-.fd-structure {
-  display: grid;
-  grid-template-columns: 400px 1fr;
-  gap: var(--s-7);
-  margin-top: var(--s-5);
-  align-items: start;
-  flex: 1;
-  min-height: 0;
-}
-
-.fd-tree { display: flex; flex-direction: column; align-items: center; }
-.fd-tree-wire { display: block; }
-.fd-tree-children { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-4); width: 100%; }
-
-.fd-entity {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  padding: var(--s-4);
-  box-sizing: border-box;
-  width: 100%;
-}
-.fd-entity-parent { border-color: var(--line-3); }
-.fd-entity .fd-chip { margin-bottom: var(--s-3); }
-.fd-entity-name { font-size: 17px; font-weight: 400; color: var(--heading); letter-spacing: -0.006em; }
-.fd-entity-role { font-size: 11px; color: var(--accent-ink); margin-top: 3px; }
-.fd-entity-note { font-size: 12px; line-height: 1.5; color: var(--tx-3); margin: var(--s-3) 0 0; }
-.fd-pending { margin-top: var(--s-4); }
-
-.fd-rationale { display: grid; gap: var(--s-3); align-content: start; }
-.fd-reason { display: grid; grid-template-columns: 28px 1fr; gap: var(--s-3); }
-.fd-reason-n { font-size: 11px; letter-spacing: 0.18em; color: var(--tx-3); font-variant-numeric: tabular-nums; }
-.fd-reason-title { font-size: 15px; font-weight: 400; color: var(--heading); letter-spacing: -0.006em; }
-.fd-reason-body { font-size: 13px; line-height: 1.5; color: var(--tx-2); margin: 3px 0 0; }
-.fd-reason-caveat { font-size: 11px; color: var(--gold); margin: var(--s-2) 0 0; }
-
-.fd-counter {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--s-4);
-  margin-top: var(--s-2);
-  padding: var(--s-4);
-  border: 1px dashed color-mix(in srgb, var(--gold) 32%, transparent);
-  border-radius: var(--r-md);
-  background: color-mix(in srgb, var(--gold) 4%, transparent);
-}
-.fd-counter .fd-chip { flex: none; }
-.fd-counter-body { font-size: 12px; line-height: 1.5; color: var(--tx-2); margin: 0; }
-
-/* ---------------------------------------------------------------- corridor */
-
-.fd-corridor-head { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--s-7); }
-.fd-legend { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-2); }
-.fd-legend li {
-  display: flex;
-  align-items: center;
-  gap: var(--s-3);
-  font-size: 12px;
-  color: var(--tx-2);
-  white-space: nowrap;
-}
-.fd-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--steel); }
-.fd-dot.k-parent, .fd-dot.k-hub { background: var(--sky); }
-.fd-dot.k-market { background: var(--gold); }
-
-/* ---------------------------------------------------------------- roadmap */
-
-.fd-timeline {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--s-5);
-  margin-top: var(--s-8);
-  padding-top: var(--s-6);
-}
-.fd-timeline-rail {
-  position: absolute;
-  top: 5px;
-  left: 6px;
-  right: 12%;
-  height: 1px;
-  background: linear-gradient(90deg, var(--deep), var(--sky));
-}
-.fd-milestone { position: relative; padding-right: var(--s-5); }
-.fd-milestone-dot {
-  position: absolute;
-  top: -33px;
-  left: 0;
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
-  background: var(--bg);
-  border: 2px solid var(--sky);
-  box-shadow: 0 0 0 4px var(--bg), 0 0 16px -2px var(--sky);
-}
-.fd-milestone-when { font-size: 11px; font-weight: 500; letter-spacing: 0.2em; color: var(--accent-ink); }
-.fd-milestone-title {
-  font-size: 17px;
-  font-weight: 400;
-  color: var(--heading);
-  margin-top: var(--s-3);
-  letter-spacing: -0.008em;
-}
-.fd-milestone-body { font-size: 13px; line-height: 1.55; color: var(--tx-2); margin: var(--s-3) 0 0; }
-
-/* ---------------------------------------------------------------- team */
-
-.fd-card-empty { border-style: dashed; background: transparent; }
-.fd-seat { display: flex; flex-direction: column; gap: var(--s-3); align-items: flex-start; }
-
-/* ---------------------------------------------------------------- risks */
-
-.fd-risks { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-4); margin-top: var(--s-6); }
-.fd-risk { display: flex; flex-direction: column; }
-.fd-mitigation { margin-top: auto; padding-top: var(--s-4); border-top: 1px solid var(--line); }
-.fd-mitigation .fd-card-body { color: var(--tx); margin-top: var(--s-2); }
-
-/* ---------------------------------------------------------------- ask */
-
-.fd-terms {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--s-5);
-  margin-top: var(--s-7);
-  padding: var(--s-5) 0;
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-}
-.fd-term-value { font-size: 38px; font-weight: 200; color: var(--heading); margin-top: var(--s-3); line-height: 1.1; }
-
-.fd-warning {
-  display: flex;
-  align-items: center;
-  gap: var(--s-4);
-  margin-top: var(--s-5);
-  padding: var(--s-4);
-  border: 1px dashed color-mix(in srgb, var(--gold) 42%, transparent);
-  border-radius: var(--r-md);
-}
-
-.fd-cta-row { margin-top: auto; }
-/* The site's pill button, glass-filled. */
-.fd-cta {
-  display: inline-flex;
-  align-items: center;
-  height: 46px;
-  padding: 0 26px;
-  border-radius: 999px;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--heading);
-  background: color-mix(in srgb, var(--sky) 24%, transparent);
-  border: 1px solid color-mix(in srgb, var(--sky) 34%, transparent);
-}
-
-/* ---------------------------------------------------------------- closing */
-
-.fd-closing-line { margin: var(--s-5) 0 0; }
-.fd-closing-meta { display: flex; gap: var(--s-9); margin-top: var(--s-8); text-align: center; }
-.fd-closing-meta .fd-small { color: var(--tx-2); margin-top: var(--s-2); }
 
 /* ---------------------------------------------------------------- print */
 
 @media print {
-  @page {
-    size: 13.333in 7.5in;
-    margin: 0;
-  }
-  .fdeck {
-    position: static;
-    overflow: visible;
-    background: var(--bg);
-  }
-  .fdeck-stage {
-    position: static;
-    width: auto;
-    height: auto;
-    transform: none !important;
-  }
+  @page { size: 13.333in 7.5in; margin: 0; }
+  .fdeck { position: static; overflow: visible; }
+  .fdeck-stage { position: static; width: auto; height: auto; transform: none !important; }
   .fdeck-slide {
     position: relative;
     visibility: visible !important;
@@ -1008,12 +534,8 @@
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
-  /* backdrop-filter does not print; the glass falls back to its tint. */
-  .liquid-glass {
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    box-shadow: none;
-  }
+  .liquid-glass { backdrop-filter: none; -webkit-backdrop-filter: none; box-shadow: none; }
   .fdeck-nav { display: none; }
   .fd-rise { opacity: 1 !important; transform: none !important; }
+  .fd-lamp { display: none; }
 }
