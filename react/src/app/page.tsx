@@ -18,7 +18,6 @@ import { ExpectationPanels } from "@/components/site/ExpectationPanels";
 import { FlowDiagram } from "@/components/site/FlowDiagram";
 import { OfferCards } from "@/components/site/OfferCards";
 import { Globe } from "@/components/site/Globe";
-import { GlobeSparks } from "@/components/site/GlobeSparks";
 import { InView } from "@/components/site/InView";
 import { Nav } from "@/components/site/Nav";
 import { ScrollFx } from "@/components/site/ScrollFx";
@@ -157,7 +156,6 @@ export default function Home() {
       <Nav />
       <span id="top" />
       <Globe />
-      <GlobeSparks />
 
       <header className="hero">
         <div className="hero-inner">
@@ -347,6 +345,9 @@ export default function Home() {
           <div className="wrap company-wrap">
             <h2 className="h-lg reveal company-head">We run the back office behind <span className="serif-i">private-market investors</span>.</h2>
           </div>
+          <a className="btn btn-glass liquid-glass inquiry-cta" href="/inquiry">
+            Make an inquiry
+          </a>
           <div className="glassbar reveal">
             <span className="wm"><b>ISTHMUS</b> <i>MERIDIAN</i></span>
             <div className="contact">
