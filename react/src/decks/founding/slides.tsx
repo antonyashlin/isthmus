@@ -330,7 +330,7 @@ const Functions: SlideFn = ({ index, total }) => (
             {i < 4 ? <span className="fd-node" style={{ left: 0, top: -5 }} /> : null}
             <div style={{ paddingTop: i < 4 ? 26 : 0 }}>
               <div className="fd-col-n">{f.n}</div>
-              <div className="fd-col-t" style={{ fontSize: 17, marginTop: 10 }}>
+              <div className="fd-col-t" style={{ fontSize: 16, marginTop: 10 }}>
                 {f.label}
               </div>
               {f.tag ? (
@@ -367,7 +367,7 @@ const Flywheel: SlideFn = ({ active, index, total }) => {
         }}
       >
         <div>
-          <p className="fd-rise fd-statement" style={{ fontSize: 52, maxWidth: "15ch" }}>
+          <p className="fd-rise fd-statement" style={{ fontSize: 46, maxWidth: "15ch" }}>
             Enter at a services multiple.{" "}
             <span className="hi">Exit at a software one.</span>
           </p>
@@ -502,7 +502,7 @@ const Moat: SlideFn = ({ index, total }) => (
         <div className="fd-label">{MOAT.wrappers.label}</div>
         <ul style={{ listStyle: "none", margin: "20px 0 0", padding: 0, display: "grid", gap: 12 }}>
           {MOAT.wrappers.rows.map((r) => (
-            <li key={r} style={{ fontSize: 14, color: "var(--tx-3)" }}>
+            <li key={r} style={{ fontSize: 13, color: "var(--tx-3)" }}>
               {r}
             </li>
           ))}
@@ -514,7 +514,7 @@ const Moat: SlideFn = ({ index, total }) => (
         </div>
         <ul style={{ listStyle: "none", margin: "20px 0 0", padding: 0, display: "grid", gap: 12 }}>
           {MOAT.ours.rows.map((r) => (
-            <li key={r} style={{ fontSize: 14, color: "var(--heading)" }}>
+            <li key={r} style={{ fontSize: 13, color: "var(--heading)" }}>
               {r}
             </li>
           ))}
@@ -564,7 +564,7 @@ const Market: SlideFn = ({ active, index, total }) => (
           style={{
             fontFamily: "var(--serif)",
             fontStyle: "italic",
-            fontSize: 68,
+            fontSize: 72,
             lineHeight: 1,
             color: "var(--accent-ink)",
             marginTop: 14,

@@ -28,31 +28,31 @@ colors:
 typography:
   wordmark:
     fontFamily: "var(--font-archivo), 'Helvetica Neue', Arial, sans-serif"
-    fontSize: "68px"
+    fontSize: "92px"
     fontWeight: 500
     lineHeight: 1
     letterSpacing: "0.10em"
   display:
     fontFamily: "var(--font-archivo), 'Helvetica Neue', Arial, sans-serif"
-    fontSize: "48px"
+    fontSize: "72px"
     fontWeight: 300
     lineHeight: 1.0
     letterSpacing: "-0.012em"
   headline:
     fontFamily: "var(--font-archivo), 'Helvetica Neue', Arial, sans-serif"
-    fontSize: "38px"
+    fontSize: "60px"
     fontWeight: 300
     lineHeight: 1.08
     letterSpacing: "-0.012em"
   title:
     fontFamily: "var(--font-archivo), 'Helvetica Neue', Arial, sans-serif"
-    fontSize: "24px"
+    fontSize: "34px"
     fontWeight: 300
     lineHeight: 1.15
     letterSpacing: "-0.01em"
   subtitle:
     fontFamily: "var(--font-archivo), 'Helvetica Neue', Arial, sans-serif"
-    fontSize: "20px"
+    fontSize: "23px"
     fontWeight: 300
     lineHeight: 1.3
   emphasis:
@@ -63,12 +63,12 @@ typography:
     letterSpacing: "0"
   body:
     fontFamily: "var(--font-archivo), 'Helvetica Neue', Arial, sans-serif"
-    fontSize: "17px"
+    fontSize: "16px"
     fontWeight: 400
     lineHeight: 1.62
   small:
     fontFamily: "var(--font-archivo), 'Helvetica Neue', Arial, sans-serif"
-    fontSize: "14px"
+    fontSize: "15px"
     fontWeight: 400
     lineHeight: 1.55
   caption:
@@ -144,8 +144,8 @@ Isthmus Meridian reads as deep navy under instrument light. The ground is
 near-black blue; the structure is drawn in hairlines; the one confident sky
 blue does all the emphasis work; and warmth enters only as a serif italic —
 never as a colour. Surfaces are glass rather than paper: they refract what is
-behind them instead of sitting on top of it, which is what keeps a dense
-investor slide from reading as a dashboard.
+behind them instead of sitting on top of it. But surfaces are rare: the
+default is type on ground with nothing between them.
 
 The lineage is Swiss in its discipline — mathematical spacing, hierarchy over
 ornament, asymmetric calm — but it is not austere. Type is set light and large,
@@ -153,8 +153,8 @@ whitespace is generous, and the meridian field runs behind the whole thing.
 
 **Key characteristics**
 
-- Dark-primary and single-theme. There is no light mode on the deck surface;
-  the site carries a paper variant for alternating screens, nothing more.
+- Dark-primary, with a paper counterpart. Screens alternate navy and
+  `#edf2f7` — on the site and in the deck — so the argument breathes.
 - **Two families, one voice.** Archivo does the structural work; Source Serif 4
   italic carries emphasis. This is the signature and it is not optional.
 - One accent blue. Everything else is ground, ink, or hairline.
@@ -203,13 +203,15 @@ navy reads muddy.
 **Emphasis:** Source Serif 4 (variable on `opsz`), italic, weight 500.
 
 Source Serif 4 being variable on optical size is why there is exactly one
-serif: the same family retunes itself from a 17px inline italic to a 68px
+serif: the same family retunes itself from a 16px inline italic to a 92px
 wordmark, so the old display/text split is unnecessary.
 
 ### The ramp
-`10 · 11 · 12 · 13 · 14 · 15 · 17 · 20 · 24 · 38 · 48 · 68`
+`10 · 11 · 12 · 13 · 15 · 16 · 19 · 23 · 34 · 46 · 60 · 72 · 92`
 
-Twelve steps, and a value off the ramp is a bug. On the marketing site these
+Thirteen steps, and a value off the ramp is a bug. The top of the scale is wide
+because this system sets display type large: a screen heading is 60, a serif
+statement is 72, and the hero wordmark is 92. On the marketing site these
 resolve through `clamp()` against the viewport; on the 1280×720 slide canvas
 they are literal pixels.
 
@@ -217,6 +219,10 @@ they are literal pixels.
 **The Serif-Italic Rule.** Emphasis inside a heading is *always* Source Serif 4
 italic in sky. Never a bolder sans, never a colour change alone, never a second
 grotesque. This is the single most recognisable thing about the brand.
+
+**The Whole-Phrase Rule.** That emphasis is a *phrase*, usually on its own line
+— "most AI companies *already solved.*" — not one accented word. A single
+italic word reads as a typo; a full italic line reads as the brand.
 
 **The Light-Heading Rule.** Headings are weight 300 with `-0.012em` tracking.
 Hierarchy comes from size and the serif accent, not from weight.
@@ -227,6 +233,15 @@ and the wordmark (`0.10em`). Everything else sits normal-to-tight.
 **Measure.** Body copy caps at 62–75ch; a slide title caps at 26ch.
 
 ## Layout
+
+**One idea per screen, and roughly half the canvas stays empty.** This is the
+hardest rule to keep and the one that most defines the work. Evidence sits on a
+single hairline rail with glowing nodes and columns beneath it — never a grid
+of cards, which is what airless decks reach for. If a screen needs two ideas it
+is two screens.
+
+**The meridian arc sweeps the left edge of every screen.** It owns the left
+fifth, which is why content indents rather than starting at the margin.
 
 Two reference frames:
 
