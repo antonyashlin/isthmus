@@ -21,9 +21,6 @@ export function Nav() {
         <a href="#company">Company</a>
       </div>
       <div className="nav-cta">
-        <a className="btn btn-ghost btn-sm" href="/deck">
-          Explore our deck
-        </a>
         <a className="btn btn-glass btn-sm liquid-glass" href="#company">
           Reach out to us
         </a>

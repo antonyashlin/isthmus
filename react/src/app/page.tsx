@@ -182,17 +182,15 @@ export default function Home() {
             <h2 className="blk-head h-lg clear-arc reveal">
               Running a fund takes more than an <span className="serif-i">investment team</span>.
             </h2>
-            <p className="blk-desc body reveal">
-              Today, most firms do one of three things.
-            </p>
+            {/* Subheading and coda are one sentence split around the routes:
+                "Three ways most funds are built … and none of them fit." The
+                reader meets each option before it is dismissed. */}
+            <p className="blk-desc blk-sub reveal">Three ways most funds are built</p>
             <div className="blk-viz">
               <div className="viz-plate">
                 <ApproachRoutes />
-                {/* The punchline lands after the three routes, not inside the
-                    lede — the reader should meet each option before it is
-                    dismissed. */}
-                <p className="routes-coda reveal">And none of them fit.</p>
               </div>
+              <p className="routes-coda reveal">and none of them fit.</p>
             </div>
           </div>
         </section>
@@ -330,14 +328,35 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 12 — trust & oversight / sign-off flow (light) · B: flow leads, desc, heading below */}
+        {/* 12 — trust & oversight / sign-off flow (light) · B: flow leads, desc, heading below
+            A four-step flow and four proof cards cannot share a 9:16 viewport,
+            so on mobile this becomes two screens: the sign-off flow here, the
+            proof points on 12b. Both render; CSS picks which pair is live. */}
         <section className="sec slide-sec light">
           <div className="slide lay-b">
             <h2 className="blk-head h-lg reveal">Nothing reaches your desk without a <span className="serif-i">sign-off</span>.</h2>
-            <p className="blk-desc body reveal">Every deliverable is AI-drafted, bench-reviewed, and approved by your team before it reaches an IC or an LP. Client work is segregated by design, covered by NDA, and handled under a SOC 2 Type II audit currently in progress.</p>
+            <p className="blk-desc body reveal">
+              Every deliverable is AI-drafted, bench-reviewed, and approved by your team before it reaches an IC or an LP.
+              <span className="wide-only-i"> Client work is segregated by design, covered by NDA, and handled under a SOC 2 Type II audit currently in progress.</span>
+            </p>
             <div className="blk-viz">
               <div className="viz-plate">
                 <SignOffFlow />
+                <div className="wide-only">
+                  <TrustBadges />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 12b — the proof points, mobile only */}
+        <section className="sec slide-sec narrow-only">
+          <div className="slide lay-a">
+            <h2 className="blk-head h-lg reveal">And it is handled <span className="serif-i">under guard</span>.</h2>
+            <p className="blk-desc body reveal">Client work is segregated by design, covered by NDA, and handled under a SOC 2 Type II audit currently in progress.</p>
+            <div className="blk-viz">
+              <div className="viz-plate">
                 <TrustBadges />
               </div>
             </div>

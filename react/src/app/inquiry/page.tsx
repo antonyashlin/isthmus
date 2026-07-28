@@ -22,18 +22,23 @@ const TYPES = [
 const INBOX = "info@isthmusmeridian.com";
 
 export default function Inquiry() {
+  const [who, setWho] = useState("");
   const [type, setType] = useState<string>(TYPES[0]);
   const [note, setNote] = useState("");
   const [touched, setTouched] = useState(false);
 
   const empty = note.trim().length === 0;
+  const noWho = who.trim().length === 0;
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     setTouched(true);
-    if (empty) return;
-    const subject = encodeURIComponent(`Inquiry — ${type}`);
-    const body = encodeURIComponent(note.trim());
+    if (empty || noWho) return;
+    // The subject carries who it is from, so the inbox can triage without
+    // opening anything; the name repeats in the body because some clients
+    // truncate long subjects.
+    const subject = encodeURIComponent(`Inquiry — ${type} — ${who.trim()}`);
+    const body = encodeURIComponent(`${who.trim()}\n\n${note.trim()}`);
     window.location.href = `mailto:${INBOX}?subject=${subject}&body=${body}`;
   };
 
@@ -54,6 +59,28 @@ export default function Inquiry() {
         </p>
 
         <form className="form liquid-glass" noValidate onSubmit={submit}>
+          <label className="field" htmlFor="inq-who">
+            <span className="field-label">Name and organisation</span>
+            <input
+              aria-describedby={touched && noWho ? "inq-who-error" : undefined}
+              aria-invalid={touched && noWho}
+              autoComplete="organization"
+              className="field-input"
+              id="inq-who"
+              name="who"
+              onChange={(e) => setWho(e.target.value)}
+              placeholder="Jordan Reyes · Meridian Partners"
+              type="text"
+              value={who}
+            />
+          </label>
+
+          {touched && noWho ? (
+            <p className="field-error" id="inq-who-error" role="alert">
+              Tell us who you are so we can reply.
+            </p>
+          ) : null}
+
           <label className="field" htmlFor="inq-type">
             <span className="field-label">Type of inquiry</span>
             <select

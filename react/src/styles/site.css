@@ -558,13 +558,20 @@ html.js .funnel{opacity:0}
 .badge-label{font-family:var(--sans);font-weight:500;font-size:13.5px;letter-spacing:-0.005em;color:var(--heading)}
 .badge-note{font-size:12px;line-height:1.44;color:var(--tx-2)}
 
-/* The coda under the three routes — the sentence that dismisses all of them.
-   Serif italic at the heading's weight so it reads as the slide's conclusion
-   rather than a caption. */
+/* The three-routes screen sets one sentence across its evidence:
+   "Three ways most funds are built … and none of them fit."
+   The opening half sits above the routes as a sans subheading; the closing
+   half sits below them in serif italic, which is where the brand puts every
+   emphasis. Both are the same size so they read as one line interrupted. */
+.blk-sub{font-weight:300;font-size:clamp(26px,3.3vw,44px);line-height:1.15;
+  letter-spacing:-0.012em;color:var(--heading);max-width:none;text-wrap:nowrap}
 .routes-coda{margin:clamp(26px,3.2vh,40px) 0 0;font-family:var(--serif);font-style:italic;
-  font-weight:400;font-size:clamp(26px,3.1vw,40px);line-height:1.1;letter-spacing:-0.01em;
-  color:var(--heading)}
-@media (max-width:760px){ .routes-coda{font-size:clamp(22px,6.4vw,28px);margin-top:24px} }
+  font-weight:400;font-size:clamp(26px,3.3vw,44px);line-height:1.15;letter-spacing:-0.01em;
+  color:var(--accent-ink)}
+@media (max-width:760px){
+  .blk-sub{font-size:clamp(22px,6.1vw,28px);text-wrap:balance}
+  .routes-coda{font-size:clamp(22px,6.1vw,28px);margin-top:22px}
+}
 
 /* ---- interactive liquid glass (offers + metrics) ----
    The Kokonut card is a shadcn Card (flex column, overflow hidden); its only
@@ -924,4 +931,43 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
   .company-head{max-width:14ch;margin-top:44vh;margin-left:auto;text-align:right}
   .glassbar{padding:14px 20px;gap:10px}
   .contact{font-size:11.5px;gap:10px}
+}
+
+/* ---- viewport-scoped screens ----
+   The sign-off screen carries a four-step flow AND four proof cards. That fits
+   a 16:9 desktop screen and cannot fit a 9:16 phone, so on mobile it splits
+   into two snap screens. `display:none` removes a section from scroll-snap
+   entirely, so only one of each pair is ever live. */
+.narrow-only{display:none}
+.wide-only-i{display:inline}
+@media (max-width:760px){
+  .narrow-only{display:block}
+  .wide-only{display:none}
+  .wide-only-i{display:none}
+}
+
+/* ---- sign-off flow + proof cards on a phone ----
+   Four columns on a 390px screen gave one word per line. Both patterns go
+   vertical: the flow becomes a left-rail timeline, the cards a 2-up grid. */
+@media (max-width:760px){
+  .soflow{grid-template-columns:1fr;gap:26px;margin-top:var(--stack)}
+  .soflow-track{top:10px;bottom:10px;left:7px;right:auto;width:1.5px;height:auto;
+    background:linear-gradient(180deg,var(--deep),var(--steel) 50%,var(--sky))}
+  .sostep{padding:0 0 0 34px}
+  .sodot{top:2px;left:0}
+  .sok{margin-top:0;font-size:19px}
+  .sostep p{max-width:none;margin-top:8px}
+
+  /* SignOffFlow already measures and animates on the cross axis below 760px
+     (`vertical` in the component), so the packet travels DOWNWARDS on its own.
+     These only re-aim the two elements onto the vertical rail: the fill grows
+     as height from the container top, and the packet is positioned by a `y`
+     transform, so both sit at top:0 and are centred on the rail by margin. */
+  .soflow-fill{top:0;left:7px;width:1.5px;height:0;
+    background:linear-gradient(180deg,var(--steel),var(--sky))}
+  .soflow-packet{top:0;left:7px;margin-top:-7.5px}
+
+  .badges{grid-template-columns:repeat(2,1fr);gap:12px;margin-top:22px}
+  .badge{padding:14px}
+  .badge-note{font-size:11.5px}
 }
