@@ -117,7 +117,7 @@ p{margin:0}
 /* ---- nav ---- */
 .nav{position:fixed;inset:0 0 auto 0;z-index:30;display:flex;align-items:center;justify-content:space-between;
   gap:24px;height:64px;padding:0 48px;background:rgba(4,10,16,0.42);
-  border-bottom:1px solid rgba(255,255,255,0.08)}
+  border-bottom:1px solid var(--line)}
 .brand{display:flex;align-items:center;gap:12px}
 .brand .wm{font-size:12px;letter-spacing:0.22em}
 .brand .wm b{font-weight:700;color:#fff}
