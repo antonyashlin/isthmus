@@ -120,38 +120,44 @@
   visibility: visible;
 }
 
-/* ---------------------------------------------------------------- the arc ---
- * The meridian sweeping the left edge. Faint, enormous, behind everything —
- * the site's signature and the reason content is indented.
+/* -------------------------------------------------------------- the field ---
+ * The site's hero meridian field, mirrored to sweep in from the right. Stroke
+ * and lamp colours are the site's; the geometry is lifted verbatim.
  */
-.fd-arc {
+.fd-field {
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 0;
 }
-.fd-arc svg {
+.fd-field svg {
   width: 100%;
   height: 100%;
 }
-.fd-arc .arc-line {
+.fd-field-g,
+.fd-field-g circle,
+.fd-field-g path,
+line.fd-field-g {
   fill: none;
   stroke: var(--mer);
+  stroke-width: 1;
   vector-effect: non-scaling-stroke;
 }
-/* A soft companion stroke under the sharp one, so the arc reads as light
-   rather than as a hairline. Rasterised once — it never animates. */
-.fd-arc .arc-glow {
-  fill: none;
-  stroke: var(--mer);
-  filter: blur(3px);
-  vector-effect: non-scaling-stroke;
+/* The lamp is filled, not stroked — the stroke rule above would outline it. */
+.fd-field .fd-lamp circle {
+  stroke: none;
+  fill: var(--mer);
 }
-/* A travelling light on the arc. Pure CSS offset-path, so it costs nothing
-   and never reads the layout — the fix the site landed on for scroll jitter. */
+.fd-field .lp-3 { opacity: 0.1; }
+.fd-field .lp-2 { opacity: 0.22; }
+.fd-field .lp-1 { opacity: 0.55; }
+.fd-field .lp-0 { opacity: 1; fill: var(--heading); }
+
+/* Pure CSS offset-path — no per-frame layout read, which is the fix the site
+   landed on after the travelling lights were measured as the jitter source. */
 .fd-lamp {
   offset-rotate: 0deg;
-  animation: fdRun 16s linear infinite;
+  animation: fdRun 22s linear infinite;
   will-change: transform;
 }
 @keyframes fdRun {
@@ -166,7 +172,7 @@
 .fd-eyebrow {
   position: absolute;
   top: 56px;
-  left: 300px;
+  left: 96px;
   z-index: 2;
   display: flex;
   align-items: center;
@@ -183,7 +189,7 @@
 
 .fd-page {
   position: absolute;
-  right: 64px;
+  right: 48px;
   bottom: 48px;
   z-index: 2;
   font-size: 11px;
@@ -200,8 +206,8 @@
 .fd-body {
   position: absolute;
   top: 118px;
-  left: 300px;
-  right: 96px;
+  left: 96px;
+  right: 210px;
   bottom: 92px;
   z-index: 1;
   display: flex;
@@ -421,8 +427,8 @@
 .fd-cover-h {
   position: absolute;
   top: 128px;
-  left: 300px;
-  right: 96px;
+  left: 96px;
+  right: 300px;
   z-index: 1;
   font-size: 34px;
   font-weight: 300;
@@ -436,10 +442,10 @@
 /* The wordmark, huge, bottom-right — exactly the site's hero lockup. */
 .fd-lockup {
   position: absolute;
-  right: 84px;
-  bottom: 96px;
+  left: 96px;
+  bottom: 92px;
   z-index: 1;
-  text-align: right;
+  text-align: left;
   line-height: 0.92;
 }
 .fd-lockup .lk-1 {
@@ -462,7 +468,7 @@
 
 .fd-cover-meta {
   position: absolute;
-  left: 300px;
+  left: 96px;
   top: 258px;
   z-index: 1;
   display: flex;

@@ -48,28 +48,53 @@ const ROMAN = [
   "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII",
 ];
 
-/* -------------------------------------------------------------- the arc */
-
-const ARC_A = "M 470 -180 A 620 620 0 0 0 470 900";
-const ARC_B = "M 372 -180 A 548 548 0 0 0 372 900";
-const RAY = "M -40 640 L 560 -60";
+/* -------------------------------------------------------------- the field */
 
 /**
- * The meridian sweeping the left edge — the site's signature, and the reason
- * every slide indents its content to 300px.
+ * The hero's meridian field, mirrored.
+ *
+ * These are the site's own paths, lifted verbatim from
+ * `components/site/globe-markup.ts` — the globe outline, its four meridian
+ * arcs at descending opacity, and the straight ray. The site's viewBox is
+ * 1200x2025 and the hero occupies its first third, so the deck frames
+ * `0 0 1200 675` to land on exactly the hero crop.
+ *
+ * The whole thing is then mirrored on X. The site sweeps in from the left; the
+ * deck sweeps in from the right, which frees the left margin for the heading
+ * and keeps the two surfaces from looking like the same screen twice.
  */
-function Arc() {
+const GLOBE_ROT = "rotate(-14 302 -431)";
+const MERIDIANS: Array<[d: string, o: string]> = [
+  ["M -407 -431 A 709 700.3 0 0 1 1011 -431 A 709 700.3 0 0 1 -407 -431", "0.5"],
+  ["M -407 -431 A 709 674.3 0 0 1 1011 -431 A 709 674.3 0 0 1 -407 -431", "0.2"],
+  ["M -407 -431 A 709 631.7 0 0 1 1011 -431 A 709 631.7 0 0 1 -407 -431", "0.08"],
+  ["M -407 -431 A 709 573.6 0 0 1 1011 -431 A 709 573.6 0 0 1 -407 -431", "0.032"],
+];
+/** The lamp rides the brightest meridian, as it does on the site. */
+const LAMP_TRACK = MERIDIANS[0][0];
+
+function Field() {
   return (
-    <div aria-hidden="true" className="fd-arc">
-      <svg preserveAspectRatio="none" viewBox="0 0 1280 720">
-        <path className="arc-glow" d={ARC_A} strokeOpacity="0.34" strokeWidth="3" />
-        <path className="arc-line" d={ARC_A} strokeOpacity="0.72" strokeWidth="1" />
-        <path className="arc-line" d={ARC_B} strokeOpacity="0.3" strokeWidth="1" />
-        <path className="arc-line" d={RAY} strokeOpacity="0.2" strokeWidth="1" />
-        <g className="fd-lamp" style={{ offsetPath: `path("${ARC_A}")` }}>
-          <circle fill="var(--mer)" fillOpacity="0.16" r="9" />
-          <circle fill="var(--mer)" fillOpacity="0.4" r="4.4" />
-          <circle fill="var(--mer)" r="1.8" />
+    <div aria-hidden="true" className="fd-field">
+      <svg
+        preserveAspectRatio="xMidYMid slice"
+        viewBox="0 0 1200 675"
+      >
+        {/* mirror: flip on X about the viewBox centre */}
+        <g transform="translate(1200 0) scale(-1 1)">
+          <g className="fd-field-g" transform={GLOBE_ROT}>
+            <circle cx="302" cy="-431" r="709" strokeOpacity="0.8" />
+            {MERIDIANS.map(([d, o]) => (
+              <path d={d} key={d} strokeOpacity={o} />
+            ))}
+            <g className="fd-lamp" style={{ offsetPath: `path("${LAMP_TRACK}")` }}>
+              <circle className="lp-3" r="9" />
+              <circle className="lp-2" r="5.4" />
+              <circle className="lp-1" r="2.6" />
+              <circle className="lp-0" r="1.3" />
+            </g>
+          </g>
+          <line className="fd-field-g" x1="-180" x2="1300" y1="560" y2="70" />
         </g>
       </svg>
     </div>
@@ -104,7 +129,7 @@ function Screen({
 }) {
   return (
     <>
-      <Arc />
+      <Field />
       {eyebrow ? (
         <div className="fd-eyebrow">
           <span>{ROMAN[index]}</span>
@@ -218,7 +243,7 @@ function useOnActive(active: boolean, run: (el: HTMLElement) => () => void) {
 
 const Cover: SlideFn = () => (
   <>
-    <Arc />
+    <Field />
     <h1 className="fd-rise fd-cover-h">
       {DECK.proposition} <span className="serif-i">{DECK.propositionAccent}</span>
     </h1>
@@ -729,7 +754,7 @@ const Ask: SlideFn = ({ index, total }) => (
 
 const Closing: SlideFn = () => (
   <>
-    <Arc />
+    <Field />
     <div className="fd-body" style={{ justifyContent: "center" }}>
       <p className="fd-rise fd-statement">
         The crossing, and the <span className="hi">line you cross it by.</span>
@@ -741,7 +766,7 @@ const Closing: SlideFn = () => (
         <div>
           <div className="fd-label">Structure</div>
           <div style={{ fontSize: 15, color: "var(--tx-2)", marginTop: 8 }}>
-            Delaware · Abu Dhabi
+            Delaware · Dubai
           </div>
         </div>
         <div>

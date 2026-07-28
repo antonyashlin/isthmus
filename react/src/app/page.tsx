@@ -183,11 +183,15 @@ export default function Home() {
               Running a fund takes more than an <span className="serif-i">investment team</span>.
             </h2>
             <p className="blk-desc body reveal">
-              Every firm needs financial models, diligence, investor materials, reporting, research, portfolio monitoring, data management, and operational coordination. Today that work is built three ways, and none of them fit.
+              Today, most firms do one of three things.
             </p>
             <div className="blk-viz">
               <div className="viz-plate">
                 <ApproachRoutes />
+                {/* The punchline lands after the three routes, not inside the
+                    lede — the reader should meet each option before it is
+                    dismissed. */}
+                <p className="routes-coda reveal">And none of them fit.</p>
               </div>
             </div>
           </div>

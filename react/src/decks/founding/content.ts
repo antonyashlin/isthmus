@@ -36,7 +36,7 @@ export const DECK = {
   propositionAccent: "rebuilt as an AI company.",
   classification: "FOUNDING-PARTNER OPPORTUNITY",
   confidential: "CONFIDENTIAL",
-  place: "DELAWARE · ABU DHABI",
+  place: "DELAWARE · DUBAI",
   date: "JULY 2026",
   /** REF — cover footer and closing line */
   tagline: "The crossing, and the line you cross it by.",
@@ -298,16 +298,16 @@ export const MARKET = {
  * REVISED from the reference deck's slide IX, at the client's instruction.
  *
  * The reference deck puts the IP-owning parent in Dubai with an India delivery
- * centre. This proposes Delaware as the parent and ADGM as a subsidiary that
+ * centre. This proposes Delaware as the parent and DIFC as a subsidiary that
  * follows. That is a genuine reversal of where IP sits, so the counter-argument
  * ships on the slide rather than in a footnote.
  */
 export const STRUCTURE = {
   eyebrow: "DEFENSIBLE BY DESIGN",
   title: "Delaware first.",
-  titleAccent: "Abu Dhabi shortly after.",
+  titleAccent: "Dubai shortly after.",
   lede:
-    "A US parent matches the near-term counterparty and the standard instruments. The Gulf entity follows for the corridor, the cost base and the client-facing lane.",
+    "A US parent matches the near-term counterparty and the standard instruments. The Gulf entity follows for the corridor, the client-facing lane and proximity to the capital.",
   tree: {
     parent: {
       key: "us",
@@ -319,9 +319,9 @@ export const STRUCTURE = {
     children: [
       {
         key: "adgm",
-        label: "ADGM entity",
+        label: "DIFC entity",
         role: "Client-facing · Gulf & CIS",
-        note: "English common law, free-zone regime, on the corridor.",
+        note: "English common law, the deepest private-markets ecosystem in the Gulf.",
         timing: "+6–9 MONTHS",
       },
       {
@@ -381,16 +381,16 @@ export const CORRIDOR = {
     { key: "calgary", label: "Calgary", note: "Customer zero", coord: [-114.07, 51.05], kind: "client" },
     { key: "delaware", label: "Delaware", note: "Parent · IP", coord: [-75.53, 39.16], kind: "parent" },
     { key: "london", label: "London", note: "Capital", coord: [-0.13, 51.51], kind: "client" },
-    { key: "adgm", label: "Abu Dhabi", note: "ADGM entity", coord: [54.37, 24.45], kind: "hub" },
+    { key: "difc", label: "Dubai", note: "DIFC entity", coord: [55.28, 25.2], kind: "hub" },
     { key: "bengaluru", label: "Bengaluru", note: "Delivery", coord: [77.59, 12.97], kind: "delivery" },
     { key: "almaty", label: "Almaty", note: "CIS deal flow", coord: [76.89, 43.24], kind: "market" },
   ],
   routes: [
     ["calgary", "delaware"],
     ["london", "delaware"],
-    ["delaware", "adgm"],
-    ["adgm", "bengaluru"],
-    ["almaty", "adgm"],
+    ["delaware", "difc"],
+    ["difc", "bengaluru"],
+    ["almaty", "difc"],
   ],
   legend: [
     { kind: "parent", label: "Parent entity" },
@@ -421,7 +421,7 @@ export const ROADMAP = {
     },
     {
       when: "MONTH 6–9",
-      title: "ADGM entity live",
+      title: "DIFC entity live",
       body: "Client-facing contracting moves to the Gulf; delivery bench begins hiring.",
     },
     {
@@ -488,7 +488,7 @@ export const RISKS = {
     {
       risk: "Cross-border structure and delivery",
       body: "A three-jurisdiction structure carries transfer-pricing, permanent-establishment and data-residency exposure.",
-      mitigation: "Counsel engaged before the ADGM entity, not after.",
+      mitigation: "Counsel engaged before the DIFC entity, not after.",
     },
   ],
 };

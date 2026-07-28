@@ -458,7 +458,7 @@ export function CorridorMap({ active }: { active: boolean }) {
   return (
     <EChart
       active={active}
-      alt="Corridor map: capital and clients in North America and London, the client-facing entity in Abu Dhabi, delivery in Bengaluru, frontier deal flow from Almaty."
+      alt="Corridor map: capital and clients in North America and London, the client-facing entity in Dubai, delivery in Bengaluru, frontier deal flow from Almaty."
       build={build}
     />
   );
