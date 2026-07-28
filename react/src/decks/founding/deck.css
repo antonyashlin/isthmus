@@ -353,7 +353,7 @@ line.fd-field-g {
 .fd-panel {
   position: relative;
   border: 1px solid var(--line);
-  border-radius: 22px;
+  border-radius: 26px;
   background: color-mix(in srgb, var(--panel) 58%, transparent);
   padding: 38px 42px;
   box-sizing: border-box;
@@ -522,8 +522,8 @@ line.fd-field-g {
   transition: background 0.16s var(--ease);
 }
 .fdeck-dot[data-on="true"] {
-  background: #88c1ed;
-  box-shadow: 0 0 10px 0 rgba(136, 193, 237, 0.8);
+  background: var(--sky);
+  box-shadow: 0 0 10px 0 color-mix(in srgb, var(--sky) 80%, transparent);
 }
 
 .fdeck-count {

@@ -25,6 +25,17 @@ colors:
   line: "rgba(255,255,255,0.10)"
   line-2: "rgba(255,255,255,0.18)"
   line-3: "rgba(136,193,237,0.24)"
+  paper-bg: "#edf2f7"
+  paper-heading: "#06121e"
+  paper-text: "#0d1c2b"
+  paper-text-2: "rgba(13,28,43,0.66)"
+  paper-text-3: "rgba(13,28,43,0.46)"
+  paper-panel: "#ffffff"
+  paper-accent-ink: "#2f628a"
+  paper-mer: "#4686b7"
+  paper-line: "rgba(13,28,43,0.12)"
+  paper-line-2: "rgba(13,28,43,0.22)"
+  paper-line-3: "rgba(70,134,183,0.32)"
 typography:
   wordmark:
     fontFamily: "var(--font-archivo), 'Helvetica Neue', Arial, sans-serif"
@@ -185,6 +196,18 @@ only red, for genuine negatives.
 `bg #04101c` → `panel #0b0f14` → `card #080d13`, with the ink ramp running
 `heading #ffffff` → `text 94%` → `text-2 62%` → `text-3 42%`. Body copy sits at
 `text-2`; captions, eyebrows and sources step to `text-3`.
+
+### The paper counterpart
+Alternating screens invert to `paper-bg #edf2f7` with the ramp running
+`paper-heading #06121e` → `paper-text` → 66% → 46%. The accent darkens to
+`paper-accent-ink #2f628a` and the meridian to `paper-mer #4686b7`, because sky
+at full strength disappears on paper.
+
+**Same token names, re-bound.** A component never branches on theme in JS: it
+reads `--heading`, `--tx-2`, `--accent-ink`, and the ground supplies the right
+values. The Bklit and ECharts layers resolve those off their container, so a
+chart re-themes itself when it lands on a paper screen with no extra wiring.
+Screens alternate; a tone change mid-sequence is what marks a new beat.
 
 ### Named rules
 **The One Voice Rule.** Sky carries emphasis and nothing competes. More than
