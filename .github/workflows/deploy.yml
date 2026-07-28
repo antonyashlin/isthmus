@@ -1,9 +1,14 @@
-name: Deploy to Hostinger
+name: Deploy to Cloudflare Pages
 
-# Push to main -> build the static export -> upload it to public_html.
-# Hostinger's own Git integration only pulls repo files; it never runs a build,
-# which a Next.js site needs. So the build happens here and only the built
-# output is shipped.
+# Push to main -> build the static export -> publish it to Cloudflare Pages.
+#
+# The site is a Next.js static export, so the build has to happen somewhere;
+# Pages' own git integration would need the build configured on its side, and
+# doing it here keeps the build identical to the one run locally.
+#
+# Replaces an earlier Hostinger FTP workflow. The domain is served by
+# Cloudflare Pages, so that workflow was deploying to a host nothing pointed
+# at — and failing on every push because its FTP secrets were never set.
 
 on:
   push:
@@ -14,10 +19,9 @@ on:
   workflow_dispatch: # lets you redeploy by hand from the Actions tab
 
 concurrency:
-  # A second push while one deploy is mid-upload would interleave two file sets
-  # in public_html. Queue instead, and never cancel a run that is already
-  # uploading — a half-uploaded site is worse than a slightly stale one.
-  group: hostinger-deploy
+  # A second push while one deploy is uploading would interleave two file sets.
+  # Queue instead, and never cancel a run that is already publishing.
+  group: pages-deploy
   cancel-in-progress: false
 
 jobs:
@@ -44,25 +48,12 @@ jobs:
         working-directory: react
         run: npm run build
 
-      - name: Guard — refuse to deploy an empty build
-        run: |
-          test -f react/out/index.html || { echo "::error::no index.html in out/"; exit 1; }
-          test -d react/out/_next     || { echo "::error::no _next/ in out/";     exit 1; }
-          echo "out/ contains $(find react/out -type f | wc -l) files"
-
-      - name: Upload to Hostinger
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      - name: Publish to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
         with:
-          server: ${{ secrets.HOSTINGER_FTP_HOST }}
-          username: ${{ secrets.HOSTINGER_FTP_USER }}
-          password: ${{ secrets.HOSTINGER_FTP_PASSWORD }}
-          protocol: ftps
-          local-dir: ./react/out/
-          server-dir: ./public_html/
-          # Mirrors out/ into public_html, deleting files that no longer exist
-          # in the build. Anything you keep on the server by hand and want to
-          # survive a deploy must be excluded here.
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: >-
+            pages deploy react/out
+            --project-name=isthmus-meridian
+            --branch=main
