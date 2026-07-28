@@ -681,9 +681,16 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
   .hero,.sec{height:auto;min-height:calc(100vw * 16 / 9);overflow:hidden}
   .sec{display:flex;justify-content:center;padding:0}
   .sec.slide-sec{padding:0}
-  .hero{padding:92px 22px 40px}
-  .hero-inner{height:auto;min-height:calc(100vw * 16 / 9 - 132px)}
-  .hero-tag{font-size:clamp(20px,5.6vw,26px)}
+  .hero{padding:84px 22px 40px}
+  /* the lockup moves up out of a space-between and sits just under the tagline,
+     leaving the lower half of the panel to the meridian field */
+  .hero-inner{height:auto;min-height:calc(100vw * 16 / 9 - 124px);
+    justify-content:flex-start;gap:clamp(28px,7vh,64px)}
+  .hero-top{max-width:none}
+  .hero-tag{font-family:var(--serif);font-style:normal;
+    font-size:clamp(15px,4.1vw,19px);line-height:1.5;letter-spacing:0;
+    text-align:left;color:var(--tx-2)}
+  .hero-bottom{margin-top:0}
   .wordmark .w-isth{font-size:clamp(44px,13vw,62px)}
   .wordmark .w-mer{font-size:clamp(40px,11.6vw,56px)}
 
@@ -718,17 +725,24 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
   .rings{grid-template-columns:1fr;justify-items:center}
   .rings-key{width:100%}
   .funnel-on-light .chart-block > div:first-child{padding-inline:34px}
-  /* three stacked dials blew the panel by 744px — read them as rows instead */
-  .dials{gap:6px}
-  .dial{display:grid;grid-template-columns:106px minmax(0,1fr);gap:12px;
-    align-items:center;text-align:left;padding:6px 0}
-  .dial > div:first-child{grid-row:1 / span 2}
-  .dial-label{margin-top:0;font-size:14px}
-  .dial-note{margin-top:3px;font-size:11.5px;max-width:none;opacity:1;transform:none}
-  .switches{max-width:none}
-  .cs-head,.cs-row{grid-template-columns:minmax(0,1fr) 54px minmax(0,1fr);gap:10px;padding:9px 8px}
-  .cs-no{font-size:12.5px}
-  .cs-yes{font-size:15px}
+  /* two up, one centred beneath — a triangle, each dial with its label under it
+     and far bigger than the row layout allowed */
+  .dials{grid-template-columns:1fr 1fr;gap:20px 12px;justify-items:center}
+  .dial{display:flex;flex-direction:column;align-items:center;text-align:center;
+    width:100%;padding:0}
+  .dial:last-child{grid-column:1 / -1;max-width:58%}
+  .dial-label{margin-top:10px;font-size:14.5px}
+  .dial-note{margin-top:5px;font-size:11.5px;max-width:24ch;opacity:1;transform:none}
+  /* each switch gets its own card, two per row — the three-column row layout
+     wasted most of the width on a phone */
+  .switches{grid-template-columns:1fr 1fr;gap:10px;max-width:none}
+  .cs-head{display:none}
+  .cs-row{display:flex;flex-direction:column;align-items:stretch;gap:9px;
+    grid-template-columns:none;background:var(--card);
+    border:1px solid var(--line);border-radius:12px;padding:13px 12px}
+  .cs-no{text-align:left;font-size:11.5px}
+  .cs-track{width:100%}
+  .cs-yes{font-size:15px;line-height:1.2}
   .xp-cap{font-size:12.5px}
 
   /* the tree keeps its connectors; the percentage geometry scales, so only the
@@ -740,25 +754,30 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
   .tree-detail{height:auto;min-height:3.4em;font-size:13.5px;padding-top:10px}
 
   .journey{grid-template-columns:1fr;gap:22px 0}
-  /* three columns kept on purpose: the track, the dots and the travelling
-     packet are the illustration, and they only work laid out horizontally */
-  .flow{grid-template-columns:repeat(3,1fr);gap:0}
-  .flow-track{right:14%}
-  .fstep{padding:0 8px 0 0}
-  .fk{margin-top:34px;font-size:15px}
-  .fstep p{margin-top:8px;font-size:11.5px;max-width:none}
-  .fdot{width:12px;height:12px}
+  /* the rail turns vertical and the packet runs DOWN it (FlowDiagram measures
+     and animates on the cross axis below 760px) */
+  .flow{grid-template-columns:1fr;gap:26px 0;padding-left:30px}
+  .flow-track{top:6px;bottom:6px;left:7px;right:auto;width:1.5px;height:auto;
+    background:linear-gradient(180deg,var(--deep),var(--steel) 50%,var(--sky))}
+  .flow-fill{top:0;left:7px;margin-left:-0.75px;width:1.5px;height:0;
+    background:linear-gradient(180deg,var(--steel),var(--sky))}
+  .flow-packet{top:0;left:7px;margin-left:-7.5px;margin-top:-7.5px}
+  .fstep{position:relative;padding:0}
+  .fdot{left:-30px;top:2px;width:14px;height:14px}
+  .fk{margin-top:0;font-size:19px}
+  .fstep p{margin-top:7px;font-size:13.5px;max-width:none}
 
   /* Four panels overflowed their 9:16 bound (routes 225px, journey 237px,
      offers 91px, funnel 33px). On touch there is no hover, so the reveal-only
      copy is dead weight — drop it, and lay the repeated items out as compact
      rows instead of stacked cards. */
   /* full cards again: glyph, name, lede AND detail, with room around them */
-  .route{padding:20px 0 22px}
-  .rt-glyph{max-width:132px}
-  .rt-name{margin-top:14px;font-size:21px}
-  .rt-lede{margin-top:10px;font-size:14px}
-  .rt-detail{display:block;opacity:1;transform:none;margin-top:8px;font-size:13px}
+  .route{display:grid;grid-template-columns:94px minmax(0,1fr);
+    gap:16px;align-items:start;padding:18px 0 20px}
+  .rt-glyph{max-width:94px;margin-top:4px}
+  .rt-name{margin-top:0;font-size:19px}
+  .rt-lede{margin-top:8px;font-size:13.5px}
+  .rt-detail{display:block;opacity:1;transform:none;margin-top:7px;font-size:12.5px}
 
   /* the journey rail turns vertical rather than disappearing */
   .journey{position:relative;gap:22px 0}
@@ -782,7 +801,7 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
   .feat-tag{margin-bottom:10px}
 
   .lay-e .blk-viz .chart-block{padding-bottom:8px}
-  .company-head{max-width:none;text-align:left;margin-left:0}
+  .company-head{max-width:14ch;margin-top:44vh;margin-left:auto;text-align:right}
   .glassbar{padding:14px 20px;gap:10px}
   .contact{font-size:11.5px;gap:10px}
 }

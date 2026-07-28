@@ -29,7 +29,8 @@ const archivo = Archivo({
 // the dark ground without a weight bump.
 const sourceSerif = Source_Serif_4({
   subsets: ["latin", "latin-ext"],
-  style: "italic",
+  // roman as well as italic — the mobile hero tagline is set in upright serif
+  style: ["normal", "italic"],
   axes: ["opsz"],
   display: "swap",
   variable: "--font-serif",

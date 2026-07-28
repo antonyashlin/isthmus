@@ -1,6 +1,6 @@
 "use client";
 
-import { animate, createTimeline, utils } from "animejs";
+import { animate, type AnimationParams, createTimeline, utils } from "animejs";
 import { useEffect, useRef } from "react";
 
 /**
@@ -50,16 +50,26 @@ export function FlowDiagram() {
 
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    /** dot centres, in px from the track's left edge */
+    /* On mobile the rail is vertical and the packet travels DOWNWARDS, so the
+       whole thing is measured and animated on the cross axis instead. */
+    let vertical = matchMedia("(max-width:760px)").matches;
+    /** dot centres in px, along whichever axis the rail runs */
     let xs: number[] = [];
     const measure = () => {
-      const base = el.getBoundingClientRect().left;
+      vertical = matchMedia("(max-width:760px)").matches;
+      const box = el.getBoundingClientRect();
       xs = dots.map((d) => {
         const r = d.getBoundingClientRect();
-        return r.left + r.width / 2 - base;
+        return vertical
+          ? r.top + r.height / 2 - box.top
+          : r.left + r.width / 2 - box.left;
       });
     };
     measure();
+    const along = (v: number): AnimationParams =>
+      (vertical ? { y: v } : { x: v }) as AnimationParams;
+    const grow = (v: number): AnimationParams =>
+      (vertical ? { height: v, width: "1.5px" } : { width: v }) as AnimationParams;
 
     const light = (i: number) => {
       steps.forEach((s, j) => s.classList.toggle("lit", j === i));
@@ -67,13 +77,13 @@ export function FlowDiagram() {
 
     if (reduce) {
       light(1);
-      utils.set(packet, { x: xs[1] ?? 0, opacity: 1 });
-      utils.set(fill, { width: xs[1] ?? 0 });
+      utils.set(packet, { ...along(xs[1] ?? 0), opacity: 1 });
+      utils.set(fill, grow(xs[1] ?? 0));
       return;
     }
 
-    utils.set(packet, { x: xs[0] ?? 0 });
-    utils.set(fill, { width: xs[0] ?? 0 });
+    utils.set(packet, along(xs[0] ?? 0));
+    utils.set(fill, grow(xs[0] ?? 0));
 
     const tl = createTimeline({ loop: true, defaults: { ease: "inOut(2)" } });
     for (let i = 0; i < xs.length; i++) {
@@ -81,16 +91,15 @@ export function FlowDiagram() {
       const to = xs[i] ?? 0;
       // the first leg of each lap restarts from the left rather than sliding back
       const jump = i === 0;
+      const move = (vertical
+        ? { y: jump ? [to, to] : [from, to] }
+        : { x: jump ? [to, to] : [from, to] }) as AnimationParams;
       tl.add(packet, {
-        x: jump ? [to, to] : [from, to],
+        ...move,
         opacity: jump ? [0, 1] : 1,
         duration: jump ? 260 : TRAVEL,
         onBegin: () => light(i),
-      }).add(
-        fill,
-        { width: to, duration: jump ? 260 : TRAVEL },
-        jump ? "<<" : "<<"
-      );
+      }).add(fill, { ...grow(to), duration: jump ? 260 : TRAVEL }, "<<");
       // land: the waypoint takes the hit, then settles
       tl.add(dots[i] as HTMLElement, {
         scale: [1, 1.55, 1],
@@ -103,8 +112,8 @@ export function FlowDiagram() {
     const enter = (i: number) => () => {
       tl.pause();
       light(i);
-      animate(packet, { x: xs[i] ?? 0, duration: 420, ease: "out(3)" });
-      animate(fill, { width: xs[i] ?? 0, duration: 420, ease: "out(3)" });
+      animate(packet, { ...along(xs[i] ?? 0), duration: 420, ease: "out(3)" });
+      animate(fill, { ...grow(xs[i] ?? 0), duration: 420, ease: "out(3)" });
     };
     const leave = () => tl.play();
 
