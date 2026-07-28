@@ -727,7 +727,7 @@
   height: 10px;
   margin: -5px 0 0 -5px;
   border-radius: 50%;
-  background: radial-gradient(circle, #fff 0%, var(--sky) 52%, transparent 74%);
+  background: radial-gradient(circle, var(--heading) 0%, var(--sky) 52%, transparent 74%);
   box-shadow: 0 0 18px 4px color-mix(in srgb, var(--sky) 52%, transparent);
   offset-distance: var(--t, 0%);
   offset-rotate: 0deg;
@@ -971,7 +971,7 @@
   border-radius: 999px;
   font-size: 14px;
   font-weight: 500;
-  color: #fff;
+  color: var(--heading);
   background: color-mix(in srgb, var(--sky) 24%, transparent);
   border: 1px solid color-mix(in srgb, var(--sky) 34%, transparent);
 }
