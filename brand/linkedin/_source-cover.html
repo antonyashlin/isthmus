@@ -1,0 +1,71 @@
+<link rel="stylesheet" href="/_next/static/chunks/23i4qkslrhwa5.css">
+<style>
+  html, body { margin: 0; padding: 0; background: #06121d; }
+  .cover {
+    width: 1128px; height: 191px; position: relative; overflow: hidden;
+    background: #06121d;
+    font-family: "Archivo", "Archivo Fallback", "Helvetica Neue", Arial, sans-serif;
+    box-sizing: border-box;
+    /* LinkedIn parks the company logo over the lower-left of the cover, so the
+       first ~250px stay clear of anything that has to be read. */
+    padding: 0 46px 0 258px;
+    /* One row, one centre axis — both blocks are optically centred against the
+       same line instead of being positioned independently. `gap` is a floor, so
+       the two never crowd each other no matter how the copy changes. */
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 104px;
+  }
+  .field { position: absolute; inset: 0; }
+
+  .copy { position: relative; flex: 0 1 auto; }
+  .line {
+    font-size: 34px; line-height: 1.22; font-weight: 300; color: #eaf1f8;
+    letter-spacing: -.012em; margin: 0; white-space: nowrap;
+  }
+  .line em { font-style: normal; color: #88c1ed; }
+  /* In the flow, so it sits on the copy's own left edge and tracks it. The
+     negative bottom margin cancels its own height, so it does not drag the
+     block's centre down — the two text masses stay on one optical axis. */
+  .rule {
+    width: 58px; height: 1px; background: #4f83b0;
+    margin-top: 18px; margin-bottom: -19px;
+  }
+
+  .meta { position: relative; text-align: right; flex: 0 0 auto; }
+  .dom {
+    font-size: 13px; letter-spacing: .24em; text-transform: uppercase;
+    color: #8494a4; font-weight: 500; margin: 0; white-space: nowrap;
+  }
+  .cat {
+    font-size: 13px; letter-spacing: .24em; text-transform: uppercase;
+    /* --isth-muted, not --isth-faint: faint is a hairline-label value and goes
+       muddy once LinkedIn recompresses the PNG. */
+    color: #6a798a; font-weight: 500; margin: 10px 0 0; white-space: nowrap;
+  }
+</style>
+
+<div class="cover">
+  <svg class="field" viewBox="0 0 1128 191" fill="none" aria-hidden="true">
+    <g stroke="#4f83b0" stroke-width="1" opacity=".5">
+      <path d="M-40 74 C 220 22, 640 -12, 1180 -58"/>
+      <path d="M-40 96 C 220 44, 640 10, 1180 -36"/>
+      <path d="M620 240 C 800 150, 960 96, 1200 30"/>
+    </g>
+    <g stroke="#88c1ed" stroke-width="1" opacity=".42">
+      <path d="M-40 196 C 340 132, 780 74, 1180 -6"/>
+    </g>
+    <circle cx="196" cy="58" r="1.8" fill="#eaf1f8" opacity=".85"/>
+    <circle cx="905" cy="66" r="1.8" fill="#eaf1f8" opacity=".6"/>
+  </svg>
+
+  <div class="copy">
+    <p class="line">We run the back office behind</p>
+    <p class="line"><em>private-market investors.</em></p>
+    <div class="rule"></div>
+  </div>
+
+  <div class="meta">
+    <p class="dom">isthmusmeridian.com</p>
+    <p class="cat">AI-enabled delivery</p>
+  </div>
+</div>
