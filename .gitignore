@@ -21,3 +21,18 @@ storybook-static/
 .DS_Store
 *.swp
 deck-dist/
+
+# design-sync / design-system tooling caches (46MB+, regenerated on demand)
+.ds-sync/
+.design-sync/
+ds-bundle/
+_dts/
+index.d.ts
+
+# agent tooling
+.agents/
+.impeccable/
+.claude/skills/
+
+# archives
+*.zip

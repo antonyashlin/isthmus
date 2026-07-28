@@ -26,7 +26,7 @@ const BADGES = [
   {
     key: "residency",
     label: "Data residency",
-    note: "Client data is stored and processed in the US only.",
+    note: "Client data is stored and processed in the US and the UAE only.",
     icon: <IconPin />,
   },
 ] as const;

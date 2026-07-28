@@ -18,6 +18,11 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
         link: "text-primary underline-offset-4 hover:underline",
+        /** Deck CTA: transparent with a hairline border that fills on hover,
+         * built from the founding deck's own CSS-var tokens so it reads
+         * correctly on both the navy and paper deck screens (the default
+         * variants are pinned to the app's fixed Tailwind theme). */
+        deck: "border-[color:var(--line-3)] bg-transparent text-[color:var(--heading)] hover:bg-[color:var(--accent-ink)] hover:text-[color:var(--bg)] hover:border-[color:var(--accent-ink)]",
       },
       size: {
         default:

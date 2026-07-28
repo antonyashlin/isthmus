@@ -2,6 +2,8 @@
 
 import * as React from "react";
 
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   ASK,
   BACKDROP,
@@ -360,7 +362,7 @@ const Functions: SlideFn = ({ index, total }) => (
               </div>
               {f.tag ? (
                 <div style={{ marginTop: 10 }}>
-                  <span className="fd-chip">{f.tag}</span>
+                  <Badge variant="deck">{f.tag}</Badge>
                 </div>
               ) : null}
             </div>
@@ -580,8 +582,11 @@ const Market: SlideFn = ({ active, index, total }) => (
         marginTop: 22,
       }}
     >
-      <div className="fd-plot fd-rise" style={{ marginTop: 0 }}>
-        <CompsChart active={active} />
+      <div className="fd-rise" style={{ display: "flex", flexDirection: "column", minHeight: 0 }}>
+        <div className="fd-label">{MARKET.compsLabel}</div>
+        <div className="fd-plot" style={{ marginTop: 14 }}>
+          <CompsChart active={active} />
+        </div>
       </div>
       <div className="fd-rise">
         <div className="fd-label">{MARKET.multiple.label}</div>
@@ -633,9 +638,9 @@ const Structure: SlideFn = ({ index, total }) => {
         className="fd-rise"
         style={{ marginTop: 24, display: "flex", gap: 18, alignItems: "flex-start" }}
       >
-        <span className="fd-chip warn" style={{ flex: "none" }}>
+        <Badge style={{ flex: "none" }} variant="deck-warn">
           {counter.label}
-        </span>
+        </Badge>
         <p className="fd-note" style={{ maxWidth: "76ch" }}>
           {counter.body} {pending}
         </p>
@@ -755,7 +760,7 @@ const Ask: SlideFn = ({ index, total }) => (
           {ASK.governance}
         </p>
         <div className="fd-ask-warn">
-          <span className="fd-chip warn">TERMS PENDING</span>
+          <Badge variant="deck-warn">TERMS PENDING</Badge>
           <p className="fd-note">{ASK.warning}</p>
         </div>
       </div>
@@ -769,6 +774,20 @@ const Ask: SlideFn = ({ index, total }) => (
           </div>
         ))}
       </div>
+      {/* Absolutely positioned, not a flex sibling in `.fd-ask-terms` — that
+          row already sets the width the left column's warning text wraps
+          against, so adding the CTA there squeezed it onto more lines and
+          pushed the whole foot past the 510px body bound. */}
+      <Button
+        className="fd-rise fd-ask-cta"
+        render={
+          <a href="mailto:info@isthmusmeridian.com?subject=Isthmus%20Meridian%20%E2%80%94%20the%20crossing" />
+        }
+        size="sm"
+        variant="deck"
+      >
+        {ASK.cta}
+      </Button>
     </div>
   </Screen>
 );

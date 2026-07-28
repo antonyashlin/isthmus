@@ -17,7 +17,7 @@
   --max:1200px; --ease:cubic-bezier(0.22,1,0.36,1);
   /* vertical rhythm — one deliberate two-tier scale for caption->evidence gaps.
      --stack: a component follows its caption. --stack-lg: a distinct beat (diagram groups). */
-  --stack:clamp(38px,4.6vh,56px); --stack-lg:clamp(52px,6vh,80px);
+  --stack:clamp(22px,4.6vh,56px); --stack-lg:clamp(30px,6vh,80px);
   /* theme tokens (dark is the default screen) */
   --bg:#04101c; --heading:#ffffff;
   --tx:rgba(255,255,255,0.94); --tx-2:rgba(255,255,255,0.62); --tx-3:rgba(255,255,255,0.42);
@@ -153,19 +153,19 @@ p{margin:0}
 .hero-inner{position:relative;z-index:2;max-width:var(--max);margin:0 auto;width:100%;
   min-height:calc(100dvh - 210px);display:flex;flex-direction:column;justify-content:space-between}
 .hero-top{margin-right:auto;text-align:left;max-width:900px}
-.hero-tag{font-size:clamp(23px,2.7vw,34px);line-height:1.3;color:rgba(255,255,255,0.86);letter-spacing:-0.01em;text-wrap:pretty}
+.hero-tag{font-size:clamp(23px,min(2.7vw,4.4vh),34px);line-height:1.3;color:rgba(255,255,255,0.86);letter-spacing:-0.01em;text-wrap:pretty}
 .hero-bottom{margin-top:auto;display:flex;justify-content:flex-end}
 .wordmark{display:flex;flex-direction:column;align-items:flex-end;text-align:right;gap:0;line-height:0.9}
 /* Solid silver, not a chrome gradient. Gradient text was decorative rather than
    meaningful, and it is on DESIGN.md's Don't list; the lift now comes from a
    faint halo on the dark ground instead of a fake bevel. */
-.wordmark .w-isth{font-family:var(--sans);font-weight:200;font-size:clamp(52px,11vw,150px);
+.wordmark .w-isth{font-family:var(--sans);font-weight:200;font-size:clamp(52px,min(11vw,17vh),150px);
   font-variation-settings:"wdth" 108;letter-spacing:0;text-transform:uppercase;
   color:var(--silver);
   text-shadow:0 0 34px color-mix(in srgb,var(--sky-2) 26%,transparent),
               0 0 10px color-mix(in srgb,#FFFFFF 12%,transparent)}
 .wordmark .w-mer{font-family:var(--serif);font-style:italic;font-weight:400;
-  font-size:clamp(46px,9.5vw,132px);letter-spacing:0;color:var(--sky);margin-top:-0.05em}
+  font-size:clamp(46px,min(9.5vw,15vh),132px);letter-spacing:0;color:var(--sky);margin-top:-0.05em}
 
 /* ---- one continuous globe field, fixed & UNDER the text (z-index:-1), panned by scroll ---- */
 /* 300vh tall: the hero sees the top third, screen 2 the middle, the last screen the bottom */
@@ -249,9 +249,9 @@ body.at-hero .gf-rule,body.at-end .gf-rule{display:none}
 .sec{height:100vh;display:flex;flex-direction:column;justify-content:center;
   padding:104px 0 64px;overflow:hidden}
 .eyebrow + .h-xl,.eyebrow + .h-lg{margin-top:20px}
-.h-xl{font-size:clamp(40px,6.2vw,82px);font-weight:400;line-height:1.0;letter-spacing:-0.012em;max-width:17ch}
-.h-lg{font-size:clamp(34px,5vw,64px);font-weight:400;line-height:1.02;letter-spacing:-0.012em;max-width:19ch}
-.h-md{font-size:clamp(22px,2.6vw,32px);line-height:1.12}
+.h-xl{font-size:clamp(40px,min(6.2vw,10vh),82px);font-weight:400;line-height:1.0;letter-spacing:-0.012em;max-width:17ch}
+.h-lg{font-size:clamp(34px,min(5vw,8vh),64px);font-weight:400;line-height:1.02;letter-spacing:-0.012em;max-width:19ch}
+.h-md{font-size:clamp(22px,min(2.6vw,4.2vh),32px);line-height:1.12}
 .mt-s{margin-top:24px}.mt-m{margin-top:34px}.mt-l{margin-top:72px}.mt-xl{margin-top:96px}
 
 /* ============================================================
@@ -387,7 +387,7 @@ body.at-hero .gf-rule,body.at-end .gf-rule{display:none}
    animating globe field on every repaint inside the plate — measured as a 32ms
    frame on hover vs 18ms without it. The 30-40% fill is what makes it read as
    glass; the blur was costing a dropped frame for very little. */
-.viz-plate{position:relative;border-radius:20px;padding:clamp(20px,2.6vw,38px);
+.viz-plate{position:relative;border-radius:20px;padding:clamp(16px,min(2.6vw,3.4vh),38px);
   background:rgba(11,20,32,0.38);border:1px solid var(--line);
   box-shadow:inset 0 1px 0 rgba(255,255,255,0.06)}
 .light .viz-plate{background:rgba(255,255,255,0.42);
@@ -408,12 +408,12 @@ body.at-hero .gf-rule,body.at-end .gf-rule{display:none}
 .tr-node{display:block;width:100%;margin:0;text-align:left}
 html.js .tree:not(.ready) .tr-node{opacity:0}
 .tr-root{font-family:var(--serif);font-style:italic;font-weight:500;
-  font-size:clamp(18px,1.6vw,23px);color:var(--accent-ink);line-height:1.2}
+  font-size:clamp(18px,min(1.6vw,2.6vh),23px);color:var(--accent-ink);line-height:1.2}
 .tr-branch{font-size:clamp(15px,1.3vw,19px);color:var(--tx-2);letter-spacing:-0.01em;
   line-height:1.25;transition:color .25s var(--ease)}
 .tr-branch.lit{color:var(--heading)}
 .tr-leaf{background:none;border:0;padding:0;font:inherit;cursor:pointer;
-  font-size:clamp(16px,1.4vw,20px);color:var(--heading);letter-spacing:-0.01em;line-height:1.25;
+  font-size:clamp(15px,min(1.4vw,2.3vh),20px);color:var(--heading);letter-spacing:-0.01em;line-height:1.25;
   transition:color .25s var(--ease)}
 .tr-leaf.lit{color:var(--accent-ink)}
 .tree-detail.swapping{opacity:.35}
@@ -428,7 +428,7 @@ html.js .tree:not(.ready) .tr-node{opacity:0}
 .rings-key{list-style:none;margin:0;padding:0;display:grid;gap:2px;align-content:center}
 /* same figure treatment as .xp-figure, scaled to fit the ring's inner hole —
    one "big number" style across the deck, not two that scale differently */
-.rings-figure{display:block;font-size:clamp(24px,2.2vw,32px);font-weight:200;color:var(--heading);
+.rings-figure{display:block;font-size:clamp(23px,min(2.2vw,3.6vh),32px);font-weight:200;color:var(--heading);
   letter-spacing:-0.02em;font-variant-numeric:tabular-nums;line-height:1.05}
 .rings-cap{display:block;margin-top:6px;max-width:11ch;font-size:12.5px;line-height:1.35;color:var(--tx-3)}
 
@@ -446,7 +446,7 @@ html.js .tree:not(.ready) .tr-node{opacity:0}
 
 /* ---- data screen (charts breathe on the ground, no box) ---- */
 .chart-block{margin-top:var(--stack)}
-.chart-title{font-size:clamp(19px,2vw,24px);font-weight:400;color:var(--heading);letter-spacing:-0.01em;max-width:34ch}
+.chart-title{font-size:clamp(18px,min(2vw,3.2vh),24px);font-weight:400;color:var(--heading);letter-spacing:-0.01em;max-width:34ch}
 .chart-cap{margin-top:12px;font-size:16px;color:var(--tx-2);line-height:1.55;max-width:58ch}
 /* a chart tight under its own title/caption; the leading gap is owned by .chart-block */
 .echart{width:100%;margin-top:22px}
@@ -563,10 +563,10 @@ html.js .funnel{opacity:0}
    The opening half sits above the routes as a sans subheading; the closing
    half sits below them in serif italic, which is where the brand puts every
    emphasis. Both are the same size so they read as one line interrupted. */
-.blk-sub{font-weight:300;font-size:clamp(19px,2.4vw,34px);line-height:1.2;
+.blk-sub{font-weight:300;font-size:clamp(19px,min(2.4vw,3.9vh),34px);line-height:1.2;
   letter-spacing:-0.01em;color:var(--heading);max-width:none;text-wrap:nowrap}
 .routes-coda{margin:clamp(26px,3.2vh,40px) 0 0;font-family:var(--serif);font-style:italic;
-  font-weight:400;font-size:clamp(19px,2.4vw,34px);line-height:1.2;letter-spacing:-0.01em;
+  font-weight:400;font-size:clamp(19px,min(2.4vw,3.9vh),34px);line-height:1.2;letter-spacing:-0.01em;
   color:var(--accent-ink)}
 @media (max-width:760px){
   .blk-sub{font-size:clamp(19px,4.6vw,23px);text-wrap:balance}
@@ -971,3 +971,59 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
   .badge{padding:14px}
   .badge-note{font-size:12px}
 }
+
+/* ---- short frames ----
+   Every screen is one viewport tall, so a wide-but-short window (a laptop with
+   a browser bar and a dock, a resized frame, a projector) is the case that
+   overflows. Type already scales on height via min(vw,vh); these are the two
+   screens whose illustrations still needed to give ground. */
+@media (max-height:760px){
+  /* The arc indent squeezes this heading into three lines on a narrow-and-short
+     frame. The arc is smaller there too, so it needs less clearance. */
+  .blk-head.clear-arc{margin-left:clamp(0px,10vw,180px)}
+  .h-lg{max-width:24ch}
+  .rt-glyph{max-width:158px}
+  .blk-sub{margin-top:2px}
+  .rt-lede{margin-top:10px;font-size:15px;line-height:1.45}
+  .rt-detail{margin-top:9px;font-size:13px;line-height:1.45}
+  .routes-coda{margin-top:18px}
+
+  .soflow{margin-top:var(--stack)}
+  .sok{margin-top:26px;font-size:19px}
+  .sostep p{margin-top:9px;font-size:13px;line-height:1.45}
+  .badges{margin-top:16px;gap:10px}
+  .badge{padding:13px 13px 15px}
+  .badge-icon svg{width:21px;height:21px}
+  .badge-note{font-size:11px;line-height:1.4}
+
+  /* Charts sized only by width stay their full height in a short frame. Each
+     plot gets a height cap and its key/legend tightens with it. */
+  .radarw-plot{max-width:min(387px,36vh)}
+  .radarw-key{margin-top:13px;padding-top:11px}
+  .rk-note{font-size:11.5px;line-height:1.4}
+  .dials{gap:14px}
+  .rings{gap:clamp(14px,2vw,26px)}
+  .chart-block{margin-top:var(--stack)}
+}
+@media (max-height:640px){
+  .rt-glyph{max-width:140px}
+  .badge-note{display:none}
+}
+
+/* ---- when a screen genuinely cannot fit, stop pretending ----
+   The deck conceit is one idea per 100vh screen, and it holds on a normal
+   desktop frame. Below 1000px the two- and three-column archetypes collapse to
+   a single stacked column, which makes screens TALLER; pair that with a short
+   window and content clips behind the next snap bound.
+
+   Shrinking type indefinitely is the wrong answer. Past this point the page
+   becomes an ordinary scrolling document — sections size to their content and
+   snap is off — which is exactly what mobile already does. Nothing is ever
+   cut off; the reader just scrolls. */
+@media (max-width:1000px), (max-height:700px){
+  html{scroll-snap-type:none;scroll-behavior:auto}
+  .hero,main>section,main>section:last-child{scroll-snap-align:none}
+  .sec{height:auto;min-height:0;padding-block:clamp(64px,10vh,120px)}
+  .hero{height:auto;min-height:min(100vh,760px);padding-block:clamp(64px,10vh,120px)}
+}
+/* Mobile keeps its own 9:16 floor, declared later, so it is unaffected. */

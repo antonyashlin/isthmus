@@ -34,7 +34,7 @@ export const DECK = {
   /** REF — cover subtitle */
   proposition: "The private-markets back office,",
   propositionAccent: "becoming the brain that runs it.",
-  classification: "A JOINT-VENTURE PROPOSAL FOR AND CAPITAL",
+  classification: "A JOINT VENTURE FOR AND CAPITAL",
   confidential: "CONFIDENTIAL",
   place: "DELAWARE · DUBAI",
   date: "JULY 2026",
@@ -49,7 +49,7 @@ export const THESIS = {
   /** REF, adapted — "AI companies" / "vertical-AI startups" reworded: the
    * deck no longer pitches an outside AI-company narrative, so the parallel
    * now runs against technology startups generally. */
-  title: "We started with the part that kills most technology companies",
+  title: "We started with the part that kills most startups",
   titleAccent: "already solved.",
   lede:
     "Most software startups raise money, then hunt for customers and beg for data. We begin with all three in hand.",
@@ -163,15 +163,25 @@ export const FUNCTIONS = {
   /** REF — the line that is the whole thesis in one sentence */
   footnote: "Every function is manual labor today. Every function is a candidate for automation —",
   footnoteAccent: "customer-funded R&D, one workflow at a time.",
+  /**
+   * Consolidated from the client's definitive scope list (2026-07-29):
+   * Back-Office Operations, Financial Modeling, Valuation, Due Diligence
+   * Support, Investment Committee Materials, Fund Operations, Portfolio
+   * Monitoring, LP Reporting, Investor Materials, Capital Formation, Market
+   * Research, Deal Sourcing Support, Investment Operations, Data Operations,
+   * AI Enablement, Workflow Automation — grouped to eight so the rail still
+   * carries eight (a grid of eight cards can't). Every named capability
+   * appears in exactly one item's label.
+   */
   items: [
-    { n: "01", label: "Origination & sourcing", tag: null },
-    { n: "02", label: "Diligence & evaluation", tag: null },
-    { n: "03", label: "Modeling, valuation & structuring", tag: "FLAGSHIP" },
-    { n: "04", label: "Capital formation & materials", tag: null },
-    { n: "05", label: "Fund operations & admin", tag: null },
-    { n: "06", label: "Portfolio monitoring", tag: null },
-    { n: "07", label: "Technology & data platform", tag: "DIFFERENTIATOR" },
-    { n: "08", label: "Research & intelligence", tag: null },
+    { n: "01", label: "Deal sourcing support", tag: null },
+    { n: "02", label: "Due diligence support", tag: null },
+    { n: "03", label: "Financial modeling & valuation", tag: "FLAGSHIP" },
+    { n: "04", label: "Capital formation, investor & IC materials", tag: null },
+    { n: "05", label: "Fund & investment operations", tag: null },
+    { n: "06", label: "Portfolio monitoring & LP reporting", tag: null },
+    { n: "07", label: "Data ops, automation & AI enablement", tag: "DIFFERENTIATOR" },
+    { n: "08", label: "Market research", tag: null },
   ],
 };
 
