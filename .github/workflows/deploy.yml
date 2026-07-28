@@ -44,9 +44,20 @@ jobs:
         working-directory: react
         run: npx tsc --noEmit
 
-      - name: Build static export
+      # `npm run build` runs split-build.mjs, which strips the deck out of
+      # out/ and fails the build if any deck file survives. The deck is a
+      # confidential document and must never ship with the marketing site.
+      - name: Build static export (site only)
         working-directory: react
         run: npm run build
+
+      - name: Assert the deck is not in the site bundle
+        working-directory: react
+        run: |
+          if ls out | grep -qi '^deck'; then
+            echo "::error::deck files found in the site bundle"; exit 1
+          fi
+          echo "site bundle is clean"
 
       - name: Publish to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
