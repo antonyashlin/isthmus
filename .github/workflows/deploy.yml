@@ -1,0 +1,68 @@
+name: Deploy to Hostinger
+
+# Push to main -> build the static export -> upload it to public_html.
+# Hostinger's own Git integration only pulls repo files; it never runs a build,
+# which a Next.js site needs. So the build happens here and only the built
+# output is shipped.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "react/**"
+      - ".github/workflows/deploy.yml"
+  workflow_dispatch: # lets you redeploy by hand from the Actions tab
+
+concurrency:
+  # A second push while one deploy is mid-upload would interleave two file sets
+  # in public_html. Queue instead, and never cancel a run that is already
+  # uploading — a half-uploaded site is worse than a slightly stale one.
+  group: hostinger-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: react/package-lock.json
+
+      - name: Install
+        working-directory: react
+        run: npm ci
+
+      - name: Typecheck
+        working-directory: react
+        run: npx tsc --noEmit
+
+      - name: Build static export
+        working-directory: react
+        run: npm run build
+
+      - name: Guard — refuse to deploy an empty build
+        run: |
+          test -f react/out/index.html || { echo "::error::no index.html in out/"; exit 1; }
+          test -d react/out/_next     || { echo "::error::no _next/ in out/";     exit 1; }
+          echo "out/ contains $(find react/out -type f | wc -l) files"
+
+      - name: Upload to Hostinger
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.HOSTINGER_FTP_HOST }}
+          username: ${{ secrets.HOSTINGER_FTP_USER }}
+          password: ${{ secrets.HOSTINGER_FTP_PASSWORD }}
+          protocol: ftps
+          local-dir: ./react/out/
+          server-dir: ./public_html/
+          # Mirrors out/ into public_html, deleting files that no longer exist
+          # in the build. Anything you keep on the server by hand and want to
+          # survive a deploy must be excluded here.
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
