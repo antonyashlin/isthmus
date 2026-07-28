@@ -349,21 +349,20 @@ export default function Home() {
             <h2 className="blk-head h-lg reveal">Nothing reaches your desk without a <span className="serif-i">sign-off</span>.</h2>
             <p className="blk-desc body reveal">
               Every deliverable is AI-drafted, bench-reviewed, and approved by your team before it reaches an IC or an LP.
-              <span className="wide-only-i"> Client work is segregated by design, covered by NDA, and handled under a SOC 2 Type II audit currently in progress.</span>
             </p>
             <div className="blk-viz">
               <div className="viz-plate">
                 <SignOffFlow />
-                <div className="wide-only">
-                  <TrustBadges />
-                </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* 12b — the proof points, mobile only */}
-        <section className="sec slide-sec narrow-only">
+        {/* 12b — the proof points, at every width. Sign-off is two screens: the
+            flow that produces the work, then the guard around it. Deliberately
+            navy between two paper screens, so the split reads as a new beat
+            rather than a continuation of the one before it. */}
+        <section className="sec slide-sec">
           <div className="slide lay-a">
             <h2 className="blk-head h-lg reveal">And it is handled <span className="serif-i">under guard</span>.</h2>
             <p className="blk-desc body reveal">Client work is segregated by design, covered by NDA, and handled under a SOC 2 Type II audit currently in progress.</p>
