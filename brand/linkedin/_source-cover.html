@@ -6,33 +6,41 @@
     background: #06121d;
     font-family: "Archivo", "Archivo Fallback", "Helvetica Neue", Arial, sans-serif;
     box-sizing: border-box;
+    /* LinkedIn parks the company logo over the lower-left of the cover, so the
+       first ~250px stay clear of anything that has to be read. */
+    padding: 0 46px 0 258px;
+    /* One row, one centre axis — both blocks are optically centred against the
+       same line instead of being positioned independently. `gap` is a floor, so
+       the two never crowd each other no matter how the copy changes. */
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 104px;
   }
   .field { position: absolute; inset: 0; }
-  /* LinkedIn parks the company logo over the lower-left of the cover, so the
-     first ~250px stay clear of anything that must be read. */
-  .copy {
-    position: absolute; left: 258px; top: 50%; transform: translateY(-50%);
-  }
+
+  .copy { position: relative; flex: 0 1 auto; }
   .line {
-    font-size: 37px; line-height: 1.2; font-weight: 300; color: #eaf1f8;
+    font-size: 34px; line-height: 1.22; font-weight: 300; color: #eaf1f8;
     letter-spacing: -.012em; margin: 0; white-space: nowrap;
   }
   .line em { font-style: normal; color: #88c1ed; }
+  /* In the flow, so it sits on the copy's own left edge and tracks it. The
+     negative bottom margin cancels its own height, so it does not drag the
+     block's centre down — the two text masses stay on one optical axis. */
   .rule {
-    position: absolute; left: 258px; bottom: 34px; width: 62px; height: 1px;
-    background: #4f83b0;
+    width: 58px; height: 1px; background: #4f83b0;
+    margin-top: 18px; margin-bottom: -19px;
   }
-  .right {
-    position: absolute; right: 44px; top: 50%; transform: translateY(-50%);
-    text-align: right;
-  }
+
+  .meta { position: relative; text-align: right; flex: 0 0 auto; }
   .dom {
-    font-size: 14px; letter-spacing: .24em; text-transform: uppercase;
-    color: #6a798a; font-weight: 500; margin: 0;
+    font-size: 13px; letter-spacing: .24em; text-transform: uppercase;
+    color: #8494a4; font-weight: 500; margin: 0; white-space: nowrap;
   }
   .cat {
-    font-size: 14px; letter-spacing: .24em; text-transform: uppercase;
-    color: #45525f; font-weight: 500; margin: 9px 0 0;
+    font-size: 13px; letter-spacing: .24em; text-transform: uppercase;
+    /* --isth-muted, not --isth-faint: faint is a hairline-label value and goes
+       muddy once LinkedIn recompresses the PNG. */
+    color: #6a798a; font-weight: 500; margin: 10px 0 0; white-space: nowrap;
   }
 </style>
 
@@ -53,11 +61,11 @@
   <div class="copy">
     <p class="line">We run the back office behind</p>
     <p class="line"><em>private-market investors.</em></p>
+    <div class="rule"></div>
   </div>
-  <div class="rule"></div>
 
-  <div class="right">
+  <div class="meta">
     <p class="dom">isthmusmeridian.com</p>
-    <p class="cat">AI-enabled &middot; Institutionally delivered</p>
+    <p class="cat">AI-enabled delivery</p>
   </div>
 </div>
