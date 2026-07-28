@@ -22,7 +22,7 @@ export function Nav() {
       </div>
       <div className="nav-cta">
         <a className="btn btn-glass btn-sm liquid-glass" href="#company">
-          Request enquiry
+          Reach out to us
         </a>
       </div>
     </nav>

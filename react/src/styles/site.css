@@ -216,9 +216,9 @@ body.at-hero .spk-md{opacity:0;animation:none}
 body.on-light .gf-rule{
   background:linear-gradient(180deg,rgba(53,108,151,0.12) 0%,#4686B7 20%,#356C97 80%,rgba(53,108,151,0.12) 100%);
   box-shadow:0 0 10px 2px rgba(70,134,183,0.35),0 0 26px 6px rgba(70,134,183,0.12)}
-/* no vertical side rule on the hero screen (display:none so the breathing
-   opacity animation can't keep it visible) */
-body.at-hero .gf-rule{display:none}
+/* no vertical side rule on the first or last screen (display:none so the
+   breathing opacity animation can't keep it visible) */
+body.at-hero .gf-rule,body.at-end .gf-rule{display:none}
 @keyframes gfBreathe{0%,100%{opacity:.3}50%{opacity:.62}}
 @keyframes gfBreatheSoft{0%,100%{opacity:.5}50%{opacity:.95}}
 @supports (animation-timeline: scroll()){
