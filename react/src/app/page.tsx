@@ -351,8 +351,7 @@ export default function Home() {
             <span className="wm"><b>ISTHMUS</b> <i>MERIDIAN</i></span>
             <div className="contact">
               <span className="contact-label">Contact us</span>
-              <a href="mailto:hello@isthmusmeridian.com">hello@isthmusmeridian.com</a>
-              <a href="tel:+10000000000">+1 (000) 000&#8209;0000</a>
+              <a href="mailto:info@isthmusmeridian.com">info@isthmusmeridian.com</a>
             </div>
           </div>
         </section>
