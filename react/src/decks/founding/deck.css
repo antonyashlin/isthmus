@@ -333,6 +333,14 @@
   max-width: 26ch;
 }
 
+/* The flywheel's nodes light as the packet reaches them. `runFlywheel` adds
+   the class; this is the only thing that makes it visible. */
+.fw-node.lit {
+  color: var(--heading) !important;
+  border-color: var(--mer) !important;
+  box-shadow: 0 0 18px -4px var(--mer);
+}
+
 /* ---------------------------------------------------------------- panel ---
  * The one surface type. A single soft plate, never a row of cards.
  */
