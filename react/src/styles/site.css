@@ -676,19 +676,21 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
   .wbr{display:none}
 
   /* --- 9:16 panels --- */
-  .hero,.sec{aspect-ratio:9/16;height:auto;min-height:0;overflow:hidden}
+  /* 9:16 is the FLOOR now, not a fixed ratio — capping it forced content to be
+     hidden, so screens grow past it whenever the content needs the room. */
+  .hero,.sec{height:auto;min-height:calc(100vw * 16 / 9);overflow:hidden}
   .sec{display:flex;justify-content:center;padding:0}
   .sec.slide-sec{padding:0}
   .hero{padding:92px 22px 40px}
-  .hero-inner{min-height:0;height:100%}
+  .hero-inner{height:auto;min-height:calc(100vw * 16 / 9 - 132px)}
   .hero-tag{font-size:clamp(20px,5.6vw,26px)}
   .wordmark .w-isth{font-size:clamp(44px,13vw,62px)}
   .wordmark .w-mer{font-size:clamp(40px,11.6vw,56px)}
 
   /* --- heading on top, then description, then the illustration --- */
-  .slide{height:100%;width:100%;padding:88px 22px 30px;row-gap:16px;
+  .slide{height:auto;width:100%;padding:96px 22px 56px;row-gap:24px;
     grid-template-columns:minmax(0,1fr);align-content:start}
-  .slide.low{align-content:start;padding-top:88px}
+  .slide.low{align-content:start;padding-top:96px}
   .slide .blk-head{order:1;grid-column:1;grid-row:auto;align-self:start;margin-left:0}
   .slide .blk-desc{order:2;grid-column:1;grid-row:auto;align-self:start}
   .slide .blk-viz{order:3;grid-column:1;grid-row:auto;align-self:start;min-width:0;min-height:0}
@@ -699,7 +701,7 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
   .source{margin-top:14px;font-size:10.5px}
 
   /* --- the field: full screen, still, and only on the first and last --- */
-  .fg{height:100vh;transform:none;animation:none;opacity:0;
+  .fg{height:118vh;transform:translateY(14vh);animation:none;opacity:0;
     transition:opacity .45s var(--ease)}
   body.at-hero .fg,body.at-end .fg{opacity:1}
   .gf-rule{display:none}
@@ -729,49 +731,55 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
   .cs-yes{font-size:15px}
   .xp-cap{font-size:12.5px}
 
-  /* the tree's three-column geometry cannot survive 390px — drop the
-     connectors and read it as an indented list instead */
-  .tree-plot{height:auto;display:flex;flex-direction:column;gap:7px}
-  .tree-links{display:none}
-  .tr-slot{position:static;transform:none;width:auto}
-  .slot-branch{padding-left:12px}
-  .slot-leaf{padding-left:24px}
-  .tr-root{font-size:18px}
-  .tr-branch{font-size:14px}
-  .tr-leaf{font-size:15px}
+  /* the tree keeps its connectors; the percentage geometry scales, so only the
+     type needs to come down to fit the narrower leaf column */
+  .tree-plot{height:clamp(360px,54vh,480px)}
+  .tr-root{font-size:15px}
+  .tr-branch{font-size:11.5px}
+  .tr-leaf{font-size:12.5px}
   .tree-detail{height:auto;min-height:3.4em;font-size:13.5px;padding-top:10px}
 
   .journey{grid-template-columns:1fr;gap:22px 0}
-  .flow{grid-template-columns:1fr;gap:22px 0}
-  .flow-track,.flow-packet,.flow-fill{display:none}
-  .flow .fstep{opacity:1;padding:0}
-  .fk{margin-top:0;font-size:20px}
-  .fstep p{font-size:13.5px;max-width:none}
-  .fdot{display:none}
+  /* three columns kept on purpose: the track, the dots and the travelling
+     packet are the illustration, and they only work laid out horizontally */
+  .flow{grid-template-columns:repeat(3,1fr);gap:0}
+  .flow-track{right:14%}
+  .fstep{padding:0 8px 0 0}
+  .fk{margin-top:34px;font-size:15px}
+  .fstep p{margin-top:8px;font-size:11.5px;max-width:none}
+  .fdot{width:12px;height:12px}
 
   /* Four panels overflowed their 9:16 bound (routes 225px, journey 237px,
      offers 91px, funnel 33px). On touch there is no hover, so the reveal-only
      copy is dead weight — drop it, and lay the repeated items out as compact
      rows instead of stacked cards. */
-  .route{display:grid;grid-template-columns:56px minmax(0,1fr);gap:12px;align-items:center}
-  .rt-glyph{max-width:56px;grid-row:1 / span 2}
-  .rt-name{margin-top:0;font-size:19px}
-  .rt-lede{margin-top:2px;font-size:12.5px}
-  .rt-detail{display:none}
+  /* full cards again: glyph, name, lede AND detail, with room around them */
+  .route{padding:20px 0 22px}
+  .rt-glyph{max-width:132px}
+  .rt-name{margin-top:14px;font-size:21px}
+  .rt-lede{margin-top:10px;font-size:14px}
+  .rt-detail{display:block;opacity:1;transform:none;margin-top:8px;font-size:13px}
 
-  .journey{gap:12px 0}
-  .jstep{display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;padding:0}
-  .journey-track{display:none}
-  .jdot{display:none}
+  /* the journey rail turns vertical rather than disappearing */
+  .journey{position:relative;gap:22px 0}
+  .journey-track{display:block;top:8px;bottom:8px;left:7px;right:auto;
+    width:1.5px;height:auto;
+    background:linear-gradient(180deg,var(--deep),var(--steel) 45%,var(--sky))}
+  .jstep{position:relative;padding:0 0 0 30px}
+  .jdot{display:block;top:3px;left:0}
   .jn{margin-top:0;font-size:11px}
-  .jstep h3{margin-top:0;font-size:16px;grid-column:2}
-  .jstep p{margin-top:2px;font-size:12.5px;max-width:none;grid-column:2}
+  .jstep h3{margin-top:6px;font-size:18px}
+  .jstep p{margin-top:6px;font-size:13.5px;max-width:none}
 
-  .offer .glass-detail{display:none}
-  .offer{padding:16px 16px 18px}
-  .offer h3{font-size:18px}
-  .offer p{margin-top:8px;font-size:13.5px}
-  .feat-tag{margin-bottom:8px}
+  /* the capability list is the card's substance — it stays, and since touch has
+     no hover it is simply always shown */
+  .offers{gap:14px}
+  .offer{padding:22px 20px 24px}
+  .offer h3{font-size:20px}
+  .offer p{margin-top:10px;font-size:14px}
+  .offer .glass-detail{display:block;opacity:1;transform:none;margin:14px 0 0}
+  .offer .glass-detail li{opacity:1;font-size:13px}
+  .feat-tag{margin-bottom:10px}
 
   .lay-e .blk-viz .chart-block{padding-bottom:8px}
   .company-head{max-width:none;text-align:left;margin-left:0}
