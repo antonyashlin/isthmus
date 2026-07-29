@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Isthmus Meridian &middot; The private-markets back office, rebuilt with AI</title>
+<meta name="description" content="Isthmus Meridian operates the analytical, operational, and reporting functions behind private-market investment firms, from active deal execution through portfolio monitoring.">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCA0OCA0OCc+PHJlY3Qgd2lkdGg9JzQ4JyBoZWlnaHQ9JzQ4JyByeD0nMTAnIGZpbGw9JyMwMDAwMDAnLz48ZyBmaWxsPSdub25lJyBzdHJva2U9JyNGMkY2RkEnIHN0cm9rZS13aWR0aD0nMicgc3Ryb2tlLWxpbmVjYXA9J3JvdW5kJz48bGluZSB4MT0nMjQnIHkxPScxMScgeDI9JzI0JyB5Mj0nMzcnLz48cGF0aCBkPSdNMTMgMTQgQyAyNCAxOSwgMjQgMjksIDEzIDM3Jy8+PHBhdGggZD0nTTM1IDE0IEMgMjQgMTksIDI0IDI5LCAzNSAzNycvPjwvZz48L3N2Zz4=">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@1,500;1,600&family=Newsreader:ital,opsz,wght@1,6..72,400;1,6..72,500;1,6..72,600&display=swap">
+<link rel="stylesheet" href="_ds/isthmus-meridian-design-system-d76f869a-18a3-40ea-bbc9-2104235c7343/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/isthmus-meridian-design-system-d76f869a-18a3-40ea-bbc9-2104235c7343/tokens/colors.css">
+<link rel="stylesheet" href="_ds/isthmus-meridian-design-system-d76f869a-18a3-40ea-bbc9-2104235c7343/tokens/typography.css">
+<link rel="stylesheet" href="_ds/isthmus-meridian-design-system-d76f869a-18a3-40ea-bbc9-2104235c7343/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/isthmus-meridian-design-system-d76f869a-18a3-40ea-bbc9-2104235c7343/tokens/effects.css">
+<style>
+:root{
+  --sky:#88C1ED; --sky-2:#C9E2F6; --steel:#4686B7; --steel-2:#63A6D9; --deep:#274F6F;
+  --ink-0:#000000; --ink-1:#05070A; --ink-2:#0B0F14; --ink-3:#101720;
+  --sans:"Helvetica Neue","Helvetica","Arimo",Arial,sans-serif;
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;
+  --mono:"SFMono-Regular","SF Mono",ui-monospace,Menlo,Consolas,"Liberation Mono",monospace;
+  --max:1200px; --ease:cubic-bezier(0.22,1,0.36,1);
+  /* vertical rhythm — one deliberate two-tier scale for caption->evidence gaps.
+     --stack: a component follows its caption. --stack-lg: a distinct beat (diagram groups). */
+  --stack:clamp(38px,4.6vh,56px); --stack-lg:clamp(52px,6vh,80px);
+  /* theme tokens (dark is the default screen) */
+  --bg:#000000; --heading:#ffffff;
+  --tx:rgba(255,255,255,0.94); --tx-2:rgba(255,255,255,0.62); --tx-3:rgba(255,255,255,0.42);
+  --line:rgba(255,255,255,0.10); --line-2:rgba(255,255,255,0.18); --line-3:rgba(136,193,237,0.24);
+  --panel:#0B0F14; --card:#080d13; --card-hover:#111a24;
+  --accent-ink:var(--sky); --mer:#88C1ED;
+}
+.light{
+  --bg:#EDF2F7; --heading:#06121e;
+  --tx:#0d1c2b; --tx-2:rgba(13,28,43,0.66); --tx-3:rgba(13,28,43,0.46);
+  --line:rgba(13,28,43,0.12); --line-2:rgba(13,28,43,0.22); --line-3:rgba(70,134,183,0.32);
+  --panel:#ffffff; --card:#ffffff; --card-hover:#e3ecf4;
+  --accent-ink:#2f628a; --mer:#4686B7;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-snap-type:y mandatory;scroll-padding-top:0}
+html,body{margin:0;padding:0}
+/* the screen background is a fixed layer that flips per screen, so the globe (above it,
+   below the text) reads on every screen */
+body{background:#04101c;transition:background .6s var(--ease)}
+body.on-light{background:#EDF2F7}
+section[id],#top{scroll-margin-top:66px}
+.hero,main>section{scroll-snap-align:start;scroll-snap-stop:always}
+body{font-family:var(--sans);color:var(--tx);-webkit-font-smoothing:antialiased;line-height:1.5;overflow-x:hidden}
+img,svg{display:block;max-width:100%}
+a{color:var(--accent-ink);text-decoration:none;transition:color .2s var(--ease)}
+:focus-visible{outline:2px solid var(--sky);outline-offset:3px;border-radius:2px}
+.btn:focus-visible{outline-offset:2px}
+.wrap{position:relative;z-index:1;width:100%;max-width:var(--max);margin:0 auto;padding:0 48px}
+main>section,footer{position:relative;overflow:hidden;background:transparent;color:var(--tx)}
+h1,h2,h3,h4{margin:0;font-weight:300;letter-spacing:-0.02em;text-wrap:pretty;color:var(--heading)}
+p{margin:0}
+.serif-i{font-family:var(--serif);font-style:italic;font-weight:500;letter-spacing:0;color:var(--accent-ink)}
+
+/* meta labels in mono, cartographer's-instrument style */
+.eyebrow{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:0.18em;
+  text-transform:uppercase;color:var(--tx-3);font-weight:400}
+.lead{font-size:20px;line-height:1.6;color:var(--tx-2);max-width:60ch}
+.body{font-size:17px;line-height:1.62;color:var(--tx-2);max-width:62ch}
+
+/* meridian graticule per section */
+.sec-field{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.sec-field .sf{stroke:var(--mer);fill:none;stroke-width:1}
+.sec-field .sf-line{stroke:var(--mer);fill:none;stroke-width:1.1}
+
+/* ---- nav ---- */
+.nav{position:fixed;inset:0 0 auto 0;z-index:30;display:flex;align-items:center;justify-content:space-between;
+  gap:24px;height:64px;padding:0 48px;background:rgba(4,10,16,0.62);
+  backdrop-filter:blur(20px) saturate(140%);-webkit-backdrop-filter:blur(20px) saturate(140%);
+  border-bottom:1px solid rgba(255,255,255,0.06)}
+.brand{display:flex;align-items:center;gap:12px}
+.brand .wm{font-size:12px;letter-spacing:0.22em}
+.brand .wm b{font-weight:700;color:#fff}
+.brand .wm i{font-style:normal;font-weight:300;color:rgba(255,255,255,0.66)}
+.nav-links{display:flex;align-items:center;gap:30px}
+.nav-links a{font-family:var(--mono);font-size:12px;letter-spacing:0.02em;color:rgba(255,255,255,0.6)}
+.nav-links a:hover{color:#fff}
+.nav-cta{display:flex;align-items:center;gap:16px}
+
+/* ---- buttons ---- */
+.btn{display:inline-flex;align-items:center;justify-content:center;height:46px;padding:0 24px;border-radius:999px;
+  font-family:var(--sans);font-size:14px;font-weight:500;letter-spacing:0.005em;white-space:nowrap;cursor:pointer;
+  border:1px solid transparent;transition:transform .14s var(--ease),background .2s var(--ease),border-color .2s var(--ease),color .2s var(--ease)}
+.btn:active{transform:translateY(1px)}
+.btn-sm{height:34px;padding:0 18px;font-size:12.5px}
+.btn-primary{background:var(--sky);color:#04121e}
+.btn-primary:hover{background:#a6d4f3}
+.btn-ghost{background:transparent;color:var(--tx);border-color:var(--line-2)}
+.btn-ghost:hover{border-color:var(--accent-ink);color:var(--heading)}
+.btn-row{display:flex;flex-wrap:wrap;gap:14px}
+
+/* ---- hero ---- */
+.hero{position:relative;height:100vh;display:flex;flex-direction:column;justify-content:center;
+  padding:120px 48px 84px;overflow:hidden;background:transparent}
+/* subtle glow over the field, low enough opacity to let the globe read */
+.hero::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(70% 60% at 80% 12%, rgba(70,134,183,0.22) 0%, rgba(4,16,28,0) 66%)}
+.hero-field{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;contain:paint}
+.hero-inner{position:relative;z-index:2;max-width:var(--max);margin:0 auto;width:100%;
+  min-height:calc(100dvh - 210px);display:flex;flex-direction:column;justify-content:space-between}
+.hero-top{margin-right:auto;text-align:left;max-width:900px}
+.hero-tag{font-size:clamp(23px,2.7vw,34px);line-height:1.3;color:rgba(255,255,255,0.86);letter-spacing:-0.01em;text-wrap:pretty}
+.hero-bottom{margin-top:auto;display:flex;justify-content:flex-end}
+.wordmark{display:flex;flex-direction:column;align-items:flex-end;text-align:right;gap:0;line-height:0.9}
+.wordmark .w-isth{font-family:var(--sans);font-weight:200;font-size:clamp(52px,11vw,150px);
+  letter-spacing:0.02em;text-transform:uppercase;color:#fff;
+  background:linear-gradient(176deg,#FFFFFF 0%,#EAF1F8 20%,#C2D0DD 48%,#FFFFFF 60%,#96A6B4 86%,#C4D2DF 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.wordmark .w-mer{font-family:"Cormorant",Georgia,serif;font-style:italic;font-weight:600;
+  font-size:clamp(46px,9.6vw,132px);letter-spacing:0;color:var(--sky);margin-top:-0.06em}
+
+/* ---- one continuous globe field, fixed & UNDER the text (z-index:-1), panned by scroll ---- */
+/* 300vh tall: the hero sees the top third, screen 2 the middle, the last screen the bottom */
+.fg{position:fixed;top:0;left:0;width:100vw;height:300vh;z-index:-1;pointer-events:none;
+  transform:translateY(-100vh);will-change:transform}   /* one composited layer; fallback = centred globe */
+.fg g,.fg circle,.fg path,.fg line{fill:none}
+.gf-glow{stroke-linecap:round;stroke-width:5;filter:blur(3px);opacity:.5;stroke:#C9E2F6;
+  animation:gfBreathe 9s var(--ease) infinite}
+.gf-sharp{stroke-linecap:round;stroke-width:1.1;opacity:.92;stroke:#FFFFFF}
+/* deep-blue when the screen under the globe is light */
+body.on-light .gf-glow{stroke:#63A6D9;opacity:.32}
+body.on-light .gf-sharp{stroke:#356C97}
+/* straight glowing side rule — changes colour with the globe (white on dark, blue on light) */
+.gf-rule{position:fixed;left:3.6%;top:0;width:1.5px;height:100vh;z-index:-1;
+  background:linear-gradient(180deg,rgba(255,255,255,0.08) 0%,#FFFFFF 20%,#C9E2F6 80%,rgba(255,255,255,0.08) 100%);
+  box-shadow:0 0 10px 2px rgba(200,226,246,0.4),0 0 26px 6px rgba(200,226,246,0.14);
+  animation:gfBreatheSoft 9s var(--ease) infinite}
+body.on-light .gf-rule{
+  background:linear-gradient(180deg,rgba(53,108,151,0.12) 0%,#4686B7 20%,#356C97 80%,rgba(53,108,151,0.12) 100%);
+  box-shadow:0 0 10px 2px rgba(70,134,183,0.35),0 0 26px 6px rgba(70,134,183,0.12)}
+/* no vertical side rule on the hero screen (display:none so the breathing
+   opacity animation can't keep it visible) */
+body.at-hero .gf-rule{display:none}
+@keyframes gfBreathe{0%,100%{opacity:.3}50%{opacity:.62}}
+@keyframes gfBreatheSoft{0%,100%{opacity:.5}50%{opacity:.95}}
+@supports (animation-timeline: scroll()){
+  @media (prefers-reduced-motion: no-preference){
+    /* pan the field: hero top -> screen-2 centre -> hold -> last screen bottom */
+    .fg{animation:fgPan linear both;animation-timeline:scroll(root block)}
+    @keyframes fgPan{0%{transform:translateY(0)}12%{transform:translateY(-100vh)}86%{transform:translateY(-100vh)}100%{transform:translateY(-200vh)}}
+    main>section .wrap{animation:gfFadeOut linear both;animation-timeline:view();animation-range:cover 72% cover 100%}
+    @keyframes gfFadeOut{0%{opacity:1}100%{opacity:0}}
+  }
+}
+
+/* ---- section rhythm — each section is exactly one snap bound (100vh) ---- */
+/* one idea per screen, content centred and clipped to the viewport so every page
+   renders cleanly within its bound over a solid dark-navy or white background */
+.sec{height:100vh;display:flex;flex-direction:column;justify-content:center;
+  padding:104px 0 64px;overflow:hidden}
+.eyebrow + .h-xl,.eyebrow + .h-lg{margin-top:20px}
+.h-xl{font-size:clamp(40px,6.2vw,82px);font-weight:400;line-height:1.0;letter-spacing:-0.025em;max-width:17ch}
+.h-lg{font-size:clamp(34px,5vw,64px);font-weight:400;line-height:1.02;letter-spacing:-0.025em;max-width:19ch}
+.h-md{font-size:clamp(22px,2.6vw,32px);line-height:1.12}
+.mt-s{margin-top:24px}.mt-m{margin-top:34px}.mt-l{margin-top:72px}.mt-xl{margin-top:96px}
+
+/* ---- problem: three stances ---- */
+.pts{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:var(--stack-lg)}
+.pts > div{padding:34px 34px 40px;border-left:1px solid var(--line)}
+.pts > div:first-child{border-left:none;padding-left:0}
+.pts .n{font-family:var(--serif);font-style:italic;font-weight:500;font-size:26px;color:var(--accent-ink)}
+.pts p{margin-top:18px;font-size:16px;line-height:1.55;color:var(--tx-2)}
+
+/* ---- data screen (charts breathe on the ground, no box) ---- */
+.chart-block{margin-top:var(--stack)}
+.chart-title{font-size:clamp(19px,2vw,24px);font-weight:400;color:var(--heading);letter-spacing:-0.01em;max-width:34ch}
+.chart-cap{margin-top:12px;font-size:16px;color:var(--tx-2);line-height:1.55;max-width:58ch}
+/* a chart tight under its own title/caption; the leading gap is owned by .chart-block */
+.echart{width:100%;margin-top:22px}
+/* a diagram that leads a screen straight after the section caption */
+.echart.chart-lead{margin-top:var(--stack-lg)}
+/* radial specimens (radar, rose): cap + left-align to the content column (like the
+   hero and every heading) so the plot fills its box and sits under its caption, not adrift */
+.echart.radial{max-width:560px;margin-left:0;margin-right:auto}
+
+/* ---- Bklit-style funnel ---- */
+.funnel{width:100%;margin-top:var(--stack);--fn:#4686B7;--fn-line:rgba(13,28,43,0.16)}
+.funnel svg{width:100%;height:auto;display:block;overflow:visible}
+.fn-seg{transform-box:fill-box;transform-origin:center}
+html.js .funnel{opacity:0}
+.fn-top{fill:var(--heading);font-family:var(--sans);font-weight:600;font-size:23px;letter-spacing:-0.01em}
+.fn-pill rect{fill:var(--heading)}
+.fn-pilltext{fill:var(--bg);font-family:var(--sans);font-weight:600;font-size:15px}
+.fn-bot{fill:var(--tx-2);font-family:var(--sans);font-size:14.5px}
+@media (prefers-reduced-motion: reduce){ html.js .funnel{opacity:1} }
+.echart canvas{cursor:default}
+.source{margin-top:26px;font-family:var(--mono);font-size:11.5px;letter-spacing:0.01em;color:var(--tx-3);line-height:1.6}
+.source a{color:var(--tx-3);text-decoration:underline;text-decoration-color:var(--line-2);text-underline-offset:3px}
+.source a:hover{color:var(--accent-ink)}
+
+/* ---- services grid ---- */
+.svc{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;margin-top:var(--stack-lg);background:var(--line);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.svc article{background:var(--card);padding:34px 32px 38px;min-height:210px;display:flex;flex-direction:column;transition:background .3s var(--ease)}
+.svc article:hover{background:var(--card-hover)}
+.svc .idx{font-family:var(--serif);font-style:italic;font-size:20px;color:var(--accent-ink)}
+.svc h3{margin-top:auto;font-size:21px;font-weight:400;letter-spacing:-0.01em;color:var(--heading)}
+.svc p{margin-top:14px;font-size:14.5px;line-height:1.52;color:var(--tx-2)}
+.svc .s-wide{grid-column:span 3}
+.svc .s-mid{grid-column:span 3}
+.svc .s-tri{grid-column:span 2}
+
+/* ---- how: journey line (five waypoints on a meridian) ---- */
+.journey{position:relative;display:grid;grid-template-columns:repeat(5,1fr);gap:0;margin-top:var(--stack-lg)}
+.journey-track{position:absolute;top:8px;left:14px;right:8%;height:1.5px;
+  background:linear-gradient(90deg,var(--deep),var(--steel) 45%,var(--sky));opacity:.7}
+.jstep{position:relative;padding:0 26px 0 0}
+.jdot{position:absolute;top:1px;left:8px;width:15px;height:15px;border-radius:50%;
+  background:var(--bg);border:2px solid var(--sky);
+  box-shadow:0 0 0 4px var(--bg),0 0 16px -2px var(--sky)}
+.jn{margin-top:44px;font-family:var(--mono);font-size:12px;letter-spacing:0.1em;color:var(--accent-ink)}
+.jstep h3{margin-top:16px;font-size:20px;font-weight:400;color:var(--heading);letter-spacing:-0.01em}
+.jstep p{margin-top:12px;font-size:14.5px;line-height:1.52;color:var(--tx-2);max-width:22ch}
+
+/* ---- shift: a three-step flow on a meridian line ---- */
+.flow{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:var(--stack-lg)}
+.flow-track{position:absolute;top:8px;left:14px;right:22%;height:1.5px;
+  background:linear-gradient(90deg,var(--deep),var(--steel) 50%,var(--sky));opacity:.7}
+.fstep{position:relative;padding:0 44px 0 0}
+.fdot{position:absolute;top:1px;left:8px;width:15px;height:15px;border-radius:50%;
+  background:var(--bg);border:2px solid var(--sky);box-shadow:0 0 0 4px var(--bg),0 0 16px -2px var(--sky)}
+.fdot.feat{background:var(--sky)}
+.fk{margin-top:46px;font-family:var(--serif);font-style:italic;font-weight:500;font-size:27px;color:var(--accent-ink)}
+.fstep p{margin-top:16px;font-size:16px;line-height:1.55;color:var(--tx-2);max-width:26ch}
+
+/* ---- who: offerings ---- */
+.offers{display:grid;grid-template-columns:1fr 1.12fr 1fr;gap:22px;margin-top:var(--stack-lg);align-items:stretch}
+.offer{padding:38px 34px 34px;border:1px solid var(--line);border-radius:18px;background:var(--card);display:flex;flex-direction:column}
+.offer.feat{border-color:var(--line-3);box-shadow:0 0 70px -24px rgba(70,134,183,0.55)}
+.offer h3{font-size:23px;font-weight:400;color:var(--heading);letter-spacing:-0.01em}
+.offer p{margin-top:14px;font-size:15.5px;line-height:1.55;color:var(--tx-2);flex:1}
+.offer .btn{margin-top:30px;align-self:flex-start}
+.feat-tag{font-family:var(--mono);font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:18px}
+
+/* ---- metric grid ---- */
+.mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-top:22px;background:var(--line);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.mgrid div{background:var(--panel);padding:30px 28px}
+.mgrid strong{display:block;font-size:34px;font-weight:200;color:var(--heading);letter-spacing:-0.02em;font-variant-numeric:tabular-nums}
+.mgrid span{display:block;margin-top:14px;font-size:14px;line-height:1.5;color:var(--tx-2)}
+
+/* ---- why: contrasts ---- */
+.contrasts{display:grid;grid-template-columns:1fr 1fr;gap:1px 0;margin-top:var(--stack-lg);background:var(--line);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.contrasts div{background:var(--card);padding:28px 32px;display:flex;align-items:baseline;gap:18px}
+.contrasts .yes{font-size:20px;color:var(--heading);font-weight:400;letter-spacing:-0.01em}
+.contrasts .no{font-family:var(--serif);font-style:italic;font-size:16px;color:var(--tx-3)}
+
+/* ---- pull quote ---- */
+.pull{font-family:var(--serif);font-style:italic;font-weight:500;font-size:clamp(26px,3.8vw,46px);
+  line-height:1.22;letter-spacing:-0.01em;color:var(--heading);max-width:18ch}
+.pull .accent{color:var(--accent-ink)}
+
+/* ---- company / cta — heading top-right, CTA body below-left ---- */
+.cta-sec{justify-content:flex-start}
+.company-head{max-width:22ch;margin-left:auto;text-align:right}
+.company-body{margin-top:clamp(40px,7vh,88px);max-width:56ch}
+.company-body .btn-row{margin-top:34px}
+
+/* ---- liquid-glass contact bar, pinned to the bottom of the company bound ---- */
+.glassbar{position:absolute;left:0;right:0;bottom:0;z-index:2;display:flex;align-items:center;
+  justify-content:space-between;gap:24px;flex-wrap:wrap;padding:20px clamp(24px,4vw,64px);
+  background:rgba(8,16,26,0.5);-webkit-backdrop-filter:blur(22px) saturate(160%);
+  backdrop-filter:blur(22px) saturate(160%);
+  border-top:1px solid rgba(255,255,255,0.16);box-shadow:inset 0 1px 0 rgba(255,255,255,0.08)}
+.glassbar .wm{font-size:12px;letter-spacing:0.22em}
+.glassbar .wm b{color:var(--heading);font-weight:700}.glassbar .wm i{font-style:normal;font-weight:300;color:var(--tx-3)}
+.contact{display:flex;align-items:center;gap:clamp(16px,2vw,28px);flex-wrap:wrap;font-family:var(--mono);font-size:12.5px}
+.contact-label{color:var(--tx-3);text-transform:uppercase;letter-spacing:0.16em;font-size:11px}
+.contact a{color:var(--tx);text-decoration:none;transition:color .2s var(--ease)}
+.contact a:hover{color:var(--sky)}
+@media (prefers-reduced-transparency: reduce){ .glassbar{background:#0a141e;backdrop-filter:none;-webkit-backdrop-filter:none} }
+.foot-nav a{color:var(--tx-2)}.foot-nav a:hover{color:#fff}
+
+/* ---- reveal — entrance choreography handed to Motion (see motion.js) ---- */
+.reveal{opacity:1}                 /* visible by default so the page is readable without JS */
+html.js .reveal{opacity:0}         /* hidden only when Motion will animate them in */
+
+@media (prefers-reduced-motion: no-preference){
+  .mg-draw,.mg-axis{stroke-dasharray:1;stroke-dashoffset:1;animation:mg-draw 2.6s var(--ease) .9s forwards}
+  .mg-axis{animation-duration:1.7s;animation-delay:.3s}
+  .mg-fan ellipse{opacity:0;animation:mg-fade .9s var(--ease) forwards}
+  .mg-faint{opacity:0;animation:mg-fade 1.4s var(--ease) 1.8s forwards}
+  .mg-breathe-a{animation:mg-breathe 13s ease-in-out 2.2s infinite}
+  .mg-breathe-b{animation:mg-breathe 13s ease-in-out 3.4s infinite}
+  .sec-field .sf{animation:mg-breathe 15s ease-in-out infinite}
+  .wordmark{opacity:0;animation:mg-rise 1s var(--ease) 1.1s forwards}
+  .hero-top{opacity:0;animation:mg-rise 1s var(--ease) .7s forwards}
+}
+@media (prefers-reduced-motion: reduce){
+  html.js .reveal{opacity:1;transform:none}
+  .mg-spark{display:none}
+  html{scroll-snap-type:none}
+}
+@keyframes mg-draw{to{stroke-dashoffset:0}}
+@keyframes mg-fade{to{opacity:1}}
+@keyframes mg-rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+@keyframes mg-breathe{0%,100%{opacity:.62}50%{opacity:1}}
+.mg-bright{filter:drop-shadow(0 0 5px rgba(136,193,237,0.45))}
+.mg-axis{filter:drop-shadow(0 0 4px rgba(200,226,246,0.6))}
+.mg-spark{filter:drop-shadow(0 0 4px rgba(200,226,246,0.9))}
+
+/* ---- responsive ---- */
+@media (max-width:1000px){
+  .journey{grid-template-columns:1fr 1fr;gap:36px 0}
+  .journey-track{display:none}
+  .jstep{padding-left:8px}
+  .offers{grid-template-columns:1fr}
+  .contrasts{grid-template-columns:1fr}
+}
+@media (max-width:760px){
+  .wrap{padding:0 24px}
+  .nav{padding:0 24px}
+  .nav-links{display:none}
+  .wbr{display:none}
+  .sec{height:auto;min-height:auto;justify-content:flex-start;padding:96px 0;overflow:visible}
+  html{scroll-snap-type:none}
+  .hero{padding:104px 24px 64px}
+  .pts{grid-template-columns:1fr;margin-top:48px}
+  .pts > div{border-left:none;border-top:1px solid var(--line);padding:26px 0}
+  .pts > div:first-child{padding-top:26px}
+  .journey{grid-template-columns:1fr;gap:30px 0}
+  .flow{grid-template-columns:1fr;gap:34px 0}
+  .flow-track{display:none}
+  .mgrid{grid-template-columns:1fr}
+}
+</style>
+<script>document.documentElement.classList.add('js')</script>
+</head>
+<body class="at-hero">
+
+<nav class="nav">
+  <a class="brand" href="#top" aria-label="Isthmus Meridian home">
+    <svg viewBox="0 0 48 48" width="26" height="26" aria-hidden="true">
+      <g fill="none" stroke="#F2F6FA" stroke-width="1.5" stroke-linecap="round">
+        <line x1="24" y1="9" x2="24" y2="39"/>
+        <path d="M12.5 12 C 24 18, 24 30, 12.5 38"/>
+        <path d="M35.5 12 C 24 18, 24 30, 35.5 38"/>
+      </g>
+    </svg>
+    <span class="wm"><b>ISTHMUS</b> <i>MERIDIAN</i></span>
+  </a>
+  <div class="nav-links">
+    <a href="#services">Services</a>
+    <a href="#how">How We Work</a>
+    <a href="#who">Who We Serve</a>
+    <a href="#why">Why Isthmus</a>
+    <a href="#company">Company</a>
+  </div>
+  <div class="nav-cta">
+    <a class="btn btn-primary btn-sm" href="#company">Request access</a>
+  </div>
+</nav>
+
+<span id="top"></span>
+
+<div class="gf-rule" aria-hidden="true"></div>
+<svg class="fg" viewBox="0 0 1200 2025" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <g class="gf-glow"><g transform="rotate(-14 302 -431)"><circle cx="302" cy="-431" r="709" stroke-opacity="0.8"></circle><path d="M -407 -431 A 709 700.3 0 0 1 1011 -431 A 709 700.3 0 0 1 -407 -431" stroke-opacity="0.5"></path><path d="M -407 -431 A 709 674.3 0 0 1 1011 -431 A 709 674.3 0 0 1 -407 -431" stroke-opacity="0.2"></path><path d="M -407 -431 A 709 631.7 0 0 1 1011 -431 A 709 631.7 0 0 1 -407 -431" stroke-opacity="0.08"></path><path d="M -407 -431 A 709 573.6 0 0 1 1011 -431 A 709 573.6 0 0 1 -407 -431" stroke-opacity="0.032"></path></g><g transform="rotate(8 885 1042)"><circle cx="885" cy="1042" r="745" stroke-opacity="0.8"></circle><path d="M 140 1042 A 745 735.8 0 0 1 1630 1042 A 745 735.8 0 0 1 140 1042" stroke-opacity="0.5"></path><path d="M 140 1042 A 745 708.5 0 0 1 1630 1042 A 745 708.5 0 0 1 140 1042" stroke-opacity="0.2"></path><path d="M 140 1042 A 745 663.8 0 0 1 1630 1042 A 745 663.8 0 0 1 140 1042" stroke-opacity="0.08"></path><path d="M 140 1042 A 745 602.7 0 0 1 1630 1042 A 745 602.7 0 0 1 140 1042" stroke-opacity="0.032"></path></g><g transform="rotate(-6 338 2550)"><circle cx="338" cy="2550" r="709" stroke-opacity="0.8"></circle><path d="M -371 2550 A 709 700.3 0 0 1 1047 2550 A 709 700.3 0 0 1 -371 2550" stroke-opacity="0.5"></path><path d="M -371 2550 A 709 674.3 0 0 1 1047 2550 A 709 674.3 0 0 1 -371 2550" stroke-opacity="0.2"></path><path d="M -371 2550 A 709 631.7 0 0 1 1047 2550 A 709 631.7 0 0 1 -371 2550" stroke-opacity="0.08"></path><path d="M -371 2550 A 709 573.6 0 0 1 1047 2550 A 709 573.6 0 0 1 -371 2550" stroke-opacity="0.032"></path></g><line x1="-180" y1="458" x2="1300" y2="158"></line><line x1="-180" y1="1625" x2="1340" y2="1985"></line></g>
+  <g class="gf-sharp"><g transform="rotate(-14 302 -431)"><circle cx="302" cy="-431" r="709" stroke-opacity="0.8"></circle><path d="M -407 -431 A 709 700.3 0 0 1 1011 -431 A 709 700.3 0 0 1 -407 -431" stroke-opacity="0.5"></path><path d="M -407 -431 A 709 674.3 0 0 1 1011 -431 A 709 674.3 0 0 1 -407 -431" stroke-opacity="0.2"></path><path d="M -407 -431 A 709 631.7 0 0 1 1011 -431 A 709 631.7 0 0 1 -407 -431" stroke-opacity="0.08"></path><path d="M -407 -431 A 709 573.6 0 0 1 1011 -431 A 709 573.6 0 0 1 -407 -431" stroke-opacity="0.032"></path></g><g transform="rotate(8 885 1042)"><circle cx="885" cy="1042" r="745" stroke-opacity="0.8"></circle><path d="M 140 1042 A 745 735.8 0 0 1 1630 1042 A 745 735.8 0 0 1 140 1042" stroke-opacity="0.5"></path><path d="M 140 1042 A 745 708.5 0 0 1 1630 1042 A 745 708.5 0 0 1 140 1042" stroke-opacity="0.2"></path><path d="M 140 1042 A 745 663.8 0 0 1 1630 1042 A 745 663.8 0 0 1 140 1042" stroke-opacity="0.08"></path><path d="M 140 1042 A 745 602.7 0 0 1 1630 1042 A 745 602.7 0 0 1 140 1042" stroke-opacity="0.032"></path></g><g transform="rotate(-6 338 2550)"><circle cx="338" cy="2550" r="709" stroke-opacity="0.8"></circle><path d="M -371 2550 A 709 700.3 0 0 1 1047 2550 A 709 700.3 0 0 1 -371 2550" stroke-opacity="0.5"></path><path d="M -371 2550 A 709 674.3 0 0 1 1047 2550 A 709 674.3 0 0 1 -371 2550" stroke-opacity="0.2"></path><path d="M -371 2550 A 709 631.7 0 0 1 1047 2550 A 709 631.7 0 0 1 -371 2550" stroke-opacity="0.08"></path><path d="M -371 2550 A 709 573.6 0 0 1 1047 2550 A 709 573.6 0 0 1 -371 2550" stroke-opacity="0.032"></path></g><line x1="-180" y1="458" x2="1300" y2="158"></line><line x1="-180" y1="1625" x2="1340" y2="1985"></line></g>
+</svg>
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-top">
+      <p class="hero-tag">The analytical, operational, and reporting work<br class="wbr"> behind an investment firm, run as a service.</p>
+    </div>
+    <div class="hero-bottom">
+      <h1 class="wordmark"><span class="w-isth">Isthmus</span><span class="w-mer">Meridian</span></h1>
+    </div>
+  </div>
+</header>
+
+
+<main>
+
+  <!-- The problem (light) -->
+  <section class="sec light">
+    
+    <div class="wrap">
+      <h2 class="h-xl reveal">Running a fund takes more than an <span class="serif-i">investment team</span>.</h2>
+      <p class="body mt-m reveal">Every firm needs financial models, diligence, investor materials, reporting, research, portfolio monitoring, data management, and operational coordination. Today that work is built three ways, and none of them fit.</p>
+      <div class="pts">
+        <div class="reveal"><div class="n">Build it</div><p>Standing up every function internally is slow and expensive.</p></div>
+        <div class="reveal"><div class="n">Outsource it</div><p>Coordinating a roster of point providers stays fragmented.</p></div>
+        <div class="reveal"><div class="n">Automate it</div><p>Generic AI tools still leave the actual work on the investor's desk.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pressure data (dark) -->
+  <section class="sec">
+    
+    <div class="wrap">
+      <h2 class="h-lg mt-s reveal">Private-market pressure is <span class="serif-i">rising</span>.</h2>
+      <p class="body mt-s reveal">More activity and longer, more complex holding periods create more analytical and operational work for investment teams.</p>
+      <div class="chart-block reveal">
+        <div class="echart reveal radial" style="height:360px" data-chart='{"indicators":[{"name":"Large deal value","max":55},{"name":"Overall PE deal value","max":55},{"name":"PE-backed exit value","max":55},{"name":"Secondaries volume","max":55}],"values":[44,17,40,48],"disp":["+44%","+17%","+40%","+48%"],"type":"radar","theme":"dark"}' role="img" aria-label="radar chart of the figures in this panel"></div>
+        <p class="source">Source: <a href="https://www.mckinsey.com/industries/private-capital/our-insights/global-private-markets-report/private-equity" target="_blank" rel="noopener">McKinsey Global Private Equity Report 2026</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- The shift (light) -->
+  <section class="sec light">
+    
+    <div class="wrap">
+      <blockquote class="pull reveal">We do not hand your team another tool to run. <span class="accent">We run the work.</span></blockquote>
+      <div class="flow reveal">
+        <div class="flow-track"></div>
+        <div class="fstep"><span class="fdot"></span><div class="fk">You send</div><p>A deal, a model, a reporting need, a fundraise, a research question.</p></div>
+        <div class="fstep"><span class="fdot feat"></span><div class="fk">We operate</div><p>On an AI-first bench, to your firm's standard, at the pace of a live raise.</p></div>
+        <div class="fstep"><span class="fdot"></span><div class="fk">You receive</div><p>Completed, institutional-grade work, ready for the IC or the LP.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services — operating tree (dark) -->
+  <section class="sec" id="services">
+    <div class="wrap">
+      <h2 class="h-lg mt-s reveal">What Isthmus Meridian operates.</h2>
+      <p class="body mt-s reveal">Organized as a single operating tree, across every function an investment firm needs to run. Hover any branch for what it covers.</p>
+      <div class="echart reveal chart-lead" style="height:400px" data-chart='{"data":{"name":"Isthmus Meridian","children":[{"name":"Deal &amp; capital","children":[{"name":"Deal team support","desc":"Sourcing, research, screening, diligence, memos, and IC decks."},{"name":"Financial modeling","desc":"Forecasting, valuation, comparables, returns, and scenarios."},{"name":"Capital formation","desc":"Fund decks, LP updates, DDQs, and data-room materials."}]},{"name":"Operations","children":[{"name":"Fund operations","desc":"Pipeline admin, documentation, internal reporting, and calendars."},{"name":"Portfolio monitoring","desc":"KPI collection, budget-vs-actual tracking, dashboards, and board updates."}]},{"name":"Research &amp; data","children":[{"name":"Research and intelligence","desc":"Sector, company, transaction, regulatory, and thematic research."},{"name":"Data and AI enablement","desc":"Workflow mapping, document processing, templates, and custom tools."}]}]},"type":"tree","theme":"dark"}' role="img" aria-label="tree chart of the figures in this panel"></div>
+    </div>
+  </section>
+
+  <!-- Back-office pain — gauges (light) -->
+  <section class="sec light">
+    <div class="wrap">
+      <h2 class="h-lg mt-s reveal">The back-office pain behind the <span class="serif-i">services</span>.</h2>
+      <div class="chart-block reveal">
+        <div class="echart reveal" style="height:250px" data-chart='{"items":[{"name":"Data fragmentation","value":89},{"name":"More detailed LP requests","value":58},{"name":"Static reporting","value":44}],"type":"gauge","theme":"light"}' role="img" aria-label="gauge chart of the figures in this panel"></div>
+        <p class="source">Sources: <a href="https://www.equiforte.com/resources/blog/pe-cfo-reporting-survey" target="_blank" rel="noopener">Equiforte</a>, <a href="https://www.maybern.com/post/meeting-the-growing-demands-of-in-flight-lp-information-requests" target="_blank" rel="noopener">Maybern / Private Funds CFO</a>, <a href="https://www.pwc.com/mk/en/news/cfo-compass-survey-2025.html" target="_blank" rel="noopener">PwC</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- How we work — journey (dark) -->
+  <section class="sec" id="how">
+    <div class="wrap">
+      <h2 class="h-lg mt-s reveal">An embedded team, without the cost of <span class="serif-i">building one</span>.</h2>
+      <div class="journey reveal"><div class="journey-track"></div><div class="jstep"><span class="jdot"></span><div class="jn">01</div><h3>Understand</h3><p>Map the firm's strategy, standards, and recurring requirements.</p></div><div class="jstep"><span class="jdot"></span><div class="jn">02</div><h3>Operate</h3><p>Take responsibility for defined workflows end to end.</p></div><div class="jstep"><span class="jdot"></span><div class="jn">03</div><h3>Standardize</h3><p>Build templates, structures, and quality controls.</p></div><div class="jstep"><span class="jdot"></span><div class="jn">04</div><h3>Automate</h3><p>Use AI and tooling to cut repetitive labor.</p></div><div class="jstep"><span class="jdot"></span><div class="jn">05</div><h3>Expand</h3><p>Take on additional functions as trust compounds.</p></div></div>
+    </div>
+  </section>
+
+  <!-- AI use — funnel (light) -->
+  <section class="sec light">
+    <div class="wrap">
+      <h2 class="h-lg mt-s reveal">AI use is active — <span class="serif-i">integration</span> decides the value.</h2>
+      <div class="chart-block reveal">
+        <div class="funnel" role="img" aria-label="Funnel of AI adoption stages"><svg viewBox="0 0 1120 470" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><g class="fn-seg"><path d="M 372.0 22.0 C 491.3 22.0 491.3 145.7 610.7 145.7 L 610.7 318.3 C 491.3 318.3 491.3 442.0 372.0 442.0 Z" fill="var(--fn)" fill-opacity="0.09"></path><path d="M 372.0 53.5 C 491.3 53.5 491.3 158.6 610.7 158.6 L 610.7 305.4 C 491.3 305.4 491.3 410.5 372.0 410.5 Z" fill="var(--fn)" fill-opacity="0.16"></path><path d="M 372.0 82.0 C 491.3 82.0 491.3 170.3 610.7 170.3 L 610.7 293.7 C 491.3 293.7 491.3 382.0 372.0 382.0 Z" fill="var(--fn)" fill-opacity="0.46"></path><line x1="610.7" y1="145.7" x2="610.7" y2="318.3" stroke="var(--fn-line)" stroke-width="1"></line><text x="491.3" y="44.0" class="fn-top" text-anchor="middle">90%</text><g class="fn-pill"><rect x="453.3" y="214.0" width="76" height="36" rx="18"></rect><text x="491.3" y="233.0" class="fn-pilltext" text-anchor="middle" dominant-baseline="central">100%</text></g><text x="491.3" y="428.0" class="fn-bot" text-anchor="middle">Use GenAI in M&A</text></g><g class="fn-seg"><path d="M 610.7 145.7 C 730.0 145.7 730.0 150.3 849.3 150.3 L 849.3 313.7 C 730.0 313.7 730.0 318.3 610.7 318.3 Z" fill="var(--fn)" fill-opacity="0.09"></path><path d="M 610.7 158.6 C 730.0 158.6 730.0 162.6 849.3 162.6 L 849.3 301.4 C 730.0 301.4 730.0 305.4 610.7 305.4 Z" fill="var(--fn)" fill-opacity="0.16"></path><path d="M 610.7 170.3 C 730.0 170.3 730.0 173.7 849.3 173.7 L 849.3 290.3 C 730.0 290.3 730.0 293.7 610.7 293.7 Z" fill="var(--fn)" fill-opacity="0.46"></path><line x1="849.3" y1="150.3" x2="849.3" y2="313.7" stroke="var(--fn-line)" stroke-width="1"></line><text x="730.0" y="44.0" class="fn-top" text-anchor="middle">37%</text><g class="fn-pill"><rect x="692.0" y="214.0" width="76" height="36" rx="18"></rect><text x="730.0" y="233.0" class="fn-pilltext" text-anchor="middle" dominant-baseline="central">41%</text></g><text x="730.0" y="428.0" class="fn-bot" text-anchor="middle">Across multiple stages</text></g><g class="fn-seg"><path d="M 849.3 150.3 C 968.7 150.3 968.7 150.3 1088.0 150.3 L 1088.0 313.7 C 968.7 313.7 968.7 313.7 849.3 313.7 Z" fill="var(--fn)" fill-opacity="0.09"></path><path d="M 849.3 162.6 C 968.7 162.6 968.7 162.6 1088.0 162.6 L 1088.0 301.4 C 968.7 301.4 968.7 301.4 849.3 301.4 Z" fill="var(--fn)" fill-opacity="0.16"></path><path d="M 849.3 173.7 C 968.7 173.7 968.7 173.7 1088.0 173.7 L 1088.0 290.3 C 968.7 290.3 968.7 290.3 849.3 290.3 Z" fill="var(--fn)" fill-opacity="0.46"></path><text x="968.7" y="44.0" class="fn-top" text-anchor="middle">35%</text><g class="fn-pill"><rect x="930.7" y="214.0" width="76" height="36" rx="18"></rect><text x="968.7" y="233.0" class="fn-pilltext" text-anchor="middle" dominant-baseline="central">39%</text></g><text x="968.7" y="428.0" class="fn-bot" text-anchor="middle">Most value, advisory-led</text></g></svg></div>
+        <p class="source">Source: <a href="https://www.deloitte.com/us/en/what-we-do/capabilities/mergers-acquisitions-restructuring/articles/m-and-a-generative-ai-study.html" target="_blank" rel="noopener">Deloitte 2026 GenAI in M&amp;A Pulse Study</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Who we serve (dark) -->
+  <section class="sec" id="who">
+    
+    <div class="wrap">
+      <h2 class="h-lg mt-s reveal">Three ways to work with us.</h2>
+      <div class="offers">
+        <div class="offer reveal">
+          <h3>Transaction support</h3>
+          <p>For a specific active deal that needs modeling, diligence, and materials at pace.</p>
+          <a class="btn btn-ghost" href="#company">Bring us a deal</a>
+        </div>
+        <div class="offer feat reveal">
+          <div class="feat-tag">Central offering</div>
+          <h3>Embedded back office</h3>
+          <p>The standing operating layer for small and mid-sized funds, across every function at once.</p>
+          <a class="btn btn-primary" href="#company">Build your back office</a>
+        </div>
+        <div class="offer reveal">
+          <h3>Portfolio and fund support</h3>
+          <p>For firms with an investment team that need recurring operating infrastructure.</p>
+          <a class="btn btn-ghost" href="#company">Discuss ongoing support</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LP expectations — metrics (light) -->
+  <section class="sec light">
+    <div class="wrap">
+      <h2 class="h-lg mt-s reveal">From periodic reporting to <span class="serif-i">on-demand analysis</span>.</h2>
+      <div class="chart-block reveal">
+        <div class="mgrid">
+          <div><strong data-count="58" data-suffix="%">58%</strong><span>of CFOs report more detailed LP information requests.</span></div>
+          <div><strong>Hours</strong><span>Expected response speed is compressing from days toward hours.</span></div>
+          <div><strong>Baseline</strong><span>Granular, standardized reporting is becoming the expectation, not the exception.</span></div>
+        </div>
+        <p class="source">Source: <a href="https://www.maybern.com/post/meeting-the-growing-demands-of-in-flight-lp-information-requests" target="_blank" rel="noopener">Maybern summary of Private Funds CFO Insights Survey 2025</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why isthmus — contrasts (dark) -->
+  <section class="sec" id="why">
+    <div class="wrap">
+      <h2 class="h-lg mt-s reveal">Built for private-market operating work.</h2>
+      <div class="contrasts">
+        <div class="reveal"><span class="yes">Integrated</span><span class="no">not fragmented</span></div>
+        <div class="reveal"><span class="yes">Embedded</span><span class="no">not external</span></div>
+        <div class="reveal"><span class="yes">Execution</span><span class="no">not software licenses</span></div>
+        <div class="reveal"><span class="yes">Investment-specific</span><span class="no">not generic</span></div>
+        <div class="reveal"><span class="yes">AI-enabled</span><span class="no">not labor-only</span></div>
+        <div class="reveal"><span class="yes">Scalable</span><span class="no">not dependent on internal hiring</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Readiness gap — rose (light) -->
+  <section class="sec light">
+    <div class="wrap">
+      <h2 class="h-lg mt-s reveal">The transaction-readiness <span class="serif-i">gap</span>.</h2>
+      <div class="chart-block reveal">
+        <p class="chart-cap">Many firms still run transaction workflows with limited tooling and integration.</p>
+        <div class="echart reveal radial" style="height:360px" data-chart='{"items":[{"name":"Limited resources","full":"Limited resources as top challenge","value":56,"display":"56%"},{"name":"Adjusted modeling","full":"Adjusted financial modeling","value":46,"display":"46%"},{"name":"Enhanced diligence","full":"Enhanced due diligence","value":40,"display":"40%"},{"name":"AI evaluations","full":"Use AI evaluations","value":5,"display":"5%"}],"type":"rose","theme":"light"}' role="img" aria-label="rose chart of the figures in this panel"></div>
+        <p class="source">Source: <a href="https://corpgov.law.harvard.edu/2025/11/04/ready-for-the-deal-transaction-readiness-in-turbulent-times/" target="_blank" rel="noopener">Harvard Law School Forum transaction-readiness survey</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Company / CTA (dark) — the last bound; heading top-right, liquid-glass contact bar -->
+  <section class="sec cta-sec" id="company">
+    <div class="wrap company-wrap">
+      <h2 class="h-lg reveal company-head">We run the back office behind <span class="serif-i">private-market investors</span>.</h2>
+      <div class="company-body">
+        <p class="lead reveal">Isthmus Meridian supports investment firms with institutional decks, deal models, diligence, reporting, research, portfolio materials, data workflows, and AI-enabled execution.</p>
+        <div class="btn-row reveal">
+          <a class="btn btn-primary" href="mailto:hello@isthmusmeridian.com?subject=Build%20your%20back%20office">Build your back office</a>
+          <a class="btn btn-ghost" href="mailto:hello@isthmusmeridian.com?subject=Bring%20us%20a%20deal">Bring us a deal</a>
+        </div>
+      </div>
+    </div>
+    <div class="glassbar reveal">
+      <span class="wm"><b>ISTHMUS</b> <i>MERIDIAN</i></span>
+      <div class="contact">
+        <span class="contact-label">Contact us</span>
+        <a href="mailto:hello@isthmusmeridian.com">hello@isthmusmeridian.com</a>
+        <a href="tel:+10000000000">+1 (000) 000&#8209;0000</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+(function(){
+  // the continuous globe field flips white/blue depending on the screen it sits behind
+  var themeIO = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if (e.isIntersecting) {
+        document.body.classList.toggle('on-light', e.target.classList.contains('light'));
+        document.body.classList.toggle('at-hero', e.target.classList.contains('hero'));
+      }
+    });
+  }, { rootMargin: '-45% 0px -45% 0px', threshold: 0 });
+  document.querySelectorAll('header.hero, main > section').forEach(function(s){ themeIO.observe(s); });
+})();
+</script>
+<script src="charts.js" defer></script>
+<script src="motion.js" defer></script>
+
+</body>
+</html>

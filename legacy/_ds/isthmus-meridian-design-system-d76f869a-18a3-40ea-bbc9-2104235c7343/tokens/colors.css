@@ -1,0 +1,91 @@
+/* Isthmus Meridian — Color tokens
+   ================================================================
+   Sourced from the brand: pure black canvas, a steel→sky blue
+   gradient axis (#4686B7 / #88C1ED), pure white type.
+   Layer 1 = raw palette. Layer 2 = semantic aliases (use these).
+*/
+:root {
+  /* ---- Ink / neutral surfaces (dark-first) ---- */
+  --im-black:      #000000;   /* true canvas */
+  --im-ink-900:    #05070A;   /* page, faint blue-black */
+  --im-ink-800:    #0B0F14;   /* card / panel */
+  --im-ink-700:    #12171E;   /* raised panel */
+  --im-ink-600:    #1B2129;   /* input / hover surface */
+  --im-ink-500:    #29313B;   /* border-strong, chips */
+  --im-ink-400:    #3B454F;   /* muted UI lines */
+
+  /* ---- Blue axis (steel → sky) ---- */
+  --im-blue-50:    #EAF4FC;
+  --im-blue-100:   #C9E2F6;
+  --im-blue-200:   #88C1ED;   /* SKY  — bright accent (brand) */
+  --im-blue-300:   #63A6D9;
+  --im-blue-400:   #4686B7;   /* STEEL — primary accent (brand) */
+  --im-blue-500:   #356C97;
+  --im-blue-600:   #274F6F;
+  --im-blue-700:   #1A3548;
+  --im-blue-800:   #0F2231;
+  --im-blue-900:   #081420;
+
+  /* ---- Pure ---- */
+  --im-white:      #FFFFFF;
+
+  /* ---- Text on dark (white with opacity ramp) ---- */
+  --im-text-strong:   #FFFFFF;
+  --im-text-primary:  rgba(255,255,255,0.92);
+  --im-text-secondary:rgba(255,255,255,0.64);
+  --im-text-muted:    rgba(255,255,255,0.42);
+  --im-text-faint:    rgba(255,255,255,0.26);
+
+  /* ---- Hairlines / borders on dark ---- */
+  --im-line:          rgba(255,255,255,0.09);
+  --im-line-strong:   rgba(255,255,255,0.16);
+  --im-line-accent:   rgba(136,193,237,0.32);
+
+  /* ---- Semantic status (kept quiet, institutional) ---- */
+  --im-positive:   #5BB98C;
+  --im-negative:   #D8695E;
+  --im-warning:    #D9A441;
+
+  /* ================= SEMANTIC ALIASES ================= */
+  --surface-page:      var(--im-black);
+  --surface-sunken:    var(--im-ink-900);
+  --surface-card:      var(--im-ink-700);
+  --surface-raised:    var(--im-ink-600);
+  --surface-input:     var(--im-ink-700);
+  --surface-hover:     var(--im-ink-600);
+
+  --text-strong:       var(--im-text-strong);
+  --text-body:         var(--im-text-primary);
+  --text-secondary:    var(--im-text-secondary);
+  --text-muted:        var(--im-text-muted);
+  --text-on-accent:    var(--im-white);
+
+  --accent:            var(--im-blue-400);   /* steel */
+  --accent-bright:     var(--im-blue-200);   /* sky   */
+  --accent-hover:      var(--im-blue-300);
+  --accent-press:      var(--im-blue-500);
+
+  --border-subtle:     var(--im-line);
+  --border-strong:     var(--im-line-strong);
+  --border-accent:     var(--im-line-accent);
+
+  /* ---- Data-visualization sequence (monochrome blue, institutional) ---- */
+  --seq-1:  #88C1ED;   /* sky */
+  --seq-2:  #4686B7;   /* steel */
+  --seq-3:  #63A6D9;
+  --seq-4:  #274F6F;
+  --seq-5:  #C9E2F6;
+  --seq-6:  #1A3548;
+  --chart-track: rgba(255,255,255,0.06);   /* @kind color */
+  --chart-grid:  rgba(255,255,255,0.055);  /* @kind color */
+  --chart-axis:  rgba(255,255,255,0.42);   /* @kind color */
+
+  /* ---- Signature gradients ---- */
+  --grad-glow:   radial-gradient(120% 120% at 62% 92%, #88C1ED 0%, #2f5f85 30%, #0b1420 62%, #000000 100%);  /* @kind color */
+  --grad-steel:  linear-gradient(180deg, #4686B7 0%, #274F6F 100%);  /* @kind color */
+  --grad-sky:    linear-gradient(135deg, #88C1ED 0%, #4686B7 100%);  /* @kind color */
+  --grad-ink:    linear-gradient(180deg, #0B0F14 0%, #000000 100%);  /* @kind color */
+  --grad-hairline:linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);  /* @kind color */
+  /* Type "chrome" fill used on big display numerals/words (see brand) */
+  --grad-chrome: linear-gradient(176deg, #FFFFFF 0%, #EAF1F8 18%, #C2D0DD 46%, #FFFFFF 58%, #8896A4 82%, #B4C2CF 100%);  /* @kind color */
+}

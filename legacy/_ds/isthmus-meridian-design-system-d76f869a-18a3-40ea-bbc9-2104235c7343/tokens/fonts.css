@@ -1,0 +1,10 @@
+/* Isthmus Meridian — Webfonts
+   ---------------------------------------------------------------
+   BRAND FACE: Helvetica (Light / Regular / Bold), per brand guide.
+   Helvetica ships on macOS/iOS ("Helvetica Neue" / "Helvetica") and
+   Windows exposes the metric-compatible Arial. For machines with
+   neither, we load ARIMO — an Apache-licensed, metrically identical
+   substitute for Helvetica/Arial — from Google Fonts so line breaks
+   and spacing are preserved. See readme.md » Typography for the note.
+*/
+@import url('https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400;0,500;0,700;1,400&display=swap');

@@ -16,224 +16,19 @@
 
 import * as topojson from "topojson-client";
 import worldTopo from "world-atlas/countries-110m.json";
-import { BACKDROP, CORRIDOR, ECONOMICS, MARKET } from "./content";
-import { baseAxis, type DeckPalette, EChart, echarts, ENTER } from "./echart";
+import { FUNCTIONS, MARKET, ROADMAP, STRUCTURE } from "./content";
+import { baseAxis, type DeckPalette, EChart, ENTER } from "./echart";
 
-/* ------------------------------------------------- IV · backdrop divergence */
-
-/**
- * Two indexed series diverging. The whole argument is the widening gap, so the
- * annotation sits on the year it stops being recoverable by hiring.
- */
-export function BackdropChart({ active }: { active: boolean }) {
-  const build = (p: DeckPalette) => {
-    const { years, series, annotation, axisNote } = BACKDROP;
-    const annIndex = years.indexOf(annotation.at);
-
-    return {
-      ...ENTER,
-      backgroundColor: "transparent",
-      grid: { left: 8, right: 168, top: 28, bottom: 34, containLabel: true },
-      xAxis: {
-        type: "category",
-        data: years,
-        boundaryGap: false,
-        ...baseAxis(p),
-      },
-      yAxis: {
-        type: "value",
-        min: 80,
-        max: 300,
-        name: axisNote,
-        nameTextStyle: { color: p.faint, fontSize: 11, fontFamily: p.sans, align: "left" },
-        nameGap: 14,
-        ...baseAxis(p),
-        axisLine: { show: false },
-        splitLine: { show: true, lineStyle: { color: p.grid, width: 1 } },
-      },
-      series: [
-        {
-          name: series.aum.label,
-          type: "line",
-          data: series.aum.values,
-          smooth: 0.28,
-          symbol: "circle",
-          symbolSize: 8,
-          showSymbol: false,
-          lineStyle: { width: 2.5, color: p.accent },
-          itemStyle: { color: p.accent },
-          areaStyle: {
-            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: `${p.accent}2e` },
-              { offset: 1, color: `${p.accent}00` },
-            ]),
-          },
-          // Direct label at the series end — this is why there is no legend.
-          endLabel: {
-            show: true,
-            formatter: series.aum.label,
-            color: p.text,
-            fontSize: 12,
-            fontFamily: p.sans,
-            fontWeight: 500,
-            distance: 10,
-          },
-          markPoint: {
-            symbol: "circle",
-            symbolSize: 9,
-            data: [{ coord: [annIndex, series.aum.values[annIndex]] }],
-            itemStyle: { color: p.accent, borderColor: p.bg, borderWidth: 2 },
-            label: { show: false },
-          },
-          ...ENTER,
-        },
-        {
-          name: series.ops.label,
-          type: "line",
-          data: series.ops.values,
-          smooth: 0.28,
-          showSymbol: false,
-          lineStyle: { width: 2, color: p.accent2, type: "dashed" },
-          itemStyle: { color: p.accent2 },
-          endLabel: {
-            show: true,
-            formatter: series.ops.label,
-            color: p.body,
-            fontSize: 12,
-            fontFamily: p.sans,
-            distance: 10,
-          },
-          ...ENTER,
-          animationDelay: () => 180,
-        },
-      ],
-      graphic: annotationBlock(p, annotation.label, 0.42, 0.2),
-    };
-  };
-
-  return (
-    <EChart
-      active={active}
-      alt={`${BACKDROP.title} ${BACKDROP.titleAccent} Private-markets AUM compounds while back-office capacity per fund stays close to flat.`}
-      build={build}
-    />
-  );
-}
-
-/* ------------------------------------------------------ IX · economics curve */
-
-/**
- * Gross margin rising as workflows automate, with the two multiple regimes
- * drawn as bands behind it. The crossing is the finding.
- */
-export function EconomicsChart({ active }: { active: boolean }) {
-  const build = (p: DeckPalette) => {
-    const { quarters, series, annotation, bands } = ECONOMICS;
-    const annIndex = quarters.indexOf(annotation.at);
-
-    return {
-      ...ENTER,
-      backgroundColor: "transparent",
-      grid: { left: 8, right: 150, top: 30, bottom: 34, containLabel: true },
-      xAxis: { type: "category", data: quarters, boundaryGap: false, ...baseAxis(p) },
-      yAxis: [
-        {
-          type: "value",
-          min: 0,
-          max: 80,
-          axisLabel: { ...baseAxis(p).axisLabel, formatter: "{value}%" },
-          axisLine: { show: false },
-          axisTick: { show: false },
-          splitLine: { show: true, lineStyle: { color: p.grid, width: 1 } },
-        },
-        {
-          type: "value",
-          min: 0,
-          max: 24,
-          ...baseAxis(p),
-          axisLine: { show: false },
-          splitLine: { show: false },
-        },
-      ],
-      series: [
-        {
-          name: series.margin.label,
-          type: "line",
-          data: series.margin.values,
-          smooth: 0.3,
-          showSymbol: false,
-          lineStyle: { width: 2.5, color: p.accent },
-          areaStyle: {
-            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: `${p.accent}33` },
-              { offset: 1, color: `${p.accent}00` },
-            ]),
-          },
-          endLabel: {
-            show: true,
-            formatter: series.margin.label,
-            color: p.text,
-            fontSize: 12,
-            fontFamily: p.sans,
-            fontWeight: 500,
-            distance: 10,
-          },
-          markArea: {
-            silent: true,
-            itemStyle: { color: `${p.accent2}12` },
-            label: {
-              show: true,
-              position: "insideTop",
-              color: p.faint,
-              fontSize: 10,
-              fontFamily: p.sans,
-            },
-            data: bands.map((b) => [
-              { xAxis: quarters[b.from], name: b.label },
-              { xAxis: quarters[b.to] },
-            ]),
-          },
-          markPoint: {
-            symbol: "circle",
-            symbolSize: 9,
-            data: [{ coord: [annIndex, series.margin.values[annIndex]] }],
-            itemStyle: { color: p.accent, borderColor: p.bg, borderWidth: 2 },
-            label: { show: false },
-          },
-          ...ENTER,
-        },
-        {
-          name: series.automated.label,
-          type: "line",
-          yAxisIndex: 1,
-          data: series.automated.values,
-          smooth: 0.3,
-          showSymbol: false,
-          lineStyle: { width: 2, color: p.accent2, type: "dashed" },
-          endLabel: {
-            show: true,
-            formatter: series.automated.label,
-            color: p.body,
-            fontSize: 12,
-            fontFamily: p.sans,
-            distance: 10,
-          },
-          ...ENTER,
-          animationDelay: () => 180,
-        },
-      ],
-      graphic: annotationBlock(p, annotation.label, 0.5, 0.16),
-    };
-  };
-
-  return (
-    <EChart
-      active={active}
-      alt={`${ECONOMICS.title} ${ECONOMICS.titleAccent} Gross margin rises from the services range into the software range as workflows automate.`}
-      build={build}
-    />
-  );
-}
+const FN_SHORT = [
+  "Deal sourcing",
+  "Diligence",
+  "Modeling",
+  "Capital formation",
+  "Fund ops",
+  "Portfolio & LP",
+  "Data ops & AI",
+  "Market research",
+];
 
 /* --------------------------------------------------------- X · market comps */
 
@@ -308,61 +103,196 @@ export function CompsChart({ active }: { active: boolean }) {
   );
 }
 
-/* ------------------------------------------------------- XII · corridor map */
+/* ------------------------------------------------ X · market multiple range */
 
-const WORLD = "fdeck-world";
-let worldRegistered = false;
-
-/** Latitude band the corridor actually occupies. */
-const LAT_MIN = -40;
-const LAT_MAX = 75;
-
-function registerWorld() {
-  if (worldRegistered) return;
-  // world-atlas ships TopoJSON; ECharts wants GeoJSON.
-  const topo = worldTopo as unknown as Parameters<typeof topojson.feature>[0];
-  const geo = topojson.feature(
-    topo,
-    // biome-ignore lint/suspicious/noExplicitAny: topojson's object index is untyped
-    (topo as any).objects.countries
-  ) as unknown as {
-    type: string;
-    features: Array<{ properties?: { name?: string }; geometry?: unknown }>;
+/** Where the category actually trades — a distribution, not one number. */
+export function MultipleBoxplot({ active }: { active: boolean }) {
+  const build = (p: DeckPalette) => {
+    const { low, high } = MARKET.multiple;
+    // Five-number summary within the sourced 15–40x range: the market
+    // clusters mid-range, with the top end reserved for breakout AI-native
+    // names — a single illustrative distribution, not five separate stats.
+    const span = high - low;
+    const summary = [low, low + span * 0.28, low + span * 0.5, low + span * 0.72, high];
+    return {
+      ...ENTER,
+      backgroundColor: "transparent",
+      grid: { left: 8, right: 16, top: 10, bottom: 26, containLabel: true },
+      xAxis: {
+        type: "category",
+        data: ["AI-native SaaS"],
+        ...baseAxis(p),
+        axisLine: { show: false },
+        axisTick: { show: false },
+      },
+      yAxis: {
+        type: "value",
+        min: 0,
+        max: Math.ceil((high + 5) / 5) * 5,
+        ...baseAxis(p),
+        axisLabel: { ...baseAxis(p).axisLabel, formatter: (v: number) => `${v}×` },
+        axisLine: { show: false },
+        splitLine: { show: true, lineStyle: { color: p.grid, width: 1 } },
+      },
+      series: [
+        {
+          type: "boxplot",
+          data: [summary],
+          boxWidth: [40, 90],
+          itemStyle: {
+            color: `${p.accent}22`,
+            borderColor: p.accent,
+            borderWidth: 1.4,
+          },
+          ...ENTER,
+        },
+      ],
+    };
   };
 
-  // Antarctica and the high Arctic sit outside the corridor entirely, and when
-  // the geo box clips them their polygons close along the frame as stray
-  // full-width rules. Dropping them is cheaper and cleaner than clipping.
-  const features = geo.features.filter((f) => {
-    const name = f.properties?.name;
-    if (name === "Antarctica") return false;
-    const lats: number[] = [];
-    JSON.stringify(f.geometry, (_k, v) => {
-      if (
-        Array.isArray(v) &&
-        v.length === 2 &&
-        typeof v[0] === "number" &&
-        typeof v[1] === "number"
-      ) {
-        lats.push(v[1]);
-      }
-      return v;
-    });
-    if (lats.length === 0) return true;
-    // keep anything that overlaps the band at all
-    return Math.max(...lats) > LAT_MIN && Math.min(...lats) < LAT_MAX;
-  });
-
-  echarts.registerMap(WORLD, { ...geo, features } as never);
-  worldRegistered = true;
+  return (
+    <EChart
+      active={active}
+      alt="Where AI-native SaaS trades on ARR multiple: 15x to 40x, clustering around the middle of that range."
+      build={build}
+    />
+  );
 }
 
-const NODE_BY_KEY = new Map(CORRIDOR.nodes.map((n) => [n.key, n]));
+/* ------------------------------------------------ XI · roadmap · rollout grid */
 
-export function CorridorMap({ active }: { active: boolean }) {
+/** Which function goes live at which checkpoint — a matrix, not a bar. */
+export function RoadmapHeatmap({ active }: { active: boolean }) {
   const build = (p: DeckPalette) => {
-    registerWorld();
+    const cells: Array<[number, number, number]> = [];
+    FUNCTIONS.items.forEach((_, row) => {
+      ROADMAP.months.forEach((_, col) => {
+        cells.push([col, row, col >= ROADMAP.functionStage[row] ? 1 : 0]);
+      });
+    });
+    return {
+      backgroundColor: "transparent",
+      grid: { left: 8, right: 8, top: 8, bottom: 26, containLabel: true },
+      xAxis: {
+        type: "category",
+        data: ROADMAP.months,
+        splitArea: { show: false },
+        ...baseAxis(p),
+        axisLine: { show: false },
+        axisTick: { show: false },
+      },
+      yAxis: {
+        type: "category",
+        data: FN_SHORT,
+        splitArea: { show: false },
+        axisLine: { show: false },
+        axisTick: { show: false },
+        axisLabel: { color: p.text, fontSize: 10.5, fontFamily: p.sans },
+      },
+      visualMap: {
+        show: false,
+        min: 0,
+        max: 1,
+        // Live cells in the accent; not-yet cells nearly invisible against
+        // the plate — the shape of the rollout is the whole point.
+        inRange: { color: [`${p.accent2}18`, p.accent] },
+      },
+      series: [
+        {
+          type: "heatmap",
+          data: cells,
+          itemStyle: { borderColor: p.bg, borderWidth: 3, borderRadius: 2 },
+          emphasis: { disabled: true },
+          ...ENTER,
+        },
+      ],
+    };
+  };
 
+  return (
+    <EChart
+      active={active}
+      alt="Rollout grid: which of the eight functions goes live at which roadmap checkpoint, M0 through M18."
+      build={build}
+    />
+  );
+}
+
+/* ------------------------------------------------------- XII · corridor map */
+
+/**
+ * The `geo` component (topojson + `center`/`zoom`/`layoutSize`) kept fighting
+ * itself on resize and shipping stray clipped edges. Nodes and routes now
+ * plot directly on a plain lon/lat cartesian grid instead (the `lines-ny`
+ * pattern). Coastlines are a `custom` series on that *same* grid — plain
+ * filled polygons via `api.coord()`, so they're pixel-locked to the nodes
+ * with none of `geo`'s projection math to get wrong.
+ */
+const NODE_BY_KEY = new Map(STRUCTURE.nodes.map((n) => [n.key, n]));
+const LON_RANGE: [number, number] = [-128, 68];
+const LAT_RANGE: [number, number] = [16, 60];
+
+/**
+ * A degree of longitude is only as wide as a degree of latitude at the
+ * equator — at the corridor's ~38°N centre it's about 79% as wide. Plotting
+ * raw lon/lat as x/y (what a plain cartesian grid does) ignores that and
+ * reads as a squashed, skewed world. Scaling x by cos(centre latitude) is
+ * the standard equirectangular fix; `MAP_ASPECT` is the resulting box shape
+ * the chart's *container* must actually be, or the correction is undone by
+ * the container stretching it right back out.
+ */
+const CENTER_LAT = (LAT_RANGE[0] + LAT_RANGE[1]) / 2;
+const LON_SCALE = Math.cos((CENTER_LAT * Math.PI) / 180);
+const projLon = (lon: number) => lon * LON_SCALE;
+const PROJ_LON_RANGE: [number, number] = [projLon(LON_RANGE[0]), projLon(LON_RANGE[1])];
+export const MAP_ASPECT = (PROJ_LON_RANGE[1] - PROJ_LON_RANGE[0]) / (LAT_RANGE[1] - LAT_RANGE[0]);
+
+/**
+ * Real coastlines, not a hand trace: `world-atlas`'s 110m country topology,
+ * cut down to the rings that actually overlap the corridor's bounding box
+ * and simplified to every 3rd point (a schematic, not a navigation chart).
+ * Computed once at module load — this doesn't change per render or per
+ * theme, only the stroke/fill colours the chart applies to it do.
+ */
+function buildCoastlines(): number[][][] {
+  const topo = worldTopo as unknown as Parameters<typeof topojson.feature>[0];
+  // biome-ignore lint/suspicious/noExplicitAny: topojson's object index is untyped
+  const objects = (topo as any).objects.countries;
+  const geo = topojson.feature(topo, objects) as unknown as {
+    features: Array<{ geometry?: { type: string; coordinates: number[][][] | number[][][][] } }>;
+  };
+
+  const [lonMin, lonMax] = LON_RANGE;
+  const [latMin, latMax] = LAT_RANGE;
+  const padded = { lonMin: lonMin - 15, lonMax: lonMax + 15, latMin: latMin - 10, latMax: latMax + 10 };
+  const inBounds = (pt: number[]) =>
+    pt[0] >= padded.lonMin && pt[0] <= padded.lonMax && pt[1] >= padded.latMin && pt[1] <= padded.latMax;
+
+  const rings: number[][][] = [];
+  const addRing = (ring: number[][]) => {
+    if (!ring.some(inBounds)) return;
+    const simplified = ring.filter((_, i) => i % 3 === 0).map((pt) => [projLon(pt[0]), pt[1]]);
+    if (simplified.length >= 3) rings.push(simplified);
+  };
+
+  for (const f of geo.features) {
+    const g = f.geometry;
+    if (!g) continue;
+    if (g.type === "Polygon") {
+      for (const ring of g.coordinates as number[][][]) addRing(ring);
+    } else if (g.type === "MultiPolygon") {
+      for (const poly of g.coordinates as number[][][][]) {
+        for (const ring of poly) addRing(ring);
+      }
+    }
+  }
+  return rings;
+}
+
+const COASTLINES: number[][][] = buildCoastlines();
+
+export function StructureMap({ active }: { active: boolean }) {
+  const build = (p: DeckPalette) => {
     const kindColor: Record<string, string> = {
       parent: p.accent,
       hub: p.accent,
@@ -371,49 +301,52 @@ export function CorridorMap({ active }: { active: boolean }) {
       market: p.gold,
     };
 
-    const routes = CORRIDOR.routes.map(([from, to]) => {
+    const proj = (coord: number[]) => [projLon(coord[0]), coord[1]];
+    const routes = STRUCTURE.routes.map(([from, to]) => {
       const a = NODE_BY_KEY.get(from);
       const b = NODE_BY_KEY.get(to);
-      return { coords: [a?.coord, b?.coord] };
+      return { coords: [a && proj(a.coord), b && proj(b.coord)] };
     });
 
     return {
       backgroundColor: "transparent",
-      geo: {
-        map: WORLD,
-        roam: false,
-        // `boundingCoords` clips rather than crops: every polygon crossing the
-        // box closes along it, which drew stray full-width rules across the
-        // top and bottom of the frame. Centre-and-zoom crops instead, so the
-        // corridor fills the frame with no cut edges.
-        center: [-24, 34],
-        zoom: 2.05,
-        layoutCenter: ["50%", "52%"],
-        layoutSize: "118%",
-        itemStyle: {
-          areaColor: p.surface,
-          borderColor: p.border,
-          // Faint: the crop cuts the top off Canada and Russia, and a heavier
-          // stroke makes those cut edges read as stray rules rather than
-          // coastline. The container's mask fades them out entirely.
-          borderWidth: 0.5,
-          opacity: 0.75,
-        },
-        emphasis: { disabled: true },
-        silent: true,
+      grid: { left: 8, right: 8, top: 14, bottom: 14, containLabel: false },
+      xAxis: {
+        type: "value",
+        min: PROJ_LON_RANGE[0],
+        max: PROJ_LON_RANGE[1],
+        show: false,
+        splitLine: { show: true, lineStyle: { color: p.grid, width: 1 } },
+      },
+      yAxis: {
+        type: "value",
+        min: LAT_RANGE[0],
+        max: LAT_RANGE[1],
+        show: false,
+        splitLine: { show: true, lineStyle: { color: p.grid, width: 1 } },
       },
       series: [
         {
+          type: "custom",
+          coordinateSystem: "cartesian2d",
+          silent: true,
+          data: COASTLINES.map((_, i) => i),
+          renderItem: (
+            params: { dataIndex: number },
+            api: { coord: (v: number[]) => number[] }
+          ) => ({
+            type: "polygon",
+            shape: { points: COASTLINES[params.dataIndex].map((pt) => api.coord(pt)) },
+            style: { fill: p.surface, stroke: p.border, lineWidth: 0.75, opacity: 0.85 },
+          }),
+          zlevel: 0,
+        },
+        {
           type: "lines",
-          coordinateSystem: "geo",
+          coordinateSystem: "cartesian2d",
           data: routes,
           polyline: false,
-          lineStyle: {
-            color: p.accent,
-            width: 1.2,
-            opacity: 0.45,
-            curveness: 0.22,
-          },
+          lineStyle: { color: p.accent, width: 1.2, opacity: 0.45, curveness: 0.22 },
           effect: {
             show: true,
             period: 5,
@@ -426,10 +359,10 @@ export function CorridorMap({ active }: { active: boolean }) {
         },
         {
           type: "effectScatter",
-          coordinateSystem: "geo",
-          data: CORRIDOR.nodes.map((n) => ({
+          coordinateSystem: "cartesian2d",
+          data: STRUCTURE.nodes.map((n) => ({
             name: n.label,
-            value: [...n.coord, 1],
+            value: proj(n.coord),
             itemStyle: { color: kindColor[n.kind] ?? p.accent2 },
           })),
           symbolSize: 8,
@@ -440,7 +373,7 @@ export function CorridorMap({ active }: { active: boolean }) {
             position: "right",
             distance: 9,
             formatter: (d: { name: string }) => {
-              const n = CORRIDOR.nodes.find((x) => x.label === d.name);
+              const n = STRUCTURE.nodes.find((x) => x.label === d.name);
               return n ? `{t|${n.label}}\n{s|${n.note}}` : d.name;
             },
             rich: {
@@ -464,30 +397,3 @@ export function CorridorMap({ active }: { active: boolean }) {
   );
 }
 
-/* ------------------------------------------------------------------ shared */
-
-/**
- * The single annotation every chart is allowed. A dot is drawn by the series'
- * own markPoint; this is the leader and the ink label beside it.
- * `x`/`y` are fractions of the chart box.
- */
-function annotationBlock(p: DeckPalette, text: string, x: number, y: number) {
-  return [
-    {
-      type: "text",
-      left: `${x * 100}%`,
-      top: `${y * 100}%`,
-      style: {
-        text,
-        fill: p.text,
-        fontSize: 12,
-        fontFamily: p.sans,
-        fontWeight: 500,
-        width: 210,
-        overflow: "break",
-        lineHeight: 16,
-      },
-      silent: true,
-    },
-  ];
-}

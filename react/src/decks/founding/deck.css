@@ -143,6 +143,27 @@ line.fd-field-g {
   stroke-width: 1;
   vector-effect: non-scaling-stroke;
 }
+/* The soft halo under the crisp line — same stroke, blurred and fatter,
+   matching the site's `.fgl-glow` layer. */
+.fd-field-glow,
+.fd-field-glow circle,
+.fd-field-glow path,
+line.fd-field-glow {
+  fill: none;
+  stroke: var(--mer);
+  stroke-width: 2.2;
+  vector-effect: non-scaling-stroke;
+}
+.fd-field-glow {
+  filter: blur(6px);
+  opacity: 0.55;
+}
+/* The large ambient globe carried on content slides — much softer and much
+   bigger than the crisp hero, so it reads as atmosphere, not a diagram. */
+.fd-field-lg .fd-field-glow {
+  filter: blur(28px);
+  opacity: 0.45;
+}
 /* The lamp is filled, not stroked — the stroke rule above would outline it. */
 .fd-field .fd-lamp circle {
   stroke: none;
@@ -207,12 +228,59 @@ line.fd-field-g {
   position: absolute;
   top: 118px;
   left: 96px;
-  right: 210px;
+  right: 96px;
   bottom: 92px;
   z-index: 1;
   display: flex;
   flex-direction: column;
 }
+
+/* -------------------------------------------------------- layout templates ---
+ * Four arrangements of heading (.fd-h) / description (.fd-blk-desc) / graph
+ * (.fd-blk-viz), so the deck doesn't run the same heading-desc-graph stack on
+ * every slide. Applied via `.fd-lay-a/b/c/d` on `.fd-body`; a slide with a
+ * fully custom internal layout (Market, Ask) skips these entirely.
+ */
+.fd-body.fd-lay-a,
+.fd-body.fd-lay-b,
+.fd-body.fd-lay-c,
+.fd-body.fd-lay-d {
+  display: grid;
+}
+
+/* A — heading, description, a large graph beneath. The default read. */
+.fd-lay-a { grid-template-rows: auto auto 1fr; }
+.fd-lay-a .fd-blk-viz { margin-top: 24px; }
+
+/* B — the graph leads; heading and caption land underneath it, statement-
+ * style. For slides where the evidence should hit before the claim does. */
+.fd-lay-b { grid-template-rows: 1fr auto auto; }
+.fd-lay-b .fd-blk-viz { order: 1; margin-top: 0; margin-bottom: 22px; }
+.fd-lay-b .fd-blk-desc { order: 2; margin-top: 0; }
+.fd-lay-b .fd-h { order: 3; margin-top: 14px; }
+
+/* C — the graph fills a wide left column at full height; heading and
+ * description stack in a narrower right-hand column beside it. */
+.fd-lay-c {
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  grid-template-rows: auto 1fr;
+  column-gap: 44px;
+}
+.fd-lay-c .fd-blk-viz { grid-column: 1; grid-row: 1 / span 2; align-self: stretch; margin-top: 0; }
+.fd-lay-c .fd-h { grid-column: 2; grid-row: 1; align-self: start; }
+.fd-lay-c .fd-blk-desc { grid-column: 2; grid-row: 2; align-self: start; margin-top: 16px; }
+
+/* D — heading spans the top; the graph area beneath splits into two panels
+ * side by side (two figures, or a figure and a secondary block). */
+.fd-lay-d { grid-template-rows: auto auto 1fr; }
+.fd-lay-d .fd-blk-desc { margin-top: 12px; }
+.fd-lay-d .fd-blk-viz {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+}
+.fd-lay-d .fd-blk-viz > .fd-viz-plate { margin: 0; }
 
 /* ---------------------------------------------------------------- type */
 
@@ -536,6 +604,226 @@ line.fd-field-g {
   .fdeck-nav { display: none; }
   .fd-rise { opacity: 1 !important; transform: none !important; }
   .fd-lamp { display: none; }
+}
+
+/* ---------------------------------------------------------------- hero (I) ---
+ * Slide one only. The site's own three-layer field (`GLOBE_HTML`, lifted
+ * verbatim, not re-derived) cropped to its hero third exactly the way the
+ * site crops it: the SVGs are 3x the wrapper's height and only the top third
+ * is visible, matching `.fg{height:300vh}` at scroll position zero.
+ */
+.fd-hero-field {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.fd-hero-field svg.fg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 300%;
+  z-index: auto;
+  /* site.css scroll-pans any `.fg` element against the root document's scroll
+     (`animation-timeline:scroll(root block)`) — on the deck's fixed, non-
+     scrolling canvas that resolves to an arbitrary offset and shifts the
+     whole field out of the visible crop. Kill it; the deck field is static. */
+  animation: none !important;
+  transform: none !important;
+}
+.fd-hero-field .fgl-glow { filter: blur(6px); }
+.fd-hero-field .fgl-glow .gf-field {
+  stroke-linecap: round;
+  stroke-width: 2.2;
+  opacity: 0.55;
+  stroke: var(--mer);
+}
+.fd-hero-field .fgl-sharp .gf-field {
+  stroke-linecap: round;
+  stroke-width: 1.1;
+  opacity: 0.92;
+  stroke: var(--heading);
+}
+.fd-hero-field .fgl-spark .spk circle,
+.fd-hero-field .fgl-spark .spk-md circle { stroke: none; }
+.fd-hero-field .fgl-spark .lp-3 { fill: var(--sky-2); fill-opacity: 0.1; }
+.fd-hero-field .fgl-spark .lp-2 { fill: var(--sky-2); fill-opacity: 0.2; }
+.fd-hero-field .fgl-spark .lp-1 { fill: var(--sky-2); fill-opacity: 0.55; }
+.fd-hero-field .fgl-spark .lp-0 { fill: var(--heading); fill-opacity: 0.95; }
+.fd-hero-field .gf-rule { display: none; }
+
+/* --------------------------------------------------------------- the block ---
+ * The site's own pattern, lifted for the fixed canvas: an eyebrow, a heading,
+ * an optional one-line description, then the chart or illustration on a
+ * plate. Nothing on a content slide is text next to a bare line of bullets.
+ */
+.fd-blk {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.fd-blk-desc {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--tx-2);
+  margin: 16px 0 0;
+  max-width: 62ch;
+}
+.fd-blk-viz {
+  flex: 1;
+  min-height: 0;
+  margin-top: 26px;
+  display: flex;
+  flex-direction: column;
+}
+.fd-viz-plate {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--panel) 46%, transparent);
+  padding: 26px 30px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+.fd-viz-plate .fd-plot { margin-top: 0; }
+/* Bklit's Area/Bar/Line charts size themselves from `width / aspectRatio`,
+   ignoring the flex parent's actual height — which clipped x-axes short
+   whenever the guessed ratio ran taller than the plate had room for. Force
+   the chart to the real box instead of guessing a ratio that fits it. */
+.fd-chart-fill {
+  height: 100%;
+  width: 100%;
+}
+.fd-chart-fill > div {
+  height: 100% !important;
+  aspect-ratio: auto !important;
+}
+.fd-viz-source {
+  margin-top: 14px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--tx-3);
+}
+
+/* ---------------------------------------------------------- illustrations ---
+ * Orbiting-circles / animated-beam network diagrams (magicui, vendored, not
+ * hand-drawn) — the hub-and-function-set visuals on "what we are" / "what we
+ * do". Kept to the deck's own ink: no gradient chrome, no drop shadow.
+ */
+.fd-orbit-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.fd-orbit-hub {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 148px;
+  height: 148px;
+  border-radius: 50%;
+  border: 1px solid var(--line-3);
+  background: color-mix(in srgb, var(--panel) 70%, transparent);
+  color: var(--heading);
+  text-align: center;
+  box-shadow: 0 0 30px -6px color-mix(in srgb, var(--mer) 45%, transparent);
+}
+.fd-orbit-hub span {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  max-width: 9ch;
+  line-height: 1.5;
+}
+.fd-orbit-node {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  padding: 7px 13px;
+  border-radius: 999px;
+  border: 1px solid var(--line-3);
+  background: var(--bg);
+  color: var(--tx-2);
+  font-size: 11px;
+  letter-spacing: 0.03em;
+}
+
+.fd-net-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.fd-net-hub {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 128px;
+  height: 128px;
+  border-radius: 50%;
+  border: 1px solid var(--line-3);
+  background: color-mix(in srgb, var(--panel) 78%, transparent);
+  text-align: center;
+  box-shadow: 0 0 30px -6px color-mix(in srgb, var(--mer) 45%, transparent);
+}
+.fd-net-hub b {
+  font-weight: 400;
+  font-size: 13px;
+  color: var(--heading);
+}
+.fd-net-hub span {
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+}
+.fd-net-node {
+  position: absolute;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px 7px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--line-2);
+  background: var(--bg);
+  font-size: 11px;
+  color: var(--heading);
+  white-space: nowrap;
+}
+.fd-net-node .fd-net-n {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--mer) 22%, transparent);
+  color: var(--accent-ink);
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
 }
 
 /* ---------------------------------------------------------------- the ask ---

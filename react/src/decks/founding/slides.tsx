@@ -2,44 +2,64 @@
 
 import * as React from "react";
 
+import { AnimatedBeam } from "@/components/ui/animated-beam";
 import { Badge } from "@/components/ui/badge";
+import { BorderBeam } from "@/components/ui/border-beam";
 import { Button } from "@/components/ui/button";
+import { NumberTicker } from "@/components/ui/number-ticker";
+import { OrbitingCircles } from "@/components/ui/orbiting-circles";
+import {
+  Bar,
+  BarChart,
+  BarXAxis,
+  ChartTooltip,
+  FunnelChart,
+  Grid,
+  PieCenter,
+  PieChart,
+  PieSlice,
+  RadarArea,
+  RadarAxis,
+  RadarChart,
+  RadarGrid,
+  RadarLabels,
+} from "@/components/charts";
+import { GLOBE_HTML } from "@/components/site/globe-markup";
 import {
   ASK,
-  BACKDROP,
-  CORRIDOR,
+  CLOSING,
+  CURRENT,
   DECK,
-  ECONOMICS,
-  FLYWHEEL,
+  type Figure,
   FUNCTIONS,
+  GAP,
+  IDENTITY,
   isIllustrative,
   MARKET,
   MOAT,
-  PROBLEM,
+  MODEL,
   RISKS,
   ROADMAP,
   type Source,
   STRUCTURE,
-  TEAM,
-  THESIS,
-  WEDGE,
 } from "./content";
-import { BackdropChart, CompsChart, CorridorMap, EconomicsChart } from "./echart-charts";
-import { runFlywheel } from "./motion";
+import { GapChart, ModelChart } from "./bklit-charts";
+import { CompsChart, MAP_ASPECT, RoadmapHeatmap, StructureMap } from "./echart-charts";
 
 /**
- * The seventeen slides, in the marketing site's layout language.
+ * The fourteen slides of the second build (2026-07-29).
  *
- * Each screen carries a heading and ONE piece of evidence, with the emphasis
- * set as a whole serif-italic phrase. Evidence is a rail — a hairline with
- * glowing nodes and columns beneath — not a grid of cards. Roughly half of
- * every canvas is deliberately empty.
+ * Every content slide follows the site's own block pattern — eyebrow, heading,
+ * one-line description, then a real chart or animated illustration on a
+ * plate (`.fd-blk-desc` / `.fd-blk-viz` / `.fd-viz-plate`, all lifted from the
+ * site's `.blk-head` / `.blk-desc` / `.blk-viz` / `.viz-plate` rules). Nothing
+ * here is text next to a bare line with bullet points under it.
  *
- * Screens alternate navy and paper, as the site does; the cover and the close
- * are both navy so the deck opens and lands on the same ground.
- *
- * Nothing here inlines a figure or a sentence — all of it comes from
- * `content.ts`, so the argument can be corrected without touching a component.
+ * Charts come from two places: the Bklit visx primitives already vendored at
+ * `@/components/charts` (Ring, Radar, Bar, Funnel, Pie) and the deck's own
+ * four ECharts figures in `echart-charts.tsx`. The two illustration slides use
+ * magicui's OrbitingCircles and AnimatedBeam, vendored (not hand-drawn) via
+ * `@/components/ui/*`.
  */
 
 export type SlideProps = { active: boolean; index: number; total: number };
@@ -47,23 +67,16 @@ type SlideFn = (p: SlideProps) => React.ReactElement;
 
 const ROMAN = [
   "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX",
-  "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII",
+  "X", "XI", "XII", "XIII", "XIV",
 ];
 
 /* -------------------------------------------------------------- the field */
 
 /**
- * The hero's meridian field, mirrored.
- *
- * These are the site's own paths, lifted verbatim from
- * `components/site/globe-markup.ts` — the globe outline, its four meridian
- * arcs at descending opacity, and the straight ray. The site's viewBox is
- * 1200x2025 and the hero occupies its first third, so the deck frames
- * `0 0 1200 675` to land on exactly the hero crop.
- *
- * The whole thing is then mirrored on X. The site sweeps in from the left; the
- * deck sweeps in from the right, which frees the left margin for the heading
- * and keeps the two surfaces from looking like the same screen twice.
+ * The ambient background carried on every content slide (II–XIV) — a very
+ * large globe, pushed mostly off-canvas and heavily blurred, so it reads as
+ * atmosphere in the corner rather than a diagram. No crisp lines, no motion —
+ * that register belongs to the cover's hero alone.
  */
 const GLOBE_ROT = "rotate(-14 302 -431)";
 const MERIDIANS: Array<[d: string, o: string]> = [
@@ -72,34 +85,41 @@ const MERIDIANS: Array<[d: string, o: string]> = [
   ["M -407 -431 A 709 631.7 0 0 1 1011 -431 A 709 631.7 0 0 1 -407 -431", "0.08"],
   ["M -407 -431 A 709 573.6 0 0 1 1011 -431 A 709 573.6 0 0 1 -407 -431", "0.032"],
 ];
-/** The lamp rides the brightest meridian, as it does on the site. */
-const LAMP_TRACK = MERIDIANS[0][0];
+/** Scale the whole globe up around its own centre (302, -431). */
+const GLOBE_SCALE = "translate(302 -431) scale(1.16) translate(-302 431)";
 
 function Field() {
   return (
-    <div aria-hidden="true" className="fd-field">
-      <svg
-        preserveAspectRatio="xMidYMid slice"
-        viewBox="0 0 1200 675"
-      >
-        {/* mirror: flip on X about the viewBox centre */}
-        <g transform="translate(1200 0) scale(-1 1)">
-          <g className="fd-field-g" transform={GLOBE_ROT}>
+    <div aria-hidden="true" className="fd-field fd-field-lg">
+      <svg preserveAspectRatio="xMidYMid slice" viewBox="0 0 1200 675">
+        <g transform={GLOBE_SCALE}>
+          <g className="fd-field-glow" transform={GLOBE_ROT}>
             <circle cx="302" cy="-431" r="709" strokeOpacity="0.8" />
             {MERIDIANS.map(([d, o]) => (
               <path d={d} key={d} strokeOpacity={o} />
             ))}
-            <g className="fd-lamp" style={{ offsetPath: `path("${LAMP_TRACK}")` }}>
-              <circle className="lp-3" r="9" />
-              <circle className="lp-2" r="5.4" />
-              <circle className="lp-1" r="2.6" />
-              <circle className="lp-0" r="1.3" />
-            </g>
           </g>
-          <line className="fd-field-g" x1="-180" x2="1300" y1="560" y2="70" />
         </g>
       </svg>
     </div>
+  );
+}
+
+/**
+ * Slide one only — the site's own hero field, `GLOBE_HTML` lifted verbatim,
+ * cropped to its hero third exactly the way the site crops it (the SVGs run
+ * 3x the wrapper's height; only the top third shows, matching `.fg{height:
+ * 300vh}` at scroll position zero). Both globes the hero shows are present —
+ * the earlier deck only ever ported the first one.
+ */
+function Hero() {
+  return (
+    <div
+      aria-hidden="true"
+      className="fd-hero-field"
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: the site's own markup, lifted verbatim
+      dangerouslySetInnerHTML={{ __html: GLOBE_HTML }}
+    />
   );
 }
 
@@ -117,16 +137,19 @@ function Mark({ size = 22 }: { size?: number }) {
   );
 }
 
-/** Section label, arc, page number. That is the entire slide furniture. */
 function Screen({
   eyebrow,
   index,
   total,
+  layout,
   children,
 }: {
   eyebrow?: string;
   index: number;
   total: number;
+  /** Which of the four reference-deck templates this slide reads as.
+   * Omit for slides that build their own internal grid (Market, Ask). */
+  layout?: "a" | "b" | "c" | "d";
   children: React.ReactNode;
 }) {
   return (
@@ -138,7 +161,7 @@ function Screen({
           <span className="fd-sec">{eyebrow}</span>
         </div>
       ) : null}
-      <div className="fd-body">{children}</div>
+      <div className={`fd-body${layout ? ` fd-lay-${layout}` : ""}`}>{children}</div>
       <div className="fd-page">
         {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
       </div>
@@ -146,7 +169,6 @@ function Screen({
   );
 }
 
-/** Heading. `accent` is a whole phrase, not a word — that is the point. */
 function H({
   head,
   accent,
@@ -169,83 +191,43 @@ function H({
   );
 }
 
-/**
- * The evidence pattern: one hairline, a glowing node per column, copy beneath.
- * This replaces every grid of cards in the deck.
- */
-function Rail({
-  cols,
-  serif = false,
+function Desc({ children }: { children: React.ReactNode }) {
+  return <p className="fd-rise fd-blk-desc">{children}</p>;
+}
+
+/** The chart/illustration plate every content slide carries. */
+function Plate({
+  children,
+  source,
 }: {
-  cols: Array<{ key: string; n?: string; title: string; body?: string }>;
-  serif?: boolean;
+  children: React.ReactNode;
+  source?: Source;
 }) {
   return (
-    <div className="fd-rail fd-rise">
-      <div className="fd-rail-line" />
-      <div
-        className="fd-rail-cols"
-        style={{ gridTemplateColumns: `repeat(${cols.length}, 1fr)` }}
-      >
-        {cols.map((c) => (
-          <div key={c.key} style={{ position: "relative" }}>
-            <span className="fd-node" style={{ left: 0, top: -5 }} />
-            <div style={{ paddingTop: 26 }}>
-              {c.n ? <div className="fd-col-n">{c.n}</div> : null}
-              <div className={`fd-col-t${serif ? " serif" : ""}`}>{c.title}</div>
-              {c.body ? <p className="fd-col-b">{c.body}</p> : null}
-            </div>
-          </div>
-        ))}
-      </div>
+    <div className="fd-rise fd-blk-viz">
+      <div className="fd-viz-plate">{children}</div>
+      {source ? (
+        isIllustrative(source) ? (
+          <span className="fd-illustrative" style={{ marginTop: 12 }}>
+            Illustrative — not sourced
+          </span>
+        ) : (
+          <p className="fd-viz-source">{source}</p>
+        )
+      ) : null}
     </div>
   );
 }
 
-/** Fires off a `source` of ILLUSTRATIVE. An unsourced figure must look it. */
-function Provenance({ source, note }: { source: Source; note?: string }) {
-  if (isIllustrative(source)) {
-    return (
-      <div className="fd-rise" style={{ marginTop: 18 }}>
-        <span className="fd-illustrative">Illustrative — not sourced</span>
-        {note ? (
-          <p className="fd-note" style={{ marginTop: 10 }}>
-            {note}
-          </p>
-        ) : null}
-      </div>
-    );
-  }
-  return (
-    <p className="fd-rise fd-note" style={{ marginTop: 18 }}>
-      {source}
-    </p>
-  );
-}
-
-/** A figure the client has not supplied. Never a plausible-looking number. */
-function Gap({ width = 6 }: { width?: number }) {
+function GapPlaceholder({ width = 6 }: { width?: number }) {
   return <span aria-label="pending" className="fd-gap" style={{ minWidth: `${width}ch` }} />;
-}
-
-function useOnActive(active: boolean, run: (el: HTMLElement) => () => void) {
-  const ref = React.useRef<HTMLDivElement>(null);
-  const played = React.useRef(false);
-  React.useEffect(() => {
-    if (!active || played.current) return;
-    const el = ref.current;
-    if (!el) return;
-    played.current = true;
-    return run(el);
-  }, [active, run]);
-  return ref;
 }
 
 /* ============================================================== I · cover */
 
 const Cover: SlideFn = () => (
   <>
-    <Field />
+    <Hero />
     <h1 className="fd-rise fd-cover-h">
       {DECK.proposition} <span className="serif-i">{DECK.propositionAccent}</span>
     </h1>
@@ -263,559 +245,529 @@ const Cover: SlideFn = () => (
   </>
 );
 
-/* ============================================================= II · thesis */
+/* ======================================================= II · what we are */
 
-const Thesis: SlideFn = ({ index, total }) => (
-  <Screen eyebrow={THESIS.eyebrow} index={index} total={total}>
-    <H accent={THESIS.titleAccent} head={THESIS.title} />
-    <p className="fd-rise fd-lede">{THESIS.lede}</p>
-    <Rail
-      cols={THESIS.cards.map((c) => ({ key: c.key, title: c.title, body: c.body }))}
-      serif
-    />
-  </Screen>
-);
-
-/* ============================================================ III · problem */
-
-const Problem: SlideFn = ({ index, total }) => (
-  <Screen eyebrow={PROBLEM.eyebrow} index={index} total={total}>
-    <H accent={PROBLEM.titleAccent} head={PROBLEM.title} />
-    <p className="fd-rise fd-lede">{PROBLEM.lede}</p>
-    <Rail
-      cols={PROBLEM.points.map((p, i) => ({
-        key: `p${i + 1}`,
-        n: `0${i + 1}`,
-        title: p.split(" — ")[0],
-        body: p.includes(" — ") ? p.split(" — ").slice(1).join(" — ") : undefined,
-      }))}
-    />
-  </Screen>
-);
-
-/* ========================================================== IV · backdrop ◆ */
-
-const Backdrop: SlideFn = ({ active, index, total }) => (
-  <Screen eyebrow={BACKDROP.eyebrow} index={index} total={total}>
-    <H accent={BACKDROP.titleAccent} head={BACKDROP.title} size="wide" />
-    <div className="fd-plot fd-rise">
-      <BackdropChart active={active} />
+const IdentityIllustration = () => (
+  <div className="fd-orbit-stage">
+    <div className="fd-orbit-hub">
+      <Mark size={20} />
+      <span>{IDENTITY.hub}</span>
     </div>
-    <Provenance
-      note="Replace with Preqin or McKinsey Global Private Markets Review. No clean public series exists for back-office capacity."
-      source={BACKDROP.source}
-    />
-  </Screen>
-);
-
-/* ============================================================== V · wedge */
-
-/** A statement screen: the line is the whole slide. */
-const Wedge: SlideFn = ({ index, total }) => (
-  <Screen eyebrow={WEDGE.eyebrow} index={index} total={total}>
-    <p className="fd-rise fd-statement">
-      {WEDGE.title} <span className="hi">{WEDGE.titleAccent}</span>
-    </p>
-    <div className="fd-rail fd-rise">
-      <div className="fd-rail-line" />
-      <div className="fd-rail-cols" style={{ gridTemplateColumns: "1fr 1.4fr" }}>
-        <div style={{ position: "relative" }}>
-          <span className="fd-node" style={{ left: 0, top: -5 }} />
-          <div style={{ paddingTop: 26 }}>
-            <div className="fd-col-n">{WEDGE.panel.eyebrow}</div>
-            <div className="fd-col-t">{WEDGE.panel.title}</div>
-          </div>
+    <OrbitingCircles duration={42} iconSize={10} path radius={130}>
+      {IDENTITY.nodes.map((n) => (
+        <div className="fd-orbit-node" key={n.key}>
+          {n.label}
         </div>
-        <div style={{ paddingTop: 52 }}>
-          <p className="fd-col-b" style={{ maxWidth: "48ch", margin: 0 }}>
-            {WEDGE.panel.body}
-          </p>
-        </div>
-      </div>
-    </div>
+      ))}
+    </OrbitingCircles>
+    <OrbitingCircles duration={30} iconSize={6} path={false} radius={64} reverse />
+  </div>
+);
+
+const Identity: SlideFn = ({ index, total }) => (
+  <Screen eyebrow={IDENTITY.eyebrow} index={index} layout="c" total={total}>
+    <H accent={IDENTITY.titleAccent} head={IDENTITY.title} size="wide" />
+    <Desc>{IDENTITY.desc}</Desc>
+    <Plate>
+      <IdentityIllustration />
+    </Plate>
   </Screen>
 );
 
-/* ========================================================== VI · functions */
+/* -------------------------------------------------------------- IV · the gap */
 
-const Functions: SlideFn = ({ index, total }) => (
-  <Screen eyebrow={FUNCTIONS.eyebrow} index={index} total={total}>
-    <H accent={FUNCTIONS.titleAccent} head={FUNCTIONS.title} />
-    <p className="fd-rise fd-lede">
-      {FUNCTIONS.footnote} <span className="serif-i">{FUNCTIONS.footnoteAccent}</span>
-    </p>
-    {/* Eight items, labels only — no bodies. A rail can carry eight; a grid of
-        eight cards cannot, which is what made the first version airless. */}
-    <div className="fd-rail fd-rise">
-      <div className="fd-rail-line" />
-      <div
-        className="fd-rail-cols"
-        style={{ gridTemplateColumns: "repeat(4, 1fr)", rowGap: 34 }}
-      >
-        {FUNCTIONS.items.map((f, i) => (
-          <div key={f.n} style={{ position: "relative" }}>
-            {i < 4 ? <span className="fd-node" style={{ left: 0, top: -5 }} /> : null}
-            <div style={{ paddingTop: i < 4 ? 26 : 0 }}>
-              <div className="fd-col-n">{f.n}</div>
-              <div className="fd-col-t" style={{ fontSize: 16, marginTop: 10 }}>
-                {f.label}
-              </div>
-              {f.tag ? (
-                <div style={{ marginTop: 10 }}>
-                  <Badge variant="deck">{f.tag}</Badge>
-                </div>
-              ) : null}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+const Gap: SlideFn = ({ active, index, total }) => (
+  <Screen eyebrow={GAP.eyebrow} index={index} layout="b" total={total}>
+    <H accent={GAP.titleAccent} head={GAP.title} size="wide" />
+    <Desc>{GAP.desc}</Desc>
+    <Plate source={GAP.source}>
+      <GapChart />
+    </Plate>
   </Screen>
 );
 
-/* =========================================================== VII · flywheel */
+/* ------------------------------------------------------------- V · what we do */
 
-const Flywheel: SlideFn = ({ active, index, total }) => {
-  const ref = useOnActive(active, runFlywheel);
-  const R = 130;
-  const C = 158;
+const NET_SHORT: Record<string, string> = {
+  "01": "Deal sourcing",
+  "02": "Due diligence",
+  "03": "Modeling & valuation",
+  "04": "Capital formation",
+  "05": "Fund & investment ops",
+  "06": "Portfolio & LP reporting",
+  "07": "Data ops & AI",
+  "08": "Market research",
+};
+
+function useNodeRefs(n: number) {
+  const store = React.useRef<React.RefObject<HTMLDivElement | null>[] | null>(null);
+  if (!store.current) {
+    store.current = Array.from({ length: n }, () => React.createRef<HTMLDivElement>());
+  }
+  return store.current;
+}
+
+const FunctionNetwork = () => {
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const hubRef = React.useRef<HTMLDivElement>(null);
+  const nodeRefs = useNodeRefs(FUNCTIONS.items.length);
+  const n = FUNCTIONS.items.length;
+  const RX = 41;
+  const RY = 39;
 
   return (
-    <Screen eyebrow={FLYWHEEL.eyebrow} index={index} total={total}>
-      <div
-        ref={ref}
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 316px",
-          gap: 64,
-          alignItems: "center",
-          flex: 1,
-          minHeight: 0,
-        }}
-      >
-        <div>
-          <p className="fd-rise fd-statement" style={{ fontSize: 46, maxWidth: "15ch" }}>
-            Enter at a services multiple.{" "}
-            <span className="hi">Exit at a software one.</span>
-          </p>
-          <ol
-            className="fd-rise"
-            style={{
-              listStyle: "none",
-              margin: "34px 0 0",
-              padding: 0,
-              display: "grid",
-              gap: 9,
-            }}
+    <div className="fd-net-stage" ref={containerRef}>
+      {FUNCTIONS.items.map((f, i) => (
+        <AnimatedBeam
+          containerRef={containerRef}
+          curvature={0}
+          delay={i * 0.22}
+          duration={4.2}
+          fromRef={hubRef}
+          gradientStartColor="var(--mer)"
+          gradientStopColor="var(--accent-ink)"
+          key={f.n}
+          pathColor="var(--line-2)"
+          pathOpacity={0.55}
+          pathWidth={1}
+          toRef={nodeRefs[i]}
+        />
+      ))}
+      {FUNCTIONS.items.map((f, i) => {
+        const a = (-90 + (360 / n) * i) * (Math.PI / 180);
+        const left = 50 + RX * Math.cos(a);
+        const top = 50 + RY * Math.sin(a);
+        return (
+          <div
+            className="fd-net-node"
+            key={f.n}
+            ref={nodeRefs[i]}
+            style={{ left: `${left}%`, top: `${top}%` }}
           >
-            {FLYWHEEL.steps.map((s) => (
-              <li
-                className="fw-step"
-                key={s.n}
-                style={{ fontSize: 13, lineHeight: 1.55, color: "var(--tx-2)" }}
-              >
-                <span style={{ color: "var(--accent-ink)", marginRight: 10 }}>{s.n}</span>
-                {s.text}{" "}
-                <b style={{ color: "var(--heading)", fontWeight: 400 }}>{s.accent}</b>{" "}
-                {s.tail}
-              </li>
-            ))}
-          </ol>
-        </div>
-
-        <div
-          className="fw-stage fd-rise"
-          style={{ position: "relative", width: 316, height: 316 }}
-        >
-          <svg aria-hidden="true" height="316" viewBox="0 0 316 316" width="316">
-            <circle cx={C} cy={C} fill="none" r={R} stroke="var(--line-2)" strokeWidth="1" />
-            <g
-              fill="none"
-              stroke="var(--heading)"
-              strokeLinecap="round"
-              strokeWidth="1.3"
-              transform={`translate(${C - 22} ${C - 30}) scale(0.95)`}
-            >
-              <line x1="24" x2="24" y1="9" y2="39" />
-              <path d="M12.5 12 C 24 18, 24 30, 12.5 38" />
-              <path d="M35.5 12 C 24 18, 24 30, 35.5 38" />
-            </g>
-            <text
-              fill="var(--tx-3)"
-              fontSize="10"
-              letterSpacing="0.22em"
-              textAnchor="middle"
-              x={C}
-              y={C + 42}
-            >
-              {FLYWHEEL.hub}
-            </text>
-          </svg>
-
-          {FLYWHEEL.steps.map((s, i) => {
-            const a = (-90 + i * 60) * (Math.PI / 180);
-            return (
-              <span
-                className="fw-node"
-                key={s.n}
-                style={{
-                  position: "absolute",
-                  left: `${C + R * Math.cos(a)}px`,
-                  top: `${C + R * Math.sin(a)}px`,
-                  width: 26,
-                  height: 26,
-                  margin: "-13px 0 0 -13px",
-                  borderRadius: "50%",
-                  display: "grid",
-                  placeItems: "center",
-                  fontSize: 11,
-                  color: "var(--tx-3)",
-                  background: "var(--bg)",
-                  border: "1px solid var(--line-2)",
-                  transition:
-                    "color .22s var(--ease), border-color .22s var(--ease), box-shadow .22s var(--ease)",
-                }}
-              >
-                {s.n}
-              </span>
-            );
-          })}
-
-          <span
-            className="fw-packet"
-            style={
-              {
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: 9,
-                height: 9,
-                margin: "-4.5px 0 0 -4.5px",
-                borderRadius: "50%",
-                background:
-                  "radial-gradient(circle, var(--heading) 0%, var(--mer) 52%, transparent 74%)",
-                boxShadow: "0 0 16px 3px color-mix(in srgb, var(--mer) 50%, transparent)",
-                offsetPath: `path("M ${C} ${C - R} A ${R} ${R} 0 1 1 ${C - 0.01} ${C - R} Z")`,
-                offsetDistance: "var(--t, 0%)",
-                offsetRotate: "0deg",
-                pointerEvents: "none",
-              } as React.CSSProperties
-            }
-          />
-        </div>
+            <span className="fd-net-n">{f.n}</span>
+            {NET_SHORT[f.n] ?? f.label}
+          </div>
+        );
+      })}
+      <div className="fd-net-hub" ref={hubRef}>
+        <b>Operating</b>
+        <span>Layer</span>
       </div>
-    </Screen>
+    </div>
   );
 };
 
-/* =============================================================== VIII · moat */
+const Functions: SlideFn = ({ index, total }) => (
+  <Screen eyebrow={FUNCTIONS.eyebrow} index={index} layout="a" total={total}>
+    <H accent={FUNCTIONS.titleAccent} head={FUNCTIONS.title} />
+    <Desc>{FUNCTIONS.desc}</Desc>
+    <Plate>
+      <FunctionNetwork />
+    </Plate>
+  </Screen>
+);
+
+/* ------------------------------------------------ VI · how we stack up · moat */
+
+const MoatBars = () => {
+  const data = MOAT.axes.map((a) => ({
+    axis: a.label,
+    wrappers: a.wrappers,
+    ours: a.ours,
+  }));
+  return (
+    <div className="fd-chart-fill">
+      <BarChart
+        aspectRatio="4.6 / 1"
+        barGap={0.35}
+        data={data}
+        margin={{ top: 10, right: 10, bottom: 38, left: 10 }}
+        xDataKey="axis"
+      >
+        <Grid horizontal />
+        <Bar dataKey="wrappers" fill="var(--tx-3)" lineCap="round" />
+        <Bar dataKey="ours" fill="var(--accent-ink)" lineCap="round" />
+        <BarXAxis />
+        <ChartTooltip />
+      </BarChart>
+    </div>
+  );
+};
 
 const Moat: SlideFn = ({ index, total }) => (
-  <Screen eyebrow={MOAT.eyebrow} index={index} total={total}>
-    <H accent={MOAT.titleAccent} head={MOAT.title} />
-    {/* Two columns divided by one hairline — no boxes, no ticks and crosses. */}
-    <div
-      className="fd-rise"
-      style={{
-        marginTop: "auto",
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-        gap: 64,
-        paddingTop: 38,
-        borderTop: "1px solid var(--line-2)",
-      }}
-    >
-      <div>
-        <div className="fd-label">{MOAT.wrappers.label}</div>
-        <ul style={{ listStyle: "none", margin: "20px 0 0", padding: 0, display: "grid", gap: 12 }}>
-          {MOAT.wrappers.rows.map((r) => (
-            <li key={r} style={{ fontSize: 13, color: "var(--tx-3)" }}>
-              {r}
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div>
-        <div className="fd-label" style={{ color: "var(--accent-ink)" }}>
-          {MOAT.ours.label}
-        </div>
-        <ul style={{ listStyle: "none", margin: "20px 0 0", padding: 0, display: "grid", gap: 12 }}>
-          {MOAT.ours.rows.map((r) => (
-            <li key={r} style={{ fontSize: 13, color: "var(--heading)" }}>
-              {r}
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
+  <Screen eyebrow={MOAT.eyebrow} index={index} layout="c" total={total}>
+    <H accent={MOAT.titleAccent} head={MOAT.title} size="wide" />
+    <Desc>{MOAT.desc}</Desc>
+    <Plate source={MOAT.source}>
+      <MoatBars />
+    </Plate>
   </Screen>
 );
 
-/* ========================================================= IX · economics ◆ */
-
-const Economics: SlideFn = ({ active, index, total }) => (
-  <Screen eyebrow={ECONOMICS.eyebrow} index={index} total={total}>
-    <H accent={ECONOMICS.titleAccent} head={ECONOMICS.title} size="wide" />
-    <div className="fd-plot fd-rise">
-      <EconomicsChart active={active} />
-    </div>
-    <Provenance
-      note="Needs AND Capital revenue, delivery cost, and the automation rate actually observed per workflow."
-      source={ECONOMICS.source}
-    />
-  </Screen>
-);
-
-/* ============================================================== X · market */
+/* ---------------------------------------------- VII · how we stack up · market */
 
 const Market: SlideFn = ({ active, index, total }) => (
   <Screen eyebrow={MARKET.eyebrow} index={index} total={total}>
     <H accent={MARKET.titleAccent} head={MARKET.title} />
+    <Desc>{MARKET.desc}</Desc>
     <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "1.5fr 1fr",
-        gap: 64,
-        alignItems: "center",
-        flex: 1,
-        minHeight: 0,
-        marginTop: 22,
-      }}
+      className="fd-rise fd-blk-viz"
+      style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: 28, minHeight: 230 }}
     >
-      <div className="fd-rise" style={{ display: "flex", flexDirection: "column", minHeight: 0 }}>
-        <div className="fd-label">{MARKET.compsLabel}</div>
-        <div className="fd-plot" style={{ marginTop: 14 }}>
+      <div className="fd-viz-plate">
+        <div className="fd-label" style={{ marginBottom: 4 }}>
+          {MARKET.compsLabel}
+        </div>
+        <div style={{ flex: 1, minHeight: 0 }}>
           <CompsChart active={active} />
         </div>
       </div>
-      <div className="fd-rise">
+      <div className="fd-viz-plate" style={{ justifyContent: "center" }}>
         <div className="fd-label">{MARKET.multiple.label}</div>
         <div
           style={{
+            display: "flex",
+            alignItems: "baseline",
+            gap: 4,
+            marginTop: 12,
             fontFamily: "var(--serif)",
             fontStyle: "italic",
-            fontSize: 72,
-            lineHeight: 1,
             color: "var(--accent-ink)",
-            marginTop: 14,
           }}
         >
-          {MARKET.multiple.display}
+          <span style={{ fontSize: 40 }}>{MARKET.multiple.low}–</span>
+          <NumberTicker
+            className="serif-i"
+            style={{ fontSize: 60, fontStyle: "italic", color: "var(--accent-ink)" }}
+            value={MARKET.multiple.high}
+          />
+          <span style={{ fontSize: 40 }}>×</span>
         </div>
-        <p className="fd-col-b" style={{ marginTop: 16 }}>
+        <p className="fd-col-b" style={{ marginTop: 14 }}>
           {MARKET.multiple.caption}
         </p>
       </div>
     </div>
-    <p className="fd-rise fd-note">{MARKET.compsSource}</p>
-    <p className="fd-rise fd-note" style={{ color: "var(--gold)", marginTop: 6 }}>
+    <p className="fd-rise fd-viz-source">{MARKET.compsSource}</p>
+    <p className="fd-rise fd-viz-source" style={{ color: "var(--gold)", marginTop: 4 }}>
       {MARKET.compsStale}
     </p>
   </Screen>
 );
 
-/* ========================================================== XI · structure ◆ */
+/* -------------------------------------------------------------- VIII · model */
 
-const Structure: SlideFn = ({ index, total }) => {
-  const { tree, counter, pending } = STRUCTURE;
-  const entities = [tree.parent, ...tree.children];
+const Model: SlideFn = ({ active, index, total }) => (
+  <Screen eyebrow={MODEL.eyebrow} index={index} layout="b" total={total}>
+    <H accent={MODEL.titleAccent} head={MODEL.title} size="wide" />
+    <Desc>{MODEL.desc}</Desc>
+    <Plate source={MODEL.source}>
+      <ModelChart />
+    </Plate>
+  </Screen>
+);
 
-  return (
-    <Screen eyebrow={STRUCTURE.eyebrow} index={index} total={total}>
-      <H accent={STRUCTURE.titleAccent} head={STRUCTURE.title} />
-      <p className="fd-rise fd-lede">{STRUCTURE.lede}</p>
-      {/* The entity sequence as a rail — a tree diagram was three boxes and a
-          wire doing the work one timeline does better. */}
-      <Rail
-        cols={entities.map((e) => ({
-          key: e.key,
-          n: e.timing,
-          title: e.label,
-          body: e.note,
-        }))}
+/* ---------------------------------------------------------- IX · where we are */
+
+const CurrentFunnel = () => (
+  <div style={{ width: "100%", height: "100%", display: "flex", justifyContent: "center", overflow: "hidden" }}>
+    <div style={{ width: 210, maxWidth: "100%", padding: "0 34px" }}>
+      <FunnelChart
+        color="var(--accent-ink)"
+        data={CURRENT.funnel}
+        orientation="vertical"
+        showLabels
+        showPercentage
+        showValues
+        style={{ height: "100%" }}
       />
-      <div
-        className="fd-rise"
-        style={{ marginTop: 24, display: "flex", gap: 18, alignItems: "flex-start" }}
-      >
-        <Badge style={{ flex: "none" }} variant="deck-warn">
-          {counter.label}
-        </Badge>
-        <p className="fd-note" style={{ maxWidth: "76ch" }}>
-          {counter.body} {pending}
-        </p>
+    </div>
+  </div>
+);
+
+const Current: SlideFn = ({ index, total }) => (
+  <Screen eyebrow={CURRENT.eyebrow} index={index} layout="c" total={total}>
+    <H accent={CURRENT.titleAccent} head={CURRENT.title} />
+    <Desc>{CURRENT.desc}</Desc>
+    <Plate source={CURRENT.source}>
+      <CurrentFunnel />
+    </Plate>
+  </Screen>
+);
+
+/* ------------------------------------------------------- X · how we get there */
+
+const Structure: SlideFn = ({ active, index, total }) => (
+  <Screen eyebrow={STRUCTURE.eyebrow} index={index} layout="a" total={total}>
+    <H accent={STRUCTURE.titleAccent} head={STRUCTURE.title} size="wide" />
+    <Desc>{STRUCTURE.desc}</Desc>
+    <Plate>
+      {/* Longitude and latitude aren't equal-sized units off the equator —
+          plotted 1:1 the corridor reads skewed. The chart itself corrects
+          for that (`MAP_ASPECT`), but the correction only holds if this box
+          is actually that shape; a wider/shorter box would just stretch it
+          straight back out. */}
+      <div style={{ height: "100%", aspectRatio: MAP_ASPECT, alignSelf: "center" }}>
+        <StructureMap active={active} />
       </div>
-    </Screen>
+    </Plate>
+    <p className="fd-rise fd-viz-source">{STRUCTURE.caption}</p>
+  </Screen>
+);
+
+/* -------------------------------------------------------- XI · long-term plan */
+
+const RoadmapBars = () => {
+  const data = ROADMAP.months.map((m, i) => ({
+    month: m,
+    automated: ROADMAP.workflowsAutomated[i],
+  }));
+  return (
+    <div className="fd-chart-fill">
+      <BarChart
+        aspectRatio="5.4 / 1"
+        data={data}
+        margin={{ top: 16, right: 16, bottom: 34, left: 10 }}
+        xDataKey="month"
+      >
+        <Grid horizontal />
+        <Bar dataKey="automated" fill="var(--accent-ink)" lineCap="round" />
+        <BarXAxis />
+        <ChartTooltip />
+      </BarChart>
+    </div>
   );
 };
 
-/* ========================================================== XII · corridor ◆ */
-
-const Corridor: SlideFn = ({ active, index, total }) => (
-  <Screen eyebrow={CORRIDOR.eyebrow} index={index} total={total}>
-    <H accent={CORRIDOR.titleAccent} head={CORRIDOR.title} size="wide" />
-    <div className="fd-plot fd-plot-mask fd-rise">
-      <CorridorMap active={active} />
+const Roadmap: SlideFn = ({ active, index, total }) => (
+  <Screen eyebrow={ROADMAP.eyebrow} index={index} layout="d" total={total}>
+    <H accent={ROADMAP.titleAccent} head={ROADMAP.title} size="wide" />
+    <Desc>{ROADMAP.desc}</Desc>
+    <div className="fd-rise fd-blk-viz">
+      <div className="fd-viz-plate">
+        <div className="fd-label" style={{ marginBottom: 6 }}>
+          ROLLOUT BY FUNCTION
+        </div>
+        <div style={{ flex: 1, minHeight: 0 }}>
+          <RoadmapHeatmap active={active} />
+        </div>
+      </div>
+      <div className="fd-viz-plate">
+        <div className="fd-label" style={{ marginBottom: 6 }}>
+          WORKFLOWS AUTOMATED, CUMULATIVE
+        </div>
+        <div style={{ flex: 1, minHeight: 0 }}>
+          <RoadmapBars />
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flex: "0 0 auto",
+            gap: 14,
+            marginTop: 10,
+            paddingTop: 10,
+            borderTop: "1px solid var(--line)",
+          }}
+        >
+          {ROADMAP.milestones.map((m) => (
+            <div key={m.at} style={{ flex: 1 }}>
+              <div className="fd-col-n">{m.at}</div>
+              <div style={{ fontSize: 11, color: "var(--tx-2)", marginTop: 3, lineHeight: 1.3 }}>
+                {m.label}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
-    <p className="fd-rise fd-note">{CORRIDOR.caption}</p>
+    <p className="fd-rise fd-viz-source" style={{ marginTop: 14 }}>
+      {ROADMAP.source}
+    </p>
   </Screen>
 );
 
-/* ========================================================= XIII · roadmap ◆ */
+/* --------------------------------------------------------- XII · what could go wrong */
 
-const Roadmap: SlideFn = ({ index, total }) => (
-  <Screen eyebrow={ROADMAP.eyebrow} index={index} total={total}>
-    <H accent={ROADMAP.titleAccent} head={ROADMAP.title} />
-    <Rail
-      cols={ROADMAP.milestones.map((m) => ({
-        key: m.when,
-        n: m.when,
-        title: m.title,
-        body: m.body,
-      }))}
-    />
-    <Provenance source={ROADMAP.source} />
-  </Screen>
-);
-
-/* ============================================================== XIV · team ◆ */
-
-const Team: SlideFn = ({ index, total }) => (
-  <Screen eyebrow={TEAM.eyebrow} index={index} total={total}>
-    <H accent="still open." head="The bench behind customer zero, and the seats" />
-    {/* No names supplied. Inventing founders in a founding-partner deck would
-        be the worst fabrication this document could contain, so the seats are
-        named and the people stay labelled gaps. */}
-    <Rail
-      cols={[
-        ...TEAM.openSeats.map((s) => ({
-          key: s.role,
-          n: "OPEN",
-          title: s.role,
-          body: s.note,
-        })),
-        { key: "pending", n: "PENDING", title: "—", body: TEAM.emptyNote },
-      ]}
-    />
-  </Screen>
-);
-
-/* ============================================================= XV · risks ◆ */
+const RiskRadar = () => {
+  const data = [
+    { label: "Exposure today", color: "var(--gold)", values: RISKS.exposure },
+    { label: "Mitigated", color: "var(--accent-ink)", values: RISKS.mitigated },
+  ];
+  return (
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", width: "100%" }}>
+      <div style={{ flex: 1, minHeight: 0, position: "relative" }}>
+        <RadarChart data={data} levels={4} margin={54} metrics={RISKS.metrics}>
+          <RadarGrid showLabels={false} strokeOpacity={0.4} />
+          <RadarAxis strokeOpacity={0.35} />
+          <RadarLabels fontSize={11.5} offset={16} />
+          {data.map((d, i) => (
+            <RadarArea color={d.color} index={i} key={d.label} />
+          ))}
+        </RadarChart>
+      </div>
+      <ul
+        className="radarw-key"
+        style={{
+          display: "flex",
+          gap: 24,
+          borderTop: "none",
+          paddingTop: 0,
+          marginTop: 6,
+          justifyContent: "center",
+        }}
+      >
+        {data.map((d) => (
+          <li key={d.label}>
+            <div className="rk">
+              <span className="rk-top">
+                <span className="rk-label" style={{ color: d.color }}>
+                  {d.label}
+                </span>
+              </span>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
 
 const Risks: SlideFn = ({ index, total }) => (
-  <Screen eyebrow={RISKS.eyebrow} index={index} total={total}>
+  <Screen eyebrow={RISKS.eyebrow} index={index} layout="c" total={total}>
     <H accent={RISKS.titleAccent} head={RISKS.title} />
-    <Rail
-      cols={RISKS.items.map((r, i) => ({
-        key: r.risk,
-        n: `0${i + 1}`,
-        title: r.risk,
-        body: r.mitigation,
-      }))}
-    />
+    <Desc>{RISKS.desc}</Desc>
+    <Plate>
+      <RiskRadar />
+    </Plate>
   </Screen>
 );
 
-/* =============================================================== XVI · ask ◆ */
+/* ------------------------------------------------------------- XIII · the ask */
+
+const AskPie = () => (
+  <PieChart data={ASK.split} size={112}>
+    {ASK.split.map((d, i) => (
+      <PieSlice color={i === 0 ? "var(--accent-ink)" : "var(--line-3)"} index={i} key={d.label} />
+    ))}
+    <PieCenter defaultLabel="split" />
+  </PieChart>
+);
 
 const Ask: SlideFn = ({ index, total }) => (
-  <Screen eyebrow={ASK.eyebrow} index={index} total={total}>
+  <Screen eyebrow={ASK.eyebrow} index={index} layout="d" total={total}>
     <H accent={ASK.titleAccent} head={ASK.title} />
-    <p className="fd-rise fd-lede" style={{ marginTop: 22, maxWidth: "46ch" }}>{ASK.lede}</p>
+    <Desc>{ASK.desc}</Desc>
 
-    {/* The proposal drawn as one rail in two equal halves. If the halves are
-        not equal the slide is lying, so the geometry carries the claim and the
-        numbers only label it. */}
-    <div className="fd-rise fd-split-bar">
-      <div className="sb-track">
-        <span className="sb-ours" style={{ flexBasis: `${ASK.split.ours}%` }} />
-        <span className="sb-theirs" style={{ flexBasis: `${ASK.split.theirs}%` }} />
-      </div>
-      <div className="sb-legend">
-        <span>
-          <b>{ASK.split.ours}%</b> {ASK.splitLabels.ours}
-        </span>
-        <span>
-          <b>{ASK.split.theirs}%</b> {ASK.splitLabels.theirs}
-        </span>
-      </div>
-    </div>
-
-    <div className="fd-rise fd-contribs">
-      {[ASK.contributions.ours, ASK.contributions.theirs].map((side) => (
-        <div key={side.label}>
-          <div className="fd-label">{side.label}</div>
-          <ul className="fd-contrib-list">
-            {side.items.map((it) => (
-              <li key={it}>{it}</li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </div>
-
-    <div className="fd-rise fd-ask-foot">
-      <div>
-        <p className="fd-note" style={{ maxWidth: "56ch" }}>
-          {ASK.governance}
-        </p>
-        <div className="fd-ask-warn">
-          <Badge variant="deck-warn">TERMS PENDING</Badge>
-          <p className="fd-note">{ASK.warning}</p>
-        </div>
-      </div>
-      <div className="fd-ask-terms">
-        {ASK.terms.map((t) => (
-          <div key={t.label}>
-            <div className="fd-label">{t.label}</div>
-            <div className="fd-term-v">
-              {t.value === null ? <Gap width={5} /> : `${t.value}${t.unit}`}
-            </div>
-          </div>
-        ))}
-      </div>
-      {/* Absolutely positioned, not a flex sibling in `.fd-ask-terms` — that
-          row already sets the width the left column's warning text wraps
-          against, so adding the CTA there squeezed it onto more lines and
-          pushed the whole foot past the 510px body bound. */}
-      <Button
-        className="fd-rise fd-ask-cta"
-        render={
-          <a href="mailto:info@isthmusmeridian.com?subject=Isthmus%20Meridian%20%E2%80%94%20the%20crossing" />
-        }
-        size="sm"
-        variant="deck"
+    <div className="fd-rise fd-blk-viz">
+      <div
+        className="fd-viz-plate"
+        style={{ alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden" }}
       >
-        {ASK.cta}
-      </Button>
+        <BorderBeam colorFrom="var(--mer)" colorTo="var(--accent-ink)" duration={7} size={90} />
+        <AskPie />
+        <div style={{ display: "flex", gap: 20, marginTop: 12 }}>
+          {ASK.split.map((d, i) => (
+            <div key={d.label} style={{ textAlign: "center" }}>
+              <div
+                style={{
+                  fontSize: 15,
+                  fontWeight: 400,
+                  color: i === 0 ? "var(--accent-ink)" : "var(--heading)",
+                }}
+              >
+                {d.value}%
+              </div>
+              <div className="fd-label" style={{ marginTop: 2, fontSize: 9.5 }}>
+                {d.label}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="fd-viz-plate" style={{ gap: 0 }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 20,
+            flex: 1,
+            minHeight: 0,
+            overflow: "hidden",
+          }}
+        >
+          {[ASK.contributions.ours, ASK.contributions.theirs].map((side, i) => (
+            <div key={side.label}>
+              <Badge variant={i === 0 ? "deck" : "deck-warn"}>{side.label}</Badge>
+              <ul className="fd-contrib-list" style={{ marginTop: 10 }}>
+                {side.items.slice(0, 2).map((it) => (
+                  <li key={it} style={{ fontSize: 11.5 }}>
+                    {it}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "space-between",
+            gap: 16,
+            marginTop: 14,
+            paddingTop: 12,
+            borderTop: "1px solid var(--line)",
+          }}
+        >
+          <div style={{ display: "flex", gap: 22 }}>
+            {ASK.terms.map((t) => (
+              <div key={t.label}>
+                <div className="fd-label" style={{ fontSize: 9.5 }}>
+                  {t.label}
+                </div>
+                <div className="fd-term-v" style={{ fontSize: 15, marginTop: 4 }}>
+                  {t.value === null ? <GapPlaceholder width={4} /> : `${t.value as Figure}${t.unit}`}
+                </div>
+              </div>
+            ))}
+          </div>
+          <Button
+            render={
+              <a href="mailto:info@isthmusmeridian.com?subject=Isthmus%20Meridian%20%E2%80%94%20the%20crossing" />
+            }
+            size="sm"
+            variant="deck"
+          >
+            {ASK.cta}
+          </Button>
+        </div>
+      </div>
     </div>
+
+    <p className="fd-rise fd-viz-source" style={{ marginTop: 12 }}>
+      {ASK.governance} {ASK.warning}
+    </p>
   </Screen>
 );
 
-/* ============================================================ XVII · closing */
+/* ---------------------------------------------------------------- XIV · close */
 
 const Closing: SlideFn = () => (
   <>
     <Field />
     <div className="fd-body" style={{ justifyContent: "center" }}>
       <p className="fd-rise fd-statement">
-        The crossing, and the <span className="hi">line you cross it by.</span>
+        {CLOSING.statement} <span className="hi">{CLOSING.statementAccent}</span>
       </p>
-      <div
-        className="fd-rise"
-        style={{ marginTop: 52, display: "flex", gap: 64 }}
-      >
+      <div className="fd-rise" style={{ marginTop: 52, display: "flex", gap: 64 }}>
         <div>
           <div className="fd-label">Structure</div>
-          <div style={{ fontSize: 15, color: "var(--tx-2)", marginTop: 8 }}>
-            Delaware · Dubai
-          </div>
+          <div style={{ fontSize: 15, color: "var(--tx-2)", marginTop: 8 }}>{CLOSING.structure}</div>
         </div>
         <div>
           <div className="fd-label">Opportunity</div>
-          <div style={{ fontSize: 15, color: "var(--tx-2)", marginTop: 8 }}>
-            AND Capital · 50/50 JV
-          </div>
+          <div style={{ fontSize: 15, color: "var(--tx-2)", marginTop: 8 }}>{CLOSING.opportunity}</div>
         </div>
       </div>
     </div>
@@ -832,25 +784,17 @@ const Closing: SlideFn = () => (
 
 export type Slide = { render: SlideFn; light?: boolean };
 
-/**
- * Screens alternate navy and paper, as the site does. The cover and the close
- * are both navy so the deck opens and lands on the same ground.
- */
 export const SLIDES: Slide[] = [
   { render: Cover },
-  { render: Thesis },
-  { render: Problem, light: true },
-  { render: Backdrop },
-  { render: Wedge, light: true },
+  { render: Identity },
+  { render: Gap, light: true },
   { render: Functions },
-  { render: Flywheel, light: true },
-  { render: Moat },
-  { render: Economics, light: true },
+  { render: Moat, light: true },
   { render: Market },
+  { render: Model, light: true },
+  { render: Current },
   { render: Structure, light: true },
-  { render: Corridor },
-  { render: Roadmap, light: true },
-  { render: Team },
+  { render: Roadmap },
   { render: Risks, light: true },
   { render: Ask },
   { render: Closing },

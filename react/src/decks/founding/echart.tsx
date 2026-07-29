@@ -17,7 +17,15 @@
  * hex anywhere in a chart module.
  */
 
-import { BarChart, EffectScatterChart, LineChart, LinesChart } from "echarts/charts";
+import {
+  BarChart,
+  BoxplotChart,
+  CustomChart,
+  EffectScatterChart,
+  HeatmapChart,
+  LineChart,
+  LinesChart,
+} from "echarts/charts";
 import {
   GeoComponent,
   GraphicComponent,
@@ -25,6 +33,7 @@ import {
   MarkAreaComponent,
   MarkLineComponent,
   MarkPointComponent,
+  VisualMapComponent,
 } from "echarts/components";
 import * as echarts from "echarts/core";
 import { SVGRenderer } from "echarts/renderers";
@@ -35,12 +44,16 @@ echarts.use([
   LineChart,
   LinesChart,
   EffectScatterChart,
+  HeatmapChart,
+  BoxplotChart,
+  CustomChart,
   GeoComponent,
   GraphicComponent,
   GridComponent,
   MarkAreaComponent,
   MarkLineComponent,
   MarkPointComponent,
+  VisualMapComponent,
   SVGRenderer,
 ]);
 
@@ -119,12 +132,17 @@ export function EChart({ build, active = true, className, style, alt }: EChartPr
     if (!el) return;
 
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const inst = echarts.init(el, undefined, {
-      renderer: "svg",
-      width: el.clientWidth || undefined,
-      height: el.clientHeight || undefined,
-    });
+    // No fixed width/height here: every slide mounts at once (only
+    // `visibility` toggles), and on the very first paint a chart on a slide
+    // that isn't index 0 can read a 0×0 box before the grid layout settles.
+    // A size locked in at init time then never recovers — ECharts only
+    // re-measures on `resize()`, and if the box never *changes* size after
+    // that (it was already at its final size, just measured too early) the
+    // ResizeObserver below has nothing to fire on. Let ECharts auto-size
+    // from the container on every read instead.
+    const inst = echarts.init(el, undefined, { renderer: "svg" });
     chart.current = inst;
+    inst.resize();
     inst.setOption(build(readPalette(el)), true);
 
     // The still frame is the deliverable: with reduced motion the chart is
@@ -152,6 +170,9 @@ export function EChart({ build, active = true, className, style, alt }: EChartPr
     const el = host.current;
     if (!inst || !el) return;
     played.current = true;
+    // Becoming the active slide is also the most reliable moment to
+    // re-measure: the browser has definitely laid the box out by now.
+    inst.resize();
     inst.setOption(build(readPalette(el)), { replaceMerge: ["series"] });
   }, [active, build]);
 
