@@ -1,160 +1,165 @@
 "use client";
 
-import { animate, type AnimationParams, createTimeline, utils } from "animejs";
-import { useEffect, useRef } from "react";
+import {
+  BadgeCheck,
+  Banknote,
+  ChartNoAxesCombined,
+  FileSpreadsheet,
+  FileText,
+  Landmark,
+  Scale,
+  Search,
+  Users,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+
+import { AnimatedBeam } from "@/components/ui/animated-beam";
+import { AnimatedList } from "@/components/ui/animated-list";
+import { BorderBeam } from "@/components/ui/border-beam";
+import { OrbitingCircles } from "@/components/ui/orbiting-circles";
+import { MeridianMark } from "@/decks/isthmus/Meridian";
 
 /**
- * "We run the work" — work moving through the bench.
+ * "You send → We operate → You receive" — the three steps, each with its own
+ * illustration, wired together by Magic UI's AnimatedBeam.
  *
- * An anime.js timeline drives one packet along the track; the trailing fill
- * follows it, and each waypoint flares as the packet lands. Positions are
- * measured from the live dots rather than assumed, so the packet stays welded to
- * them at any column width.
+ * Every moving part is an imported component:
+ *   · AnimatedList     — requests piling into the inbox ("you send")
+ *   · OrbitingCircles  — the bench turning around the meridian mark ("we operate")
+ *   · BorderBeam       — the finished deliverable being sealed ("you receive")
+ *   · AnimatedBeam     — the connectors between them
+ * Icons are lucide. Nothing here is a hand-drawn path.
  *
- * Pointing at a step takes the timeline over and seeks to that step instead of
- * fighting it, and releasing hands it back — the motion is never something you
- * have to wait out.
+ * The beams measure from live DOM refs, so the ports are the only geometry that
+ * matters: CSS moves them to the plate's side edges on wide screens and to the
+ * top/bottom edges once the columns stack, and the beams re-measure themselves
+ * through their own ResizeObserver. No JS branch on viewport.
  */
 
-const STEPS = [
-  {
-    k: "You send",
-    p: "A deal, a model, a reporting need, a fundraise, a research question.",
-  },
-  {
-    k: "We operate",
-    p: "On an AI-first bench, to your firm's standard, at the pace of a live raise.",
-    feat: true,
-  },
-  {
-    k: "You receive",
-    p: "Completed, institutional-grade work, ready for the IC or the LP.",
-  },
+/* Screen 4 is always the paper theme, so these are the light-side tokens:
+   --sky #88C1ED leads the pulse, --accent-ink #2f628a carries its body. */
+const BEAM_LEAD = "#88C1ED";
+const BEAM_BODY = "#2f628a";
+
+const INBOUND = [
+  { icon: FileSpreadsheet, label: "Deal model" },
+  { icon: FileText, label: "LP report" },
+  { icon: Banknote, label: "Fundraise pack" },
+  { icon: Search, label: "Research memo" },
 ] as const;
 
-const TRAVEL = 900;
-const DWELL = 1100;
+/* the bench: what actually turns while the work is with us */
+const ORBIT_INNER = [FileSpreadsheet, ChartNoAxesCombined, Landmark] as const;
+const ORBIT_OUTER = [Scale, Users, Banknote, FileText] as const;
 
 export function FlowDiagram() {
-  const root = useRef<HTMLDivElement>(null);
+  const container = useRef<HTMLDivElement>(null);
+  const outA = useRef<HTMLSpanElement>(null);
+  const inB = useRef<HTMLSpanElement>(null);
+  const outB = useRef<HTMLSpanElement>(null);
+  const inC = useRef<HTMLSpanElement>(null);
 
+  /* AnimatedList fills once and stops by design, which is right for an inbox —
+     remounting it on a cycle is what turns it back into a loop. */
+  const [cycle, setCycle] = useState(0);
   useEffect(() => {
-    const el = root.current;
-    if (!el) return;
-
-    const packet = el.querySelector<HTMLElement>(".flow-packet");
-    const fill = el.querySelector<HTMLElement>(".flow-fill");
-    const dots = Array.from(el.querySelectorAll<HTMLElement>(".fdot"));
-    const steps = Array.from(el.querySelectorAll<HTMLElement>(".fstep"));
-    if (!(packet && fill) || !dots.length) return;
-
-    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    /* On mobile the rail is vertical and the packet travels DOWNWARDS, so the
-       whole thing is measured and animated on the cross axis instead. */
-    let vertical = matchMedia("(max-width:760px)").matches;
-    /** dot centres in px, along whichever axis the rail runs */
-    let xs: number[] = [];
-    const measure = () => {
-      vertical = matchMedia("(max-width:760px)").matches;
-      const box = el.getBoundingClientRect();
-      xs = dots.map((d) => {
-        const r = d.getBoundingClientRect();
-        return vertical
-          ? r.top + r.height / 2 - box.top
-          : r.left + r.width / 2 - box.left;
-      });
-    };
-    measure();
-    const along = (v: number): AnimationParams =>
-      (vertical ? { y: v } : { x: v }) as AnimationParams;
-    const grow = (v: number): AnimationParams =>
-      (vertical ? { height: v, width: "1.5px" } : { width: v }) as AnimationParams;
-
-    const light = (i: number) => {
-      steps.forEach((s, j) => s.classList.toggle("lit", j === i));
-    };
-
-    if (reduce) {
-      light(1);
-      utils.set(packet, { ...along(xs[1] ?? 0), opacity: 1 });
-      utils.set(fill, grow(xs[1] ?? 0));
-      return;
-    }
-
-    utils.set(packet, along(xs[0] ?? 0));
-    utils.set(fill, grow(xs[0] ?? 0));
-
-    const tl = createTimeline({ loop: true, defaults: { ease: "inOut(2)" } });
-    for (let i = 0; i < xs.length; i++) {
-      const from = xs[i === 0 ? xs.length - 1 : i - 1] ?? 0;
-      const to = xs[i] ?? 0;
-      // the first leg of each lap restarts from the left rather than sliding back
-      const jump = i === 0;
-      const move = (vertical
-        ? { y: jump ? [to, to] : [from, to] }
-        : { x: jump ? [to, to] : [from, to] }) as AnimationParams;
-      tl.add(packet, {
-        ...move,
-        opacity: jump ? [0, 1] : 1,
-        duration: jump ? 260 : TRAVEL,
-        onBegin: () => light(i),
-      }).add(fill, { ...grow(to), duration: jump ? 260 : TRAVEL }, "<<");
-      // land: the waypoint takes the hit, then settles
-      tl.add(dots[i] as HTMLElement, {
-        scale: [1, 1.55, 1],
-        duration: 520,
-        ease: "out(3)",
-      }).add(packet, { duration: DWELL }, "<<");
-    }
-
-    // pointing at a step takes the loop over; leaving hands it back
-    const enter = (i: number) => () => {
-      tl.pause();
-      light(i);
-      animate(packet, { ...along(xs[i] ?? 0), duration: 420, ease: "out(3)" });
-      animate(fill, { ...grow(xs[i] ?? 0), duration: 420, ease: "out(3)" });
-    };
-    const leave = () => tl.play();
-
-    const offs: Array<() => void> = [];
-    steps.forEach((s, i) => {
-      const on = enter(i);
-      s.addEventListener("mouseenter", on);
-      s.addEventListener("focusin", on);
-      s.addEventListener("mouseleave", leave);
-      s.addEventListener("focusout", leave);
-      offs.push(() => {
-        s.removeEventListener("mouseenter", on);
-        s.removeEventListener("focusin", on);
-        s.removeEventListener("mouseleave", leave);
-        s.removeEventListener("focusout", leave);
-      });
-    });
-
-    const onResize = () => measure();
-    addEventListener("resize", onResize);
-
-    return () => {
-      tl.pause();
-      offs.forEach((o) => o());
-      removeEventListener("resize", onResize);
-    };
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const id = setInterval(() => setCycle((c) => c + 1), 9000);
+    return () => clearInterval(id);
   }, []);
 
   return (
-    <div className="flow reveal" ref={root}>
-      <div className="flow-track" />
-      <div className="flow-fill" />
-      <span className="flow-packet" />
-      {STEPS.map((s) => (
-        // biome-ignore lint/a11y/noNoninteractiveTabindex: focus stop so keyboard users can steer the loop
-        <div className="fstep" key={s.k} tabIndex={0}>
-          <span className={`fdot${"feat" in s && s.feat ? " feat" : ""}`} />
-          <div className="fk">{s.k}</div>
-          <p>{s.p}</p>
+    <div className="flow reveal" ref={container}>
+      <div className="fstep">
+        <div className="flow-plate">
+          <AnimatedList className="fbox" delay={900} key={cycle}>
+            {INBOUND.map(({ icon: Icon, label }) => (
+              <div className="fin" key={label}>
+                <Icon aria-hidden="true" size={15} strokeWidth={1.5} />
+                <span>{label}</span>
+              </div>
+            ))}
+          </AnimatedList>
         </div>
-      ))}
+        <span className="fport port-out" ref={outA} />
+        <div className="fk">You send</div>
+        <p>A deal, a model, a reporting need, a fundraise, a research question.</p>
+      </div>
+
+      <div className="fstep">
+        <div className="flow-plate">
+          <div className="fbench">
+            <MeridianMark className="fbench-mark" title="" />
+            <OrbitingCircles duration={26} iconSize={26} path={false} radius={40}>
+              {ORBIT_INNER.map((Icon, i) => (
+                <span className="forb" key={`i${i}`}>
+                  <Icon aria-hidden="true" size={13} strokeWidth={1.5} />
+                </span>
+              ))}
+            </OrbitingCircles>
+            <OrbitingCircles duration={36} iconSize={26} path={false} radius={64} reverse>
+              {ORBIT_OUTER.map((Icon, i) => (
+                <span className="forb" key={`o${i}`}>
+                  <Icon aria-hidden="true" size={13} strokeWidth={1.5} />
+                </span>
+              ))}
+            </OrbitingCircles>
+          </div>
+        </div>
+        <span className="fport port-in" ref={inB} />
+        <span className="fport port-out" ref={outB} />
+        <div className="fk">We operate</div>
+        <p>On an AI-first bench, to your firm&rsquo;s standard, at the pace of a live raise.</p>
+      </div>
+
+      <div className="fstep">
+        <div className="flow-plate">
+          <div className="fout">
+            <BorderBeam
+              borderWidth={1.5}
+              className="fseam"
+              colorFrom={BEAM_LEAD}
+              colorTo={BEAM_BODY}
+              duration={7}
+              size={70}
+            />
+            <BadgeCheck aria-hidden="true" className="fout-seal" size={20} strokeWidth={1.4} />
+            <span className="fout-rule" />
+            <span className="fout-rule" />
+            <span className="fout-rule short" />
+            <div className="fout-cap">Signed off</div>
+          </div>
+        </div>
+        <span className="fport port-in" ref={inC} />
+        <div className="fk">You receive</div>
+        <p>Completed, institutional-grade work, ready for the IC or the LP.</p>
+      </div>
+
+      <AnimatedBeam
+        className="fbeam"
+        containerRef={container}
+        duration={4}
+        fromRef={outA}
+        gradientStartColor={BEAM_LEAD}
+        gradientStopColor={BEAM_BODY}
+        pathColor={BEAM_BODY}
+        pathOpacity={0.16}
+        pathWidth={1.5}
+        toRef={inB}
+      />
+      <AnimatedBeam
+        className="fbeam"
+        containerRef={container}
+        delay={1.1}
+        duration={4}
+        fromRef={outB}
+        gradientStartColor={BEAM_LEAD}
+        gradientStopColor={BEAM_BODY}
+        pathColor={BEAM_BODY}
+        pathOpacity={0.16}
+        pathWidth={1.5}
+        toRef={inC}
+      />
     </div>
   );
 }

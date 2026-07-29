@@ -1,7 +1,22 @@
 "use client";
 
-import { animate, createDrawable, stagger } from "animejs";
-import { useEffect, useMemo, useRef } from "react";
+import { animate, createDrawable, cubicBezier, stagger } from "animejs";
+import {
+  Boxes,
+  BrainCircuit,
+  ClipboardList,
+  Calculator,
+  Handshake,
+  Radar,
+  Telescope,
+  type LucideIcon,
+} from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+
+import { MeridianMark } from "@/decks/isthmus/Meridian";
+import { BlurFade } from "@/components/ui/blur-fade";
+import { BorderBeam } from "@/components/ui/border-beam";
+import { TextAnimate } from "@/components/ui/text-animate";
 
 /**
  * The operating tree — root → three branches → seven functions.
@@ -23,7 +38,22 @@ import { useEffect, useMemo, useRef } from "react";
 export type TreeLeaf = { key: string; name: string; desc: string };
 export type TreeBranch = { key: string; name: string; leaves: TreeLeaf[] };
 
-const EASE = "cubicBezier(0.22, 1, 0.36, 1)";
+/* anime.js v4 dropped the string form of this ease from the core, so the easing
+   function is imported and passed directly — the string was silently falling
+   back to the default. */
+const EASE = cubicBezier(0.22, 1, 0.36, 1);
+
+/* One lucide glyph per function, so hovering a leaf swaps the illustration in
+   the detail card as well as the description. */
+const LEAF_ICONS: Record<string, LucideIcon> = {
+  "deal-team": Handshake,
+  modeling: Calculator,
+  capital: Telescope,
+  "fund-ops": ClipboardList,
+  monitoring: Radar,
+  intel: Boxes,
+  ai: BrainCircuit,
+};
 const LEAF_Y = [6, 20, 34, 49, 63, 78, 92];
 const ROOT_X = 20;
 const BRANCH_X = 27;
@@ -40,6 +70,10 @@ export function ServicesTree({
   summary: string;
 }) {
   const scope = useRef<HTMLDivElement>(null);
+  /* Only the detail card is React-driven. The tree itself stays on direct DOM
+     class toggles and its markup is memoised, so a hover re-renders one card
+     rather than ten paths and eleven nodes (see the note above). */
+  const [active, setActive] = useState<string | null>(null);
 
   const layout = useMemo(() => {
     let row = 0;
@@ -89,12 +123,10 @@ export function ServicesTree({
     return () => io.disconnect();
   }, []);
 
-  // hover: pure DOM, no re-render
+  // hover: the tree paints via DOM, the detail card via `active`
   useEffect(() => {
     const el = scope.current;
     if (!el) return;
-    const detail = el.querySelector<HTMLElement>(".tree-detail");
-    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
     let current: string | null = null;
 
     const paint = (leafKey: string | null) => {
@@ -116,15 +148,7 @@ export function ServicesTree({
         p.classList.toggle("lit", p.dataset.spine === branchKey);
       }
 
-      if (!detail) return;
-      detail.textContent = leaf ? leaf.desc : summary;
-      if (reduce) return;
-      // no JS keyframe here on purpose: re-running a [6,0] rise on every pointer
-      // move restarts the translate from 6px each time, which reads as a jitter
-      // when you shuffle quickly. A CSS transition interpolates from wherever
-      // the value currently is, so rapid switching just settles.
-      detail.classList.add("swapping");
-      requestAnimationFrame(() => detail.classList.remove("swapping"));
+      setActive(leafKey);
     };
 
     const offs: Array<() => void> = [];
@@ -144,10 +168,15 @@ export function ServicesTree({
       });
     }
     return () => offs.forEach((o) => o());
-  }, [layout, summary]);
+  }, [layout]);
 
-  return (
-    <div className="tree" ref={scope}>
+  const leaf = active ? layout.leaves.find((l) => l.key === active) : undefined;
+  const Icon = active ? LEAF_ICONS[active] : undefined;
+
+  /* memoised so `active` changing re-renders the detail card only — the plot's
+     element tree is reused wholesale and React reconciles nothing inside it */
+  const plot = useMemo(
+    () => (
       <div className="tree-plot">
         <svg
           aria-hidden="true"
@@ -196,8 +225,46 @@ export function ServicesTree({
           </div>
         ))}
       </div>
+    ),
+    [layout, root]
+  );
 
-      <p className="tree-detail">{summary}</p>
+  return (
+    <div className="tree" ref={scope}>
+      {plot}
+
+      {/* the illustration: a glyph that blurs in and copy that types itself
+          back in, both keyed on the hovered leaf so every swap replays */}
+      <div className={`tree-detail${active ? " lit" : ""}`}>
+        <BlurFade className="td-glyph" direction="up" key={`g-${active ?? "0"}`}>
+          {Icon ? (
+            <Icon aria-hidden="true" size={22} strokeWidth={1.4} />
+          ) : (
+            <MeridianMark title="" />
+          )}
+        </BlurFade>
+        <TextAnimate
+          animation="blurInUp"
+          as="p"
+          by="word"
+          className="td-copy"
+          duration={0.4}
+          key={`t-${active ?? "0"}`}
+          startOnView={false}
+        >
+          {leaf?.desc ?? summary}
+        </TextAnimate>
+        {active ? (
+          <BorderBeam
+            borderWidth={1.5}
+            className="td-beam"
+            colorFrom="#88C1ED"
+            colorTo="#4686B7"
+            duration={5}
+            size={64}
+          />
+        ) : null}
+      </div>
     </div>
   );
 }

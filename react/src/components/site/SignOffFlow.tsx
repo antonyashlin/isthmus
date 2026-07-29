@@ -1,157 +1,132 @@
 "use client";
 
-import { animate, type AnimationParams, createTimeline, utils } from "animejs";
-import { useEffect, useRef } from "react";
+import { Bot, Inbox, PenLine, SearchCheck, type LucideIcon } from "lucide-react";
+import { useRef } from "react";
+
+import {
+  FigChecks,
+  FigResolve,
+  FigRows,
+  FigType,
+} from "@/components/site/figures";
+import { AnimatedBeam } from "@/components/ui/animated-beam";
+import { BlurFade } from "@/components/ui/blur-fade";
+import { BorderBeam } from "@/components/ui/border-beam";
 
 /**
- * "Nothing reaches your desk without a sign-off" — the same packet-on-a-track
- * rig as FlowDiagram, extended to four waypoints so the human checkpoint
- * between the AI draft and the client's own approval is explicit rather than
+ * "Nothing reaches your desk without a sign-off" — the four checkpoints between
+ * an AI draft and an IC or LP, with the human gate made explicit rather than
  * implied.
+ *
+ * Same rig as JourneyFlow: three Magic UI AnimatedBeams strung dot-to-dot, each
+ * delayed by its own index so one pulse walks the chain and repeats. The gate
+ * itself — "You sign off" — is the step the headline promises, so it carries a
+ * BorderBeam while the others just hold their glyph.
  */
 
-const STEPS = [
+/* screen 12 is the paper theme */
+const BEAM_LEAD = "#88C1ED";
+const BEAM_BODY = "#2f628a";
+
+const LEG = 1.6;
+const LEGS = 3;
+const CYCLE = LEG * (LEGS + 1);
+
+/* Each checkpoint shows its own work: the draft typing itself, the review
+   ticking against a standard, the approval resolving into a decision, the
+   finished packs going out. */
+const STEPS: Array<{
+  k: string;
+  p: string;
+  icon: LucideIcon;
+  gate?: boolean;
+  fig: React.ReactNode;
+}> = [
   {
     k: "AI drafts",
     p: "First-pass work from an AI-first bench, built to your firm's structure and standard.",
+    icon: Bot,
+    fig: <FigType lines={"Q3 valuation memo\n> drafting…"} />,
   },
   {
     k: "Bench reviews",
     p: "A senior analyst checks it against your standard before it ever reaches you.",
-    feat: true,
+    icon: SearchCheck,
+    fig: <FigChecks items={["Method", "Sources", "Format"]} />,
   },
   {
     k: "You sign off",
     p: "Nothing ships to an IC or an LP without your team's approval.",
+    icon: PenLine,
+    gate: true,
+    fig: <FigResolve word="APPROVED" />,
   },
   {
     k: "IC / LP receives",
     p: "Completed, institutional-grade work, delivered ready to use.",
+    icon: Inbox,
+    fig: <FigRows reverse rows={["IC pack", "LP report", "Valuation", "Board deck"]} />,
   },
-] as const;
-
-const TRAVEL = 900;
-const DWELL = 1100;
+];
 
 export function SignOffFlow() {
-  const root = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = root.current;
-    if (!el) return;
-
-    const packet = el.querySelector<HTMLElement>(".soflow-packet");
-    const fill = el.querySelector<HTMLElement>(".soflow-fill");
-    const dots = Array.from(el.querySelectorAll<HTMLElement>(".sodot"));
-    const steps = Array.from(el.querySelectorAll<HTMLElement>(".sostep"));
-    if (!(packet && fill) || !dots.length) return;
-
-    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    /* On mobile the rail is vertical and the packet travels DOWNWARDS, so the
-       whole thing is measured and animated on the cross axis instead. */
-    let vertical = matchMedia("(max-width:760px)").matches;
-    /** dot centres in px, along whichever axis the rail runs */
-    let xs: number[] = [];
-    const measure = () => {
-      vertical = matchMedia("(max-width:760px)").matches;
-      const box = el.getBoundingClientRect();
-      xs = dots.map((d) => {
-        const r = d.getBoundingClientRect();
-        return vertical
-          ? r.top + r.height / 2 - box.top
-          : r.left + r.width / 2 - box.left;
-      });
-    };
-    measure();
-    const along = (v: number): AnimationParams =>
-      (vertical ? { y: v } : { x: v }) as AnimationParams;
-    const grow = (v: number): AnimationParams =>
-      (vertical ? { height: v, width: "1.5px" } : { width: v }) as AnimationParams;
-
-    const light = (i: number) => {
-      steps.forEach((s, j) => s.classList.toggle("lit", j === i));
-    };
-
-    if (reduce) {
-      light(1);
-      utils.set(packet, { ...along(xs[1] ?? 0), opacity: 1 });
-      utils.set(fill, grow(xs[1] ?? 0));
-      return;
-    }
-
-    utils.set(packet, along(xs[0] ?? 0));
-    utils.set(fill, grow(xs[0] ?? 0));
-
-    const tl = createTimeline({ loop: true, defaults: { ease: "inOut(2)" } });
-    for (let i = 0; i < xs.length; i++) {
-      const from = xs[i === 0 ? xs.length - 1 : i - 1] ?? 0;
-      const to = xs[i] ?? 0;
-      // the first leg of each lap restarts from the left rather than sliding back
-      const jump = i === 0;
-      const move = (vertical
-        ? { y: jump ? [to, to] : [from, to] }
-        : { x: jump ? [to, to] : [from, to] }) as AnimationParams;
-      tl.add(packet, {
-        ...move,
-        opacity: jump ? [0, 1] : 1,
-        duration: jump ? 260 : TRAVEL,
-        onBegin: () => light(i),
-      }).add(fill, { ...grow(to), duration: jump ? 260 : TRAVEL }, "<<");
-      // land: the waypoint takes the hit, then settles
-      tl.add(dots[i] as HTMLElement, {
-        scale: [1, 1.55, 1],
-        duration: 520,
-        ease: "out(3)",
-      }).add(packet, { duration: DWELL }, "<<");
-    }
-
-    // pointing at a step takes the loop over; leaving hands it back
-    const enter = (i: number) => () => {
-      tl.pause();
-      light(i);
-      animate(packet, { ...along(xs[i] ?? 0), duration: 420, ease: "out(3)" });
-      animate(fill, { ...grow(xs[i] ?? 0), duration: 420, ease: "out(3)" });
-    };
-    const leave = () => tl.play();
-
-    const offs: Array<() => void> = [];
-    steps.forEach((s, i) => {
-      const on = enter(i);
-      s.addEventListener("mouseenter", on);
-      s.addEventListener("focusin", on);
-      s.addEventListener("mouseleave", leave);
-      s.addEventListener("focusout", leave);
-      offs.push(() => {
-        s.removeEventListener("mouseenter", on);
-        s.removeEventListener("focusin", on);
-        s.removeEventListener("mouseleave", leave);
-        s.removeEventListener("focusout", leave);
-      });
-    });
-
-    const onResize = () => measure();
-    addEventListener("resize", onResize);
-
-    return () => {
-      tl.pause();
-      offs.forEach((o) => o());
-      removeEventListener("resize", onResize);
-    };
-  }, []);
+  const container = useRef<HTMLDivElement>(null);
+  /* stable ref objects — AnimatedBeam keys its measuring effect on ref identity */
+  const d0 = useRef<HTMLSpanElement>(null);
+  const d1 = useRef<HTMLSpanElement>(null);
+  const d2 = useRef<HTMLSpanElement>(null);
+  const d3 = useRef<HTMLSpanElement>(null);
+  const dots = [d0, d1, d2, d3];
 
   return (
-    <div className="soflow reveal" ref={root}>
-      <div className="soflow-track" />
-      <div className="soflow-fill" />
-      <span className="soflow-packet" />
-      {STEPS.map((s) => (
-        // biome-ignore lint/a11y/noNoninteractiveTabindex: focus stop so keyboard users can steer the loop
-        <div className="sostep" key={s.k} tabIndex={0}>
-          <span className={`sodot${"feat" in s && s.feat ? " feat" : ""}`} />
-          <div className="sok">{s.k}</div>
-          <p>{s.p}</p>
-        </div>
+    <div className="soflow reveal" ref={container}>
+      {STEPS.map(({ k, p, icon: Icon, gate, fig }, i) => (
+        <BlurFade
+          className={`sostep${gate ? " gate" : ""}`}
+          delay={i * 0.09}
+          inView
+          key={k}
+        >
+          <span className={`sodot${gate ? " feat" : ""}`} ref={dots[i]} />
+          <div className="soplate">
+            {fig}
+            {gate ? (
+              <BorderBeam
+                borderWidth={1.5}
+                className="sobeam-gate"
+                colorFrom={BEAM_LEAD}
+                colorTo={BEAM_BODY}
+                duration={5}
+                size={48}
+              />
+            ) : null}
+          </div>
+          <div className="sok">
+            <span className="soglyph">
+              <Icon aria-hidden="true" size={15} strokeWidth={1.5} />
+            </span>
+            {k}
+          </div>
+          <p>{p}</p>
+        </BlurFade>
+      ))}
+
+      {STEPS.slice(0, LEGS).map((s, i) => (
+        <AnimatedBeam
+          className="sobeam"
+          containerRef={container}
+          delay={i * LEG}
+          duration={LEG}
+          fromRef={dots[i]}
+          gradientStartColor={BEAM_LEAD}
+          gradientStopColor={BEAM_BODY}
+          key={`beam-${s.k}`}
+          pathColor={BEAM_BODY}
+          pathOpacity={0.18}
+          pathWidth={1.5}
+          repeatDelay={CYCLE - LEG}
+          toRef={dots[i + 1]}
+        />
       ))}
     </div>
   );

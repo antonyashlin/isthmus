@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Ring, RingChart } from "@/components/charts";
+import { NumberTicker } from "@/components/ui/number-ticker";
 
 /**
  * The transaction-readiness gap, on Bklit's concentric ring chart — the second
@@ -53,8 +54,12 @@ export function ReadinessRings({ bands }: { bands: ReadinessBand[] }) {
         {/* Not RingCenter: its custom renderer only runs while hovering, and its
             fallback sums the rings — 147%, which means nothing when these are
             four independent shares. Own centre, correct at rest and on hover. */}
+        {/* The centre figure rolls rather than cutting: it counts up when the
+            screen arrives, and rolls between bands as you move across the key. */}
         <div className="rings-center">
-          <span className="rings-figure">{shown.display}</span>
+          <span className="rings-figure">
+            <NumberTicker className="rings-num" value={shown.value} />%
+          </span>
           <span className="rings-cap">{shown.label}</span>
         </div>
       </div>

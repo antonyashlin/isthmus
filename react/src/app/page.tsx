@@ -4,8 +4,6 @@ import dynamic from "next/dynamic";
 /* The Bklit charts pull in visx + their own runtime. Each is behind an <InView>
    already, so splitting them means a screen's chart JS arrives when you reach
    that screen instead of all of it landing on first paint. */
-const FunnelChart = dynamic(() =>
-  import("@/components/charts/funnel-chart").then((m) => m.FunnelChart));
 const PainGauges = dynamic(() =>
   import("@/components/site/PainGauges").then((m) => m.PainGauges));
 const PressureRadar = dynamic(() =>
@@ -13,9 +11,12 @@ const PressureRadar = dynamic(() =>
 const ReadinessRings = dynamic(() =>
   import("@/components/site/ReadinessRings").then((m) => m.ReadinessRings));
 
-import { ContrastSwitches } from "@/components/site/ContrastSwitches";
+import { AdoptionFunnel } from "@/components/site/AdoptionFunnel";
+import { BrainOrbit } from "@/components/site/BrainOrbit";
 import { ExpectationPanels } from "@/components/site/ExpectationPanels";
 import { FlowDiagram } from "@/components/site/FlowDiagram";
+import { JourneyFlow } from "@/components/site/JourneyFlow";
+import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { OfferCards } from "@/components/site/OfferCards";
 import { Globe } from "@/components/site/Globe";
 import { InView } from "@/components/site/InView";
@@ -145,27 +146,18 @@ const BRANCHES = [
     { key: "ai", name: "Data and AI enablement", desc: "Workflow mapping, document processing, templates, and custom tools." },
   ] },
 ];
-/* The integration gap. Replaces a GenAI-in-M&A adoption funnel, which measured
-   the wrong scope entirely — and this reads better: the technology already
-   works, the blocker is domain expertise, and even the best-adopted function
-   is barely a third integrated. */
-const FUNNEL = [
-  { label: "Meets the business case", value: 95, displayValue: "95%" },
-  { label: "Held back by expertise", value: 49, displayValue: "49%" },
-  { label: "Actually integrated", value: 31, displayValue: "31%" },
-];
-const STEPS = [
-  ["01", "Understand", "Map the firm's strategy, standards, and recurring requirements."],
-  ["02", "Operate", "Take responsibility for defined workflows end to end."],
-  ["03", "Standardize", "Build templates, structures, and quality controls."],
-  ["04", "Automate", "Use AI and tooling to cut repetitive labor."],
-  ["05", "Expand", "Take on additional functions as trust compounds."],
-];
+/* The integration-gap stages moved into AdoptionFunnel, which owns the label
+   layout as well — it has to swap it on a phone. */
+/* The five stages moved into JourneyFlow, which owns their glyphs and the beam
+   timing as well as the copy. */
 
 export default function Home() {
   return (
     <>
       <ScrollFx />
+      {/* how far through the thirteen screens you are — a hairline on the
+          meridian ramp, sitting above the nav's glass */}
+      <ScrollProgress className="scroll-line from-[#274F6F] via-[#4686B7] to-[#88C1ED]" />
       <Nav />
       <span id="top" />
       <Globe />
@@ -267,17 +259,7 @@ export default function Home() {
           <div className="slide lay-a">
             <h2 className="blk-head h-lg reveal">An embedded team, without the cost of <span className="serif-i">building one</span>.</h2>
             <div className="blk-viz">
-              <div className="journey reveal">
-                <div className="journey-track" />
-                {STEPS.map(([n, title, desc]) => (
-                  <div className="jstep" key={n}>
-                    <span className="jdot" />
-                    <div className="jn">{n}</div>
-                    <h3>{title}</h3>
-                    <p>{desc}</p>
-                  </div>
-                ))}
-              </div>
+              <JourneyFlow />
             </div>
           </div>
         </section>
@@ -289,17 +271,7 @@ export default function Home() {
             <p className="blk-desc body reveal">Almost every AI initiative in private equity is meeting its business case. Almost none of it is integrated, and the reason firms give is not the model — it is that nobody in the building knows both the technology and the asset class.</p>
             <div className="blk-viz funnel-on-light">
               <div className="chart-block viz-plate reveal">
-                <InView amount={0.2}>
-                  <FunnelChart
-                    data={FUNNEL}
-                    orientation="vertical"
-                    color="var(--chart-1)"
-                    showValues
-                    showLabels
-                    showPercentage
-                    style={{ height: "min(52vh, calc(100vh - 250px))" }}
-                  />
-                </InView>
+                <AdoptionFunnel />
                 <p className="source">Source: <a href="https://www.fticonsulting.com/insights/reports/2026-private-equity-ai-radar" target="_blank" rel="noopener">FTI Consulting 2026 Private Equity AI Radar</a>.</p>
               </div>
             </div>
@@ -309,7 +281,7 @@ export default function Home() {
         {/* 9 — who we serve / Kokonut glass offers (dark) · A: heading → offers */}
         <section className="sec slide-sec" id="who">
           <div className="slide lay-a">
-            <h2 className="blk-head h-lg reveal">Three ways to work with us.</h2>
+            <h2 className="blk-head h-lg reveal">Three ways to work with <span className="serif-i">us</span>.</h2>
             <div className="blk-viz">
               <OfferCards offers={OFFERS} />
             </div>
@@ -335,7 +307,7 @@ export default function Home() {
             <h2 className="blk-head h-lg reveal">A brain for <span className="serif-i">private equity</span>.</h2>
             <p className="blk-desc body reveal">A terminal tells you what happened. A platform gives your team something else to operate. We are neither — we bring the technology and the domain expertise together, and run the work with them.</p>
             <div className="blk-viz">
-              <ContrastSwitches />
+              <BrainOrbit />
             </div>
           </div>
         </section>

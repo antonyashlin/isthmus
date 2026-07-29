@@ -416,9 +416,21 @@ html.js .tree:not(.ready) .tr-node{opacity:0}
   font-size:clamp(15px,min(1.4vw,2.3vh),20px);color:var(--heading);letter-spacing:-0.01em;line-height:1.25;
   transition:color .25s var(--ease)}
 .tr-leaf.lit{color:var(--accent-ink)}
-.tree-detail.swapping{opacity:.35}
-.tree-detail{height:4.6em;overflow:hidden;transition:opacity .2s var(--ease);margin:0;padding-top:16px;border-top:1px solid var(--line);
-  font-size:clamp(15px,1.35vw,19px);line-height:1.5;color:var(--tx-2);max-width:64ch}
+/* the detail card: a glyph and the copy for whichever leaf is hovered, both
+   replayed on every swap, with a BorderBeam tracing the card while one is held */
+.tree-detail{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr);
+  align-items:start;gap:clamp(12px,1.4vw,20px);min-height:5.6em;margin:0;
+  padding:16px 18px 16px 0;border-top:1px solid var(--line);border-radius:0 0 12px 12px;
+  transition:border-color .3s var(--ease),background-color .3s var(--ease)}
+.tree-detail.lit{border-color:var(--line-3);
+  background:color-mix(in srgb,var(--accent-ink) 5%,transparent);padding-left:18px}
+.td-glyph{display:flex;align-items:center;justify-content:center;flex:none;
+  width:clamp(38px,3.4vw,46px);height:clamp(38px,3.4vw,46px);border-radius:11px;
+  border:1px solid var(--line-2);background:var(--panel);color:var(--accent-ink)}
+.td-glyph svg{width:22px;height:22px}
+.td-copy{margin:0;font-size:clamp(15px,1.35vw,19px);line-height:1.5;
+  color:var(--tx-2);max-width:60ch}
+@media (prefers-reduced-motion:reduce){ .td-beam{display:none} }
 
 /* ---- readiness rings (Bklit RingChart, replaces the ECharts rose) ---- */
 .rings{display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(18px,2.4vw,38px);align-items:center}
@@ -489,73 +501,195 @@ html.js .funnel{opacity:0}
 .svc .s-tri{grid-column:span 2}
 
 /* ---- how: journey line (five waypoints on a meridian) ---- */
+/* The static rule is gone: the track is four AnimatedBeams strung dot-to-dot,
+   which draw their own base path and carry the travelling pulse. */
 .journey{position:relative;display:grid;grid-template-columns:repeat(5,1fr);gap:0;margin-top:var(--stack-lg)}
-.journey-track{position:absolute;top:8px;left:14px;right:8%;height:1.5px;
-  background:linear-gradient(90deg,var(--deep),var(--steel) 45%,var(--sky));opacity:.7}
 .jstep{position:relative;padding:0 26px 0 0}
 .jdot{position:absolute;top:1px;left:8px;width:15px;height:15px;border-radius:50%;
-  background:var(--bg);border:2px solid var(--sky);
+  background:var(--bg);border:2px solid var(--sky);z-index:2;
   box-shadow:0 0 0 4px var(--bg),0 0 16px -2px var(--sky)}
-.jn{margin-top:44px;font-family:var(--sans);font-weight:500;font-size:12px;letter-spacing:0.1em;color:var(--accent-ink)}
-.jstep h3{margin-top:16px;font-size:20px;font-weight:400;color:var(--heading);letter-spacing:-0.01em}
+.jn{margin-top:36px;font-family:var(--sans);font-weight:500;font-size:12px;letter-spacing:0.1em;color:var(--accent-ink)}
+.jstep h3{margin-top:14px;font-size:19px;font-weight:400;color:var(--heading);letter-spacing:-0.01em;
+  display:flex;align-items:center;gap:9px}
+.jglyph{display:inline-flex;align-items:center;justify-content:center;flex:none;
+  width:24px;height:24px;border-radius:7px;border:1px solid var(--line-2);
+  background:color-mix(in srgb,var(--panel) 55%,transparent);color:var(--accent-ink)}
 .jstep p{margin-top:12px;font-size:14.5px;line-height:1.52;color:var(--tx-2);max-width:22ch}
 
-/* ---- shift: a three-step flow on a meridian line ---- */
-.flow{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:var(--stack-lg)}
-.flow-track{position:absolute;top:8px;left:14px;right:22%;height:1.5px;
-  background:linear-gradient(90deg,var(--deep),var(--steel) 50%,var(--sky));opacity:.7}
-.fstep{position:relative;padding:0 44px 0 0}
-.fdot{position:absolute;top:1px;left:8px;width:15px;height:15px;border-radius:50%;
-  background:var(--bg);border:2px solid var(--sky);box-shadow:0 0 0 4px var(--bg),0 0 16px -2px var(--sky)}
-.fdot.feat{background:var(--sky)}
-.fk{margin-top:46px;font-family:var(--serif);font-style:italic;font-weight:500;font-size:27px;color:var(--accent-ink)}
-.fstep p{margin-top:16px;font-size:16px;line-height:1.55;color:var(--tx-2);max-width:26ch}
-/* the packet: work moving along the flow. `left` transitions between two calc()
-   lengths so the waypoints stay pinned to the dots at any column width */
-.flow .fstep{opacity:.6;transition:opacity .35s var(--ease)}
-.flow .fstep.lit{opacity:1}
-.fstep.lit .fdot{background:var(--sky);box-shadow:0 0 0 4px var(--bg),0 0 24px 1px var(--sky)}
-.flow-fill{position:absolute;top:8px;left:14px;height:1.5px;width:0;z-index:1;
-  background:linear-gradient(90deg,var(--steel),var(--sky));
-  box-shadow:0 0 12px 1px rgba(136,193,237,0.5);pointer-events:none}
-.flow-packet{position:absolute;top:1px;z-index:2;width:15px;height:15px;margin-left:-7.5px;
-  border-radius:50%;pointer-events:none;
-  background:radial-gradient(circle,#FFFFFF 0%,var(--sky) 46%,rgba(136,193,237,0) 72%);
-  box-shadow:0 0 20px 5px rgba(136,193,237,0.45);
-  will-change:transform}
-@media (prefers-reduced-motion:reduce){ .flow-packet,.flow-fill{display:none} .flow .fstep{opacity:1} }
+/* ---- shift: three illustrated steps, wired together by Magic UI beams ----
+   Each plate holds an imported component (AnimatedList / OrbitingCircles /
+   BorderBeam). The ports are the only geometry AnimatedBeam measures, so moving
+   them in a media query is what re-routes the connectors when columns stack —
+   the component re-measures itself through its own ResizeObserver. */
+.flow{--plate-h:clamp(148px,min(15vw,21vh),206px);
+  position:relative;display:grid;grid-template-columns:repeat(3,1fr);
+  gap:0 clamp(20px,3.4vw,58px);margin-top:var(--stack-lg)}
+.fstep{position:relative;min-width:0}
+.flow-plate{position:relative;display:flex;align-items:center;justify-content:center;
+  height:var(--plate-h);border:1px solid var(--line);border-radius:16px;
+  background:color-mix(in srgb,var(--panel) 52%,transparent);overflow:hidden}
+/* beam terminals — the connectors visibly land on these */
+.fport{position:absolute;top:var(--plate-h);width:9px;height:9px;
+  margin-top:calc(var(--plate-h) / -2 - 4.5px);border-radius:50%;z-index:3;
+  background:var(--panel);border:1.5px solid var(--accent-ink)}
+.port-out{right:-4.5px}
+.port-in{left:-4.5px}
 
-/* ---- sign-off: a four-step flow on the meridian line ---- */
+/* 1 — you send: requests piling into the inbox */
+.fbox{justify-content:flex-end;gap:8px;width:100%;height:100%;
+  padding:14px clamp(10px,1.4vw,18px)}
+.fin{display:flex;align-items:center;gap:9px;padding:7px 11px;border-radius:9px;
+  border:1px solid var(--line-2);background:var(--panel);
+  font-size:13px;letter-spacing:-0.005em;color:var(--tx)}
+.fin svg{flex:none;color:var(--accent-ink)}
+
+/* 2 — we operate: the bench turning around the mark */
+.fbench{position:relative;display:flex;align-items:center;justify-content:center;
+  width:100%;height:100%}
+.fbench::before,.fbench::after{content:"";position:absolute;top:50%;left:50%;
+  border:1px solid var(--line-2);border-radius:50%;pointer-events:none}
+.fbench::before{width:80px;height:80px;margin:-40px 0 0 -40px}
+.fbench::after{width:128px;height:128px;margin:-64px 0 0 -64px}
+.fbench-mark{width:28px;height:28px;color:var(--accent-ink)}
+.forb{display:flex;align-items:center;justify-content:center;width:26px;height:26px;
+  border-radius:50%;background:var(--panel);border:1px solid var(--line-2);color:var(--tx-2)}
+
+/* 3 — you receive: the deliverable, sealed */
+.fout{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:9px;
+  width:clamp(124px,64%,170px);padding:16px 18px;border-radius:12px;
+  border:1px solid var(--line-2);background:var(--panel)}
+.fout-seal{color:var(--accent-ink)}
+.fout-rule{display:block;width:100%;height:1.5px;border-radius:1px;background:var(--line-2)}
+.fout-rule.short{width:58%}
+.fout-cap{margin-top:2px;font-family:var(--sans);font-weight:500;font-size:10px;
+  letter-spacing:0.1em;text-transform:uppercase;color:var(--accent-ink)}
+
+.fk{margin-top:26px;font-family:var(--serif);font-style:italic;font-weight:500;
+  font-size:clamp(21px,min(1.9vw,3vh),27px);color:var(--accent-ink)}
+.fstep p{margin-top:12px;font-size:clamp(14px,min(1.15vw,1.9vh),16px);
+  line-height:1.55;color:var(--tx-2);max-width:26ch}
+
+@media (prefers-reduced-motion:reduce){
+  .flow .animate-orbit{animation:none}
+  .fbeam,.fseam{display:none}
+}
+
+/* ---- sign-off: four checkpoints, the human gate marked ----
+   Same rig as the journey: the track is three AnimatedBeams strung dot-to-dot,
+   and "You sign off" carries a BorderBeam because it is the gate the heading
+   promises. */
 .soflow{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:var(--stack-lg)}
-.soflow-track{position:absolute;top:8px;left:14px;right:15%;height:1.5px;
-  background:linear-gradient(90deg,var(--deep),var(--steel) 50%,var(--sky));opacity:.7}
 .sostep{position:relative;padding:0 26px 0 0}
-.sodot{position:absolute;top:1px;left:8px;width:15px;height:15px;border-radius:50%;
+.sodot{position:absolute;top:1px;left:8px;width:15px;height:15px;border-radius:50%;z-index:2;
   background:var(--bg);border:2px solid var(--sky);box-shadow:0 0 0 4px var(--bg),0 0 16px -2px var(--sky)}
-.sodot.feat{background:var(--sky)}
-.sok{margin-top:40px;font-family:var(--serif);font-style:italic;font-weight:500;font-size:21px;color:var(--accent-ink)}
+.sodot.feat{background:var(--sky);box-shadow:0 0 0 4px var(--bg),0 0 24px 1px var(--sky)}
+.sostep.gate .soplate{border-color:var(--line-3);
+  background:color-mix(in srgb,var(--accent-ink) 6%,transparent)}
+.sok{margin-top:14px;font-family:var(--serif);font-style:italic;font-weight:500;font-size:21px;
+  color:var(--accent-ink);display:flex;align-items:center;gap:9px}
+.soglyph{display:inline-flex;align-items:center;justify-content:center;flex:none;
+  width:24px;height:24px;border-radius:7px;border:1px solid var(--line-2);
+  background:color-mix(in srgb,var(--panel) 55%,transparent);color:var(--accent-ink)}
 .sostep p{margin-top:13px;font-size:14px;line-height:1.5;color:var(--tx-2);max-width:22ch}
-.soflow .sostep{opacity:.6;transition:opacity .35s var(--ease)}
-.soflow .sostep.lit{opacity:1}
-.sostep.lit .sodot{background:var(--sky);box-shadow:0 0 0 4px var(--bg),0 0 24px 1px var(--sky)}
-.soflow-fill{position:absolute;top:8px;left:14px;height:1.5px;width:0;z-index:1;
-  background:linear-gradient(90deg,var(--steel),var(--sky));
-  box-shadow:0 0 12px 1px rgba(136,193,237,0.5);pointer-events:none}
-.soflow-packet{position:absolute;top:1px;z-index:2;width:15px;height:15px;margin-left:-7.5px;
-  border-radius:50%;pointer-events:none;
-  background:radial-gradient(circle,#FFFFFF 0%,var(--sky) 46%,rgba(136,193,237,0) 72%);
-  box-shadow:0 0 20px 5px rgba(136,193,237,0.45);
-  will-change:transform}
-@media (prefers-reduced-motion:reduce){ .soflow-packet,.soflow-fill{display:none} .soflow .sostep{opacity:1} }
+@media (prefers-reduced-motion:reduce){ .sobeam,.sobeam-gate{display:none} }
+
+/* ---- step plates + the figures inside them ----
+   The three step screens (journey, sign-off, under guard) each hold a small
+   animated figure per item, assembled from imported components in figures.tsx.
+   One plate geometry and one figure vocabulary is shared across all three so
+   the screens read as the same system at three scales. */
+.jplate,.soplate,.badge-plate{position:relative;overflow:hidden;
+  border:1px solid var(--line-2);border-radius:11px;
+  background:color-mix(in srgb,var(--panel) 45%,transparent)}
+.jplate{height:clamp(104px,min(9.4vw,14vh),148px);margin-top:14px}
+.soplate{height:clamp(112px,min(10vw,15vh),158px);margin-top:34px}
+.badge-plate{height:clamp(96px,min(8.6vw,13vh),132px);margin-bottom:2px}
+
+.fig{position:relative;width:100%;height:100%;overflow:hidden;
+  font-family:var(--sans);color:var(--tx-2)}
+.fig-center{display:flex;align-items:center;justify-content:center}
+
+/* noise resolving into a word */
+.fig-hyper{font-family:var(--sans);font-weight:500;letter-spacing:0.13em;
+  font-size:clamp(10px,0.85vw,11px);color:var(--accent-ink);text-align:center;
+  padding:0 8px;overflow-wrap:anywhere}
+
+/* the bench turning */
+.fig-bench{--hub:11px}
+.fig-hub{width:var(--hub);height:var(--hub);border-radius:50%;background:var(--accent-ink);
+  box-shadow:0 0 0 4px color-mix(in srgb,var(--accent-ink) 14%,transparent)}
+.fig-orb{display:flex;align-items:center;justify-content:center;width:24px;height:24px;
+  border-radius:50%;border:1px solid var(--line-2);background:var(--panel);color:var(--tx-2)}
+
+/* identical rows running past */
+.fig-rows{display:flex;justify-content:center;
+  mask-image:linear-gradient(180deg,transparent,#000 26%,#000 74%,transparent);
+  -webkit-mask-image:linear-gradient(180deg,transparent,#000 26%,#000 74%,transparent)}
+.fig-row{display:block;padding:5px 12px;border-radius:5px;border:1px solid var(--line-2);
+  background:var(--panel);font-size:10px;letter-spacing:0.04em;color:var(--tx-2);
+  white-space:nowrap;text-align:center}
+
+/* two lanes that never meet */
+.fig-lanes{display:grid;grid-template-columns:1fr auto 1fr;align-items:stretch;
+  mask-image:linear-gradient(180deg,transparent,#000 24%,#000 76%,transparent);
+  -webkit-mask-image:linear-gradient(180deg,transparent,#000 24%,#000 76%,transparent)}
+.fig-lane{display:flex;justify-content:center;overflow:hidden}
+.fig-bar{display:block;height:6px;border-radius:3px;
+  background:color-mix(in srgb,var(--accent-ink) 42%,transparent)}
+.fig-divide{width:1px;background:repeating-linear-gradient(180deg,var(--line-2) 0 3px,transparent 3px 7px)}
+
+/* work writing itself */
+.fig-type{display:flex;align-items:center;padding:0 11px}
+.fig-mono{font-family:var(--sans);font-size:10px;line-height:1.5;letter-spacing:0.01em;
+  color:var(--tx-2);white-space:pre-line}
+
+/* items landing one after another */
+.fig-checks{display:flex;align-items:center;padding:0 11px}
+.fig-list{gap:5px!important;justify-content:center;width:100%}
+.fig-check{display:flex;align-items:center;gap:7px;padding:5px 10px;border-radius:5px;
+  border:1px solid var(--line-2);background:var(--panel);
+  font-size:10px;letter-spacing:0.03em;color:var(--tx-2)}
+.fig-check svg{flex:none;color:var(--accent-ink)}
+
+/* the audit part-way through */
+.fig-gauge{width:clamp(64px,6.4vw,86px);height:clamp(64px,6.4vw,86px);
+  font-size:clamp(11px,1.05vw,13px);color:var(--accent-ink)}
+
+/* two jurisdictions, and a path only between them */
+.fig-residency{display:flex;align-items:center;justify-content:space-between;padding:0 18px}
+.fig-place{position:relative;z-index:1;padding:6px 12px;border-radius:6px;
+  border:1px solid var(--line-2);background:var(--panel);
+  font-weight:500;font-size:10px;letter-spacing:0.1em;color:var(--accent-ink)}
+
+@media (prefers-reduced-motion:reduce){
+  .fig .animate-orbit,.fig .animate-marquee,.fig .animate-marquee-vertical{animation:none}
+  .fig-beam{display:none}
+}
+
+/* the scroll hairline sits above the nav glass and is 2px so it survives on a
+   dark screen; reduced motion keeps it (it is position, not decoration) */
+.scroll-line{height:2px;z-index:60}
 
 /* ---- trust badges: four quiet proof points under the sign-off flow ---- */
-.badges{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(12px,1.6vw,22px);margin-top:26px}
-.badge{display:flex;flex-direction:column;gap:10px;padding:16px 16px 18px;border-radius:14px;
-  border:1px solid var(--line);background:var(--card);
+.badges-wrap{position:relative;isolation:isolate}
+/* faint field behind the row — texture only, so it stays well under the cards */
+.badges-field{position:absolute;inset:-8% -4%;z-index:0;color:var(--accent-ink);opacity:.16;
+  mask-image:radial-gradient(ellipse at center,#000 30%,transparent 76%);
+  -webkit-mask-image:radial-gradient(ellipse at center,#000 30%,transparent 76%)}
+.badges{position:relative;z-index:1;display:grid;grid-template-columns:repeat(4,1fr);
+  gap:clamp(12px,1.6vw,22px);margin-top:26px}
+.badge{position:relative;display:flex;flex-direction:column;gap:10px;padding:16px 16px 18px;
+  border-radius:14px;border:1px solid var(--line);background:var(--card);
   transition:border-color .3s var(--ease),transform .3s var(--ease)}
 .badge:hover,.badge:focus-visible{border-color:var(--line-3);transform:translateY(-3px)}
-.badge-icon{display:block;color:var(--accent-ink)}
-.badge-label{font-family:var(--sans);font-weight:500;font-size:13.5px;letter-spacing:-0.005em;color:var(--heading)}
+/* the beam only traces the card being pointed at — evidence, not a loop */
+.badge-beam{opacity:0;transition:opacity .3s var(--ease)}
+.badge:hover .badge-beam,.badge:focus-within .badge-beam{opacity:1}
+.badge-icon{display:inline-flex;align-items:center;justify-content:center;flex:none;
+  width:24px;height:24px;border-radius:7px;border:1px solid var(--line-2);
+  background:color-mix(in srgb,var(--panel) 55%,transparent);color:var(--accent-ink)}
+.badge-label{display:flex;align-items:center;gap:8px;font-family:var(--sans);font-weight:500;
+  font-size:13.5px;letter-spacing:-0.005em;color:var(--heading)}
 .badge-note{font-size:12px;line-height:1.44;color:var(--tx-2)}
 
 /* The three-routes screen sets one sentence across its evidence:
@@ -573,38 +707,63 @@ html.js .funnel{opacity:0}
   .routes-coda{font-size:clamp(19px,4.6vw,23px);margin-top:23px}
 }
 
-/* ---- interactive liquid glass (offers + metrics) ----
-   The Kokonut card is a shadcn Card (flex column, overflow hidden); its only
-   in-flow child is the content wrapper, so that is what has to grow. */
-.glass-slot{position:relative;display:flex;min-width:0}
-.glass-slot > *{width:100%}
-.glass-sheen{position:absolute;top:-30%;left:-40%;width:34%;height:160%;z-index:0;opacity:0;
-  pointer-events:none;transform:skewX(-16deg);
-  background:linear-gradient(90deg,transparent,
-    color-mix(in srgb,var(--sky-2) 16%,transparent),transparent)}
-.light .glass-sheen{background:linear-gradient(90deg,transparent,
-  color-mix(in srgb,var(--steel) 18%,transparent),transparent)}
-.glass-detail{display:block;opacity:0;transform:translateY(7px);
-  transition:opacity .3s var(--ease),transform .3s var(--ease)}
-.glass-detail.on{opacity:1;transform:none}
-.offer > div.relative,.mcard > div.relative{display:flex;flex:1;flex-direction:column}
-
-/* ---- who: offerings ---- */
+/* ---- who: three offerings, on Kokonut's card flip ----
+   The front carries the offering and who it is for; hover or focus turns it to
+   the capabilities. Kokonut ships this in zinc and orange with a fixed
+   280×320 — the mechanics are theirs, the surface is ours. */
 .offers{display:grid;grid-template-columns:1fr 1.12fr 1fr;gap:22px;align-items:stretch}
-.offer{height:100%;padding:34px 32px 30px;border:1px solid var(--line);border-radius:18px;background:var(--card);
-  transition:border-color .3s var(--ease),box-shadow .3s var(--ease),opacity .3s var(--ease)}
-.offer.feat{border-color:var(--line-3);box-shadow:0 0 70px -24px rgba(70,134,183,0.55)}
-.offer.on{border-color:var(--line-3);box-shadow:0 22px 60px -30px rgba(70,134,183,0.75)}
-.offer.off{opacity:.62}
-.offer h3{font-size:23px;font-weight:400;color:var(--heading);letter-spacing:-0.01em}
-.offer p{margin-top:13px;font-size:15.5px;line-height:1.55;color:var(--tx-2)}
-.offer .btn{margin-top:auto;align-self:flex-start}
-.glass-detail{margin-top:14px}
-.offer .glass-detail{list-style:none;margin:16px 0 4px;padding:0;opacity:1}
-.offer .glass-detail li{position:relative;opacity:0;padding-left:16px;font-size:13.5px;line-height:1.5;color:var(--tx-3)}
-.offer .glass-detail li + li{margin-top:7px}
-.offer .glass-detail li::before{content:"";position:absolute;left:0;top:8px;width:6px;height:1px;background:var(--accent-ink)}
-.feat-tag{font-family:var(--sans);font-weight:500;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:16px}
+.offer-slot{display:flex;min-width:0}
+.cardflip{position:relative;flex:1;min-width:0;
+  height:clamp(268px,min(26vw,42vh),360px);perspective:2000px;outline:none}
+.cf-turn{position:relative;width:100%;height:100%;transform-style:preserve-3d;
+  transition:transform .55s cubic-bezier(0.77,0,0.175,1)}
+.cf-turn.flipped{transform:rotateY(180deg)}
+@media (prefers-reduced-motion:reduce){ .cf-turn{transition:none} }
+
+.cf-face{position:absolute;inset:0;backface-visibility:hidden;overflow:hidden;
+  border:1px solid var(--line);border-radius:18px;background:var(--card);
+  transition:border-color .3s var(--ease),box-shadow .3s var(--ease)}
+.cf-front{transform:rotateY(0deg)}
+.cf-back{transform:rotateY(180deg);display:flex;flex-direction:column;
+  padding:clamp(20px,2.2vw,32px)}
+.cardflip.feat .cf-face{border-color:var(--line-3);
+  box-shadow:0 0 70px -24px rgba(70,134,183,0.55)}
+.cardflip:hover .cf-face,.cardflip:focus-visible .cf-face{border-color:var(--line-3);
+  box-shadow:0 22px 60px -30px rgba(70,134,183,0.75)}
+
+/* front: the offering, over a slow pulse that reads as work in hand */
+.cf-front-copy{position:absolute;right:0;bottom:0;left:0;z-index:1;
+  padding:clamp(20px,2.2vw,32px)}
+.cf-front h3{font-size:23px;font-weight:400;color:var(--heading);letter-spacing:-0.01em}
+.cf-front p{margin-top:11px;font-size:15.5px;line-height:1.55;color:var(--tx-2)}
+.cf-tag{position:absolute;top:clamp(20px,2.2vw,32px);left:clamp(20px,2.2vw,32px);z-index:1;
+  font-family:var(--sans);font-weight:500;font-size:11px;letter-spacing:0.14em;
+  text-transform:uppercase;color:var(--accent-ink)}
+.cf-pulse{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  pointer-events:none;
+  mask-image:linear-gradient(180deg,#000,transparent 72%);
+  -webkit-mask-image:linear-gradient(180deg,#000,transparent 72%)}
+.cf-pulse span{position:absolute;width:46px;height:46px;border-radius:50%;opacity:0;
+  border:1px solid color-mix(in srgb,var(--accent-ink) 45%,transparent);
+  animation:cf-scale 3.4s linear infinite}
+.cardflip:hover .cf-pulse span{animation-duration:2.3s}
+@keyframes cf-scale{
+  0%{transform:scale(2.1);opacity:0}
+  50%{transform:translateY(-5px) scale(1);opacity:.62}
+  100%{transform:translateY(5px) scale(.1);opacity:0}
+}
+@media (prefers-reduced-motion:reduce){ .cf-pulse span{animation:none;opacity:.28} }
+
+/* back: what we actually run */
+.cf-back h3{font-size:21px;font-weight:400;color:var(--heading);letter-spacing:-0.01em}
+.cf-eyebrow{margin-top:10px;font-family:var(--sans);font-weight:500;font-size:11px;
+  letter-spacing:0.14em;text-transform:uppercase;color:var(--accent-ink)}
+.cf-caps{list-style:none;margin:14px 0 0;padding:0}
+.cf-caps li{display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.5;
+  color:var(--tx-2);transition:transform .3s cubic-bezier(0.23,1,0.32,1),opacity .3s cubic-bezier(0.23,1,0.32,1)}
+.cf-caps li + li{margin-top:9px}
+.cf-caps svg{flex:none;margin-top:3px;color:var(--accent-ink)}
+@media (prefers-reduced-motion:reduce){ .cf-caps li{transition:none} }
 
 /* ---- LP expectations: metric cards ---- */
 .mcards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:stretch}
@@ -641,29 +800,53 @@ html.js .funnel{opacity:0}
 .xp-row.fine{height:2px;opacity:.4}
 .xp-cap{font-size:14px;line-height:1.5;color:var(--tx-2)}
 
-/* ---- why: six switches from the usual way to ours ---- */
-.switches{display:grid;grid-template-columns:1fr;gap:2px;width:100%;max-width:920px}
-.cs-head{display:grid;grid-template-columns:minmax(0,1fr) clamp(90px,10vw,150px) minmax(0,1fr);
-  align-items:center;gap:20px;padding:0 18px 10px;border-bottom:1px solid var(--line);margin-bottom:8px}
-.cs-head span{font-family:var(--sans);font-weight:500;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:var(--tx-3)}
-.cs-head span:first-child{text-align:right}
-.cs-head span:last-child{grid-column:3;color:var(--accent-ink)}
-.cs-row{display:grid;grid-template-columns:minmax(0,1fr) clamp(90px,10vw,150px) minmax(0,1fr);
-  align-items:center;gap:20px;padding:13px 18px;border-radius:12px;
-  transition:background .3s var(--ease)}
-.cs-row:hover,.cs-row:focus-visible{background:color-mix(in srgb,var(--accent-ink) 10%,transparent)}
-.cs-no{font-family:var(--serif);font-style:italic;font-size:clamp(15px,1.4vw,19px);
-  color:var(--tx-3);text-align:right;text-decoration:line-through;
-  text-decoration-color:var(--line-2);text-decoration-thickness:1px}
-.cs-track{position:relative;height:3px;border-radius:2px;background:var(--line-2)}
-.cs-fill{position:absolute;left:0;top:0;height:100%;width:0;border-radius:2px;
-  background:linear-gradient(90deg,var(--steel),var(--sky))}
-.cs-knob{position:absolute;top:50%;left:0;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;
-  background:var(--bg);border:2px solid var(--line-2);
-  transition:border-color .3s var(--ease),box-shadow .3s var(--ease),background .3s var(--ease)}
-.cs-row.landed .cs-knob{background:var(--sky);border-color:var(--sky);
-  box-shadow:0 0 0 3px var(--bg),0 0 20px -1px var(--sky)}
-.cs-yes{font-size:clamp(18px,1.75vw,25px);color:var(--heading);letter-spacing:-0.01em}
+/* ---- why: a brain for private equity, on Magic UI's orbiting circles ----
+   Replaces six contrast switches. Two counter-rotating rings carry the six
+   qualities around one centre; OrbitingCircles counter-rotates each chip
+   against its own orbit, so the labels stay upright while they travel. */
+.brainorbit{display:flex;flex-direction:column;align-items:center;gap:clamp(14px,2vh,26px);width:100%}
+/* the plot is sized from the orbit radius the component is actually using, so
+   the drawn ring and the travelling chips can never disagree */
+.bo-plot{position:relative;display:flex;align-items:center;justify-content:center;
+  width:100%;height:calc(var(--orbit-r,178px) * 2 + 76px)}
+.bo-core{display:flex;align-items:center;justify-content:center;
+  width:clamp(54px,5.4vw,74px);height:clamp(54px,5.4vw,74px);border-radius:50%;
+  border:1px solid var(--line-3);color:var(--accent-ink);
+  background:color-mix(in srgb,var(--accent-ink) 9%,transparent);
+  box-shadow:0 0 60px -18px rgba(70,134,183,0.75)}
+.bo-core svg{width:58%;height:58%}
+/* the two orbits, drawn rather than left implicit */
+.bo-plot::before,.bo-plot::after{content:"";position:absolute;top:50%;left:50%;
+  border:1px solid var(--line);border-radius:50%;pointer-events:none}
+/* the orbit the chips actually ride */
+.bo-plot::before{width:calc(var(--orbit-r,178px) * 2);height:calc(var(--orbit-r,178px) * 2);
+  margin:calc(var(--orbit-r,178px) * -1) 0 0 calc(var(--orbit-r,178px) * -1)}
+/* an inner rule for depth, at 46% of it */
+.bo-plot::after{width:calc(var(--orbit-r,178px) * 0.92);height:calc(var(--orbit-r,178px) * 0.92);
+  margin:calc(var(--orbit-r,178px) * -0.46) 0 0 calc(var(--orbit-r,178px) * -0.46);
+  border-style:dashed}
+.bo-chip{display:inline-flex;align-items:center;justify-content:center;
+  padding:7px 14px;border-radius:999px;white-space:nowrap;cursor:default;outline:none;
+  border:1px solid var(--line-2);background:var(--card);
+  font-size:clamp(13px,1.15vw,16px);letter-spacing:-0.005em;color:var(--heading);
+  transition:border-color .25s var(--ease),color .25s var(--ease),
+    background-color .25s var(--ease),opacity .25s var(--ease)}
+.bo-chip:hover,.bo-chip:focus-visible{border-color:var(--line-3);color:var(--accent-ink);
+  background:color-mix(in srgb,var(--accent-ink) 12%,transparent)}
+/* holding one chip quiets the rest, so the pair below reads against one label */
+.brainorbit.holding .bo-chip{opacity:.5}
+.brainorbit.holding .bo-chip:hover,.brainorbit.holding .bo-chip:focus-visible{opacity:1}
+.brainorbit.holding .animate-orbit{animation-play-state:paused}
+
+.bo-detail{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:center;gap:10px;
+  min-height:2.4em;margin:0;text-align:center;
+  font-size:clamp(15px,1.35vw,19px);line-height:1.5;color:var(--tx-3)}
+.bo-ours{font-size:clamp(18px,1.75vw,25px);color:var(--heading);letter-spacing:-0.01em}
+.bo-sep{font-family:var(--sans);font-weight:500;font-size:11px;letter-spacing:0.16em;
+  text-transform:uppercase;color:var(--tx-3)}
+.bo-theirs{font-family:var(--serif);font-style:italic;font-size:clamp(15px,1.4vw,19px);
+  color:var(--tx-2)}
+@media (prefers-reduced-motion:reduce){ .brainorbit .animate-orbit{animation:none} }
 
 /* ---- why: contrasts ---- */
 .contrasts{display:grid;grid-template-columns:1fr 1fr;gap:1px 0;margin-top:var(--stack-lg);background:var(--line);border:1px solid var(--line);border-radius:18px;overflow:hidden}
@@ -761,10 +944,44 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
 .mg-spark{filter:drop-shadow(0 0 4px rgba(200,226,246,0.9))}
 
 /* ---- responsive ---- */
+/* ---------------------------------------------------------------
+   Document mode.
+
+   The one-screen-one-bound conceit only holds on a desktop viewport. Below it
+   the layouts collapse to a single stacked column that does not fit in 100vh,
+   and `.sec{height:100vh;overflow:hidden}` was cutting the bottom off rather
+   than letting the screen grow — the same is true of a short desktop window,
+   where the content is unchanged but the bound is not there.
+
+   So: no snap, no fixed heights, no clipping. A screen still fills the viewport
+   when its content fits (min-height), and simply grows past it when it doesn't.
+   `100svh` rather than `100vh` so a phone's collapsing browser chrome does not
+   make every screen a scroll longer than it looks.
+   --------------------------------------------------------------- */
+@media (max-width:1000px),(max-height:700px){
+  html{scroll-snap-type:none;scroll-behavior:auto}
+  .hero,main>section,main>section:last-child{scroll-snap-align:none}
+  .hero{height:auto;min-height:100svh}
+  .sec{height:auto;min-height:100svh;overflow:visible;padding:96px 0 76px}
+  .sec.slide-sec{padding:0}
+  .slide{height:auto;padding-top:108px;padding-bottom:84px}
+  /* the leaving-slide fade is keyed to a screen that is exactly one viewport;
+     once a screen can be shorter or taller than that it fires over the wrong
+     stretch of scroll and dims copy that is still being read */
+  main>section .wrap,main>section .slide{animation:none;opacity:1}
+}
+
 @media (max-width:1000px){
+  /* two-up: the beams would have to jump back across the row to reach the next
+     dot, so they come off and each stage stands on its own */
   .journey{grid-template-columns:1fr 1fr;gap:36px 0}
-  .journey-track{display:none}
+  .jbeam{display:none}
   .jstep{padding-left:8px}
+  .soflow{grid-template-columns:1fr 1fr;gap:32px 0}
+  .sobeam{display:none}
+  .sostep{padding-left:8px}
+  /* two on top, two underneath — four 80px columns is not a card */
+  .badges{grid-template-columns:repeat(2,1fr)}
   .offers,.mcards{grid-template-columns:1fr}
   .contrasts{grid-template-columns:1fr}
   .routes,.dials{grid-template-columns:1fr}
@@ -846,7 +1063,15 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
   .radarw-key{grid-template-columns:1fr;gap:0}
   .rings{grid-template-columns:1fr;justify-items:center}
   .rings-key{width:100%}
-  .funnel-on-light .chart-block > div:first-child{padding-inline:34px}
+  /* The labels move inside the bands here (see AdoptionFunnel), so the inset
+     that made room for them outside is no longer needed — and Bklit's nowrap
+     has to come off, or a three-word stage name still runs off the screen. */
+  .funnel-on-light .chart-block > div:first-child{padding-inline:0}
+  .funnel-on-light .whitespace-nowrap{white-space:normal;text-align:center;
+    max-width:min(60vw,240px);line-height:1.35;text-wrap:balance}
+  /* muted-foreground was tuned for the paper behind the chart; on the band
+     itself it drops to about 2.5:1, so the stage name takes a darker ink */
+  .funnel-on-light .text-muted-foreground{color:rgba(6,18,30,0.86)}
   /* two up, one centred beneath — a triangle, each dial with its label under it
      and far bigger than the row layout allowed */
   .dials{grid-template-columns:1fr 1fr;gap:20px 12px;justify-items:center}
@@ -857,14 +1082,8 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
   .dial-note{margin-top:5px;font-size:11.5px;max-width:24ch;opacity:1;transform:none}
   /* each switch gets its own card, two per row — the three-column row layout
      wasted most of the width on a phone */
-  .switches{grid-template-columns:1fr 1fr;gap:10px;max-width:none}
-  .cs-head{display:none}
-  .cs-row{display:flex;flex-direction:column;align-items:stretch;gap:9px;
-    grid-template-columns:none;background:var(--card);
-    border:1px solid var(--line);border-radius:12px;padding:13px 12px}
-  .cs-no{text-align:left;font-size:11.5px}
-  .cs-track{width:100%}
-  .cs-yes{font-size:15px;line-height:1.2}
+  .bo-chip{padding:5px 10px;font-size:12px}
+  .bo-detail{font-size:13.5px;gap:7px}
   .xp-cap{font-size:12.5px}
 
   /* the tree keeps its connectors; the percentage geometry scales, so only the
@@ -873,20 +1092,18 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
   .tr-root{font-size:15px}
   .tr-branch{font-size:11.5px}
   .tr-leaf{font-size:12.5px}
-  .tree-detail{height:auto;min-height:3.4em;font-size:13.5px;padding-top:10px}
+  .tree-detail{min-height:0;padding:12px 0;gap:12px}
+  .td-glyph{width:36px;height:36px;border-radius:9px}
+  .td-glyph svg{width:19px;height:19px}
+  .td-copy{font-size:13.5px}
 
   .journey{grid-template-columns:1fr;gap:22px 0}
-  /* the rail turns vertical and the packet runs DOWN it (FlowDiagram measures
-     and animates on the cross axis below 760px) */
-  .flow{grid-template-columns:1fr;gap:32px 0;padding-left:32px}
-  .flow-track{top:8px;bottom:8px;left:8px;right:auto;width:1.5px;height:auto;
-    background:linear-gradient(180deg,var(--deep),var(--steel) 50%,var(--sky))}
-  .flow-fill{top:0;left:8px;margin-left:-0.75px;width:1.5px;height:0;
-    background:linear-gradient(180deg,var(--steel),var(--sky))}
-  .flow-packet{top:0;left:8px;margin-left:-7.5px;margin-top:-7.5px}
-  .fstep{position:relative;padding:0}
-  .fdot{left:-32px;top:4px;width:16px;height:16px}
-  .fk{margin-top:0;font-size:24px}
+  /* Stacked, each step's caption sits between its plate and the next one, so a
+     connector would have to cross the copy to reach the port. The beams are a
+     wide-screen device: drop them and let the three illustrations carry it. */
+  .flow{--plate-h:clamp(160px,42vw,220px);grid-template-columns:1fr;gap:36px 0}
+  .fbeam,.fport{display:none}
+  .fk{margin-top:20px;font-size:24px}
   .fstep p{margin-top:9px;font-size:15.5px;line-height:1.5;max-width:none}
 
   /* Four panels overflowed their 9:16 bound (routes 225px, journey 237px,
@@ -906,10 +1123,34 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
   .rt-lede{margin-top:8px;font-size:13.5px}
   .rt-detail{display:block;opacity:1;transform:none;margin-top:7px;font-size:12.5px}
 
-  /* the journey rail turns vertical rather than disappearing */
+  /* the sign-off checkpoints stack the same way the journey does: beams off,
+     one vertical rule down the left, dots sitting on it */
+  .soflow{position:relative;grid-template-columns:1fr;gap:22px 0}
+  .soflow::before{content:"";position:absolute;top:8px;bottom:8px;left:7px;
+    width:1.5px;opacity:.7;
+    background:linear-gradient(180deg,var(--deep),var(--steel) 50%,var(--sky))}
+  .sobeam{display:none}
+  .sostep{padding:0 0 0 30px}
+  .sodot{top:3px;left:0}
+  .badges{grid-template-columns:repeat(2,1fr);gap:10px;margin-top:18px}
+  .badge{padding:11px 11px 13px;gap:8px;border-radius:12px}
+  .badge-label{font-size:12.5px;gap:7px}
+  .badge-note{font-size:11px}
+  .badges-field{display:none}
+  /* the figures keep working stacked; only the plates need to come down */
+  .badge-plate{height:76px}
+  .jplate{height:84px;margin-top:10px}
+  .soplate{height:88px;margin-top:10px}
+  .badge-icon,.jglyph,.soglyph{width:21px;height:21px;border-radius:6px}
+  .badge-icon svg,.jglyph svg,.soglyph svg{width:13px;height:13px}
+  .sok{margin-top:10px;font-size:19px}
+  .sostep p{margin-top:6px;font-size:13.5px;max-width:none}
+
+  /* stacked, the rail turns vertical — drawn as a gradient on .journey itself
+     now that the beams (a wide-screen device) are off */
   .journey{position:relative;gap:22px 0}
-  .journey-track{display:block;top:8px;bottom:8px;left:7px;right:auto;
-    width:1.5px;height:auto;
+  .journey::before{content:"";position:absolute;top:8px;bottom:8px;left:7px;
+    width:1.5px;opacity:.7;
     background:linear-gradient(180deg,var(--deep),var(--steel) 45%,var(--sky))}
   .jstep{position:relative;padding:0 0 0 30px}
   .jdot{display:block;top:3px;left:0}
@@ -923,9 +1164,12 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
   .offer{padding:22px 20px 24px}
   .offer h3{font-size:20px}
   .offer p{margin-top:10px;font-size:14px}
-  .offer .glass-detail{display:block;opacity:1;transform:none;margin:14px 0 0}
-  .offer .glass-detail li{opacity:1;font-size:13px}
-  .feat-tag{margin-bottom:10px}
+  /* the flip needs a real card height even when the grid goes single-column */
+  .offers{grid-template-columns:1fr;gap:14px}
+  .cardflip{height:clamp(230px,64vw,290px)}
+  .cf-front h3,.cf-back h3{font-size:19px}
+  .cf-front p{font-size:14px;margin-top:8px}
+  .cf-caps li{font-size:12.5px}
 
   .lay-e .blk-viz .chart-block{padding-bottom:8px}
   .company-head{max-width:14ch;margin-top:44vh;margin-left:auto;text-align:right}
