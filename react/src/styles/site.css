@@ -1082,7 +1082,8 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
     max-width:min(60vw,240px);line-height:1.35;text-wrap:balance}
   /* muted-foreground was tuned for the paper behind the chart; on the band
      itself it drops to about 2.5:1, so the stage name takes a darker ink */
-  .funnel-on-light .text-muted-foreground{color:rgba(6,18,30,0.86)}
+  .funnel-on-light .text-muted-foreground{
+    color:color-mix(in srgb,var(--foreground) 86%,transparent)}
   /* two up, one centred beneath — a triangle, each dial with its label under it
      and far bigger than the row layout allowed */
   .dials{grid-template-columns:1fr 1fr;gap:20px 12px;justify-items:center}
