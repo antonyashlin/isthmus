@@ -590,7 +590,7 @@ html.js .funnel{opacity:0}
 .sodot.feat{background:var(--sky);box-shadow:0 0 0 4px var(--bg),0 0 24px 1px var(--sky)}
 .sostep.gate .soplate{border-color:var(--line-3);
   background:color-mix(in srgb,var(--accent-ink) 6%,transparent)}
-.sok{margin-top:14px;font-family:var(--serif);font-style:italic;font-weight:500;font-size:21px;
+.sok{margin-top:14px;font-family:var(--serif);font-style:italic;font-weight:500;font-size:19px;
   color:var(--accent-ink);display:flex;align-items:center;gap:9px}
 .soglyph{display:inline-flex;align-items:center;justify-content:center;flex:none;
   width:24px;height:24px;border-radius:7px;border:1px solid var(--line-2);
@@ -700,7 +700,7 @@ html.js .funnel{opacity:0}
   width:24px;height:24px;border-radius:7px;border:1px solid var(--line-2);
   background:color-mix(in srgb,var(--panel) 55%,transparent);color:var(--accent-ink)}
 .badge-label{display:flex;align-items:center;gap:8px;font-family:var(--sans);font-weight:500;
-  font-size:13.5px;letter-spacing:-0.005em;color:var(--heading)}
+  font-size:13px;letter-spacing:-0.005em;color:var(--heading)}
 .badge-note{font-size:12px;line-height:1.44;color:var(--tx-2)}
 
 /* The three-routes screen sets one sentence across its evidence:
@@ -746,7 +746,7 @@ html.js .funnel{opacity:0}
 .cf-front-copy{position:absolute;right:0;bottom:0;left:0;z-index:1;
   padding:clamp(20px,2.2vw,32px)}
 .cf-front h3{font-size:23px;font-weight:400;color:var(--heading);letter-spacing:-0.01em}
-.cf-front p{margin-top:11px;font-size:15.5px;line-height:1.55;color:var(--tx-2)}
+.cf-front p{margin-top:11px;font-size:15px;line-height:1.55;color:var(--tx-2)}
 .cf-tag{position:absolute;top:clamp(20px,2.2vw,32px);left:clamp(20px,2.2vw,32px);z-index:1;
   font-family:var(--sans);font-weight:500;font-size:11px;letter-spacing:0.14em;
   text-transform:uppercase;color:var(--accent-ink)}
@@ -766,7 +766,7 @@ html.js .funnel{opacity:0}
 @media (prefers-reduced-motion:reduce){ .cf-pulse span{animation:none;opacity:.28} }
 
 /* back: what we actually run */
-.cf-back h3{font-size:21px;font-weight:400;color:var(--heading);letter-spacing:-0.01em}
+.cf-back h3{font-size:19px;font-weight:400;color:var(--heading);letter-spacing:-0.01em}
 .cf-eyebrow{margin-top:10px;font-family:var(--sans);font-weight:500;font-size:11px;
   letter-spacing:0.14em;text-transform:uppercase;color:var(--accent-ink)}
 .cf-caps{list-style:none;margin:14px 0 0;padding:0}
@@ -1095,7 +1095,7 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
   /* each switch gets its own card, two per row — the three-column row layout
      wasted most of the width on a phone */
   .bo-chip{padding:5px 10px;font-size:12px}
-  .bo-detail{font-size:13.5px;gap:7px}
+  .bo-detail{font-size:13px;gap:7px}
   .xp-cap{font-size:12.5px}
 
   /* the tree keeps its connectors; the percentage geometry scales, so only the
@@ -1107,7 +1107,7 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
   .tree-detail{min-height:0;padding:12px 0;gap:12px}
   .td-glyph{width:36px;height:36px;border-radius:9px}
   .td-glyph svg{width:19px;height:19px}
-  .td-copy{font-size:13.5px}
+  .td-copy{font-size:13px}
 
   .journey{grid-template-columns:1fr;gap:22px 0}
   /* Stacked, each step's caption sits between its plate and the next one, so a
@@ -1115,7 +1115,7 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
      wide-screen device: drop them and let the three illustrations carry it. */
   .flow{--plate-h:clamp(160px,42vw,220px);grid-template-columns:1fr;gap:36px 0}
   .fbeam,.fport{display:none}
-  .fk{margin-top:20px;font-size:24px}
+  .fk{margin-top:20px;font-size:23px}
   .fstep p{margin-top:9px;font-size:15.5px;line-height:1.5;max-width:none}
 
   /* Four panels overflowed their 9:16 bound (routes 225px, journey 237px,
@@ -1146,7 +1146,7 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
   .sodot{top:3px;left:0}
   .badges{grid-template-columns:repeat(2,1fr);gap:10px;margin-top:18px}
   .badge{padding:11px 11px 13px;gap:8px;border-radius:12px}
-  .badge-label{font-size:12.5px;gap:7px}
+  .badge-label{font-size:12px;gap:7px}
   .badge-note{font-size:11px}
   .badges-field{display:none}
   /* the figures keep working stacked; only the plates need to come down */
@@ -1156,7 +1156,7 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
   .badge-icon,.jglyph,.soglyph{width:21px;height:21px;border-radius:6px}
   .badge-icon svg,.jglyph svg,.soglyph svg{width:13px;height:13px}
   .sok{margin-top:10px;font-size:19px}
-  .sostep p{margin-top:6px;font-size:13.5px;max-width:none}
+  .sostep p{margin-top:6px;font-size:13px;max-width:none}
 
   /* stacked, the rail turns vertical — drawn as a gradient on .journey itself
      now that the beams (a wide-screen device) are off */
@@ -1180,8 +1180,8 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
   .offers{grid-template-columns:1fr;gap:14px}
   .cardflip{height:clamp(230px,64vw,290px)}
   .cf-front h3,.cf-back h3{font-size:19px}
-  .cf-front p{font-size:14px;margin-top:8px}
-  .cf-caps li{font-size:12.5px}
+  .cf-front p{font-size:13px;margin-top:8px}
+  .cf-caps li{font-size:12px}
 
   .lay-e .blk-viz .chart-block{padding-bottom:8px}
   .company-head{max-width:14ch;margin-top:44vh;margin-left:auto;text-align:right}
