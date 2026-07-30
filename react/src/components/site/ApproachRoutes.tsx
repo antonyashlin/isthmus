@@ -1,6 +1,6 @@
 "use client";
 
-import { animate, createTimeline, stagger, utils } from "animejs";
+import { animate, createTimeline, cubicBezier, stagger, utils } from "animejs";
 import { useEffect, useRef } from "react";
 
 /**
@@ -13,7 +13,9 @@ import { useEffect, useRef } from "react";
  * re-renders the tree of SVG nodes underneath it.
  */
 
-const EASE = "cubicBezier(0.22, 1, 0.36, 1)";
+/* anime.js v4 dropped string easings from the core — passed as a string this
+   silently falls back to the default curve (and warns once per animation). */
+const EASE = cubicBezier(0.22, 1, 0.36, 1);
 
 const ROUTES = [
   {

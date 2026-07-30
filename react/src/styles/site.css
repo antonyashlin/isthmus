@@ -58,7 +58,12 @@ section[id],#top{scroll-margin-top:66px}
 /* the last screen aligns its BOTTOM to the viewport so the snap carries you all
    the way down to the contact bar rather than stopping at its top edge */
 main>section:last-child{scroll-snap-align:end}
-body{font-family:var(--sans);color:var(--tx);-webkit-font-smoothing:antialiased;line-height:1.5;overflow-x:hidden}
+body{font-family:var(--sans);color:var(--tx);-webkit-font-smoothing:antialiased;line-height:1.5}
+/* `clip` rather than `hidden`, and on the root as well as body: `hidden` on body
+   alone leaves iOS Safari willing to pan the page sideways when anything
+   overflows, and `hidden` on the root would make it a scroll container, which
+   would take the y-snap and the scroll() timelines with it. `clip` only clips. */
+html,body{overflow-x:clip}
 img,svg{display:block;max-width:100%}
 /* Kokonut ships its glass <filter> in an `svg.hidden`; this stylesheet is
    unlayered, so the rule above would otherwise beat Tailwind's `hidden` and
@@ -418,7 +423,7 @@ html.js .tree:not(.ready) .tr-node{opacity:0}
 .tr-leaf.lit{color:var(--accent-ink)}
 /* the detail card: a glyph and the copy for whichever leaf is hovered, both
    replayed on every swap, with a BorderBeam tracing the card while one is held */
-.tree-detail{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr);
+.tree-detail{position:relative;overflow:hidden;display:grid;grid-template-columns:auto minmax(0,1fr);
   align-items:start;gap:clamp(12px,1.4vw,20px);min-height:5.6em;margin:0;
   padding:16px 18px 16px 0;border-top:1px solid var(--line);border-radius:0 0 12px 12px;
   transition:border-color .3s var(--ease),background-color .3s var(--ease)}
@@ -555,7 +560,7 @@ html.js .funnel{opacity:0}
   border-radius:50%;background:var(--panel);border:1px solid var(--line-2);color:var(--tx-2)}
 
 /* 3 — you receive: the deliverable, sealed */
-.fout{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:9px;
+.fout{position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:flex-start;gap:9px;
   width:clamp(124px,64%,170px);padding:16px 18px;border-radius:12px;
   border:1px solid var(--line-2);background:var(--panel)}
 .fout-seal{color:var(--accent-ink)}
@@ -678,7 +683,13 @@ html.js .funnel{opacity:0}
   -webkit-mask-image:radial-gradient(ellipse at center,#000 30%,transparent 76%)}
 .badges{position:relative;z-index:1;display:grid;grid-template-columns:repeat(4,1fr);
   gap:clamp(12px,1.6vw,22px);margin-top:26px}
-.badge{position:relative;display:flex;flex-direction:column;gap:10px;padding:16px 16px 18px;
+/* overflow:hidden is BorderBeam's contract, not decoration — its travelling
+   square is a 60px absolutely-positioned box that pokes ~28px past the corner
+   as it rounds it. Unclipped that widens the card's scroll width, which the
+   two-column grid then inherits, and the whole screen overflows sideways on a
+   phone. Same for the other two hosts below. */
+.badge{position:relative;overflow:hidden;
+  display:flex;flex-direction:column;gap:10px;padding:16px 16px 18px;
   border-radius:14px;border:1px solid var(--line);background:var(--card);
   transition:border-color .3s var(--ease),transform .3s var(--ease)}
 .badge:hover,.badge:focus-visible{border-color:var(--line-3);transform:translateY(-3px)}
