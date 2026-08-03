@@ -1,14 +1,12 @@
 /**
- * Founding-partner deck — second build (2026-07-29).
+ * Founding-partner deck — third build (2026-08-02).
  *
  * Content is data. Nothing in `slides.tsx` inlines a number or a sentence, so
  * the whole argument can be read, reviewed and corrected here without touching
- * a component. The narrative arc, in order:
- *
- *   what we are · why we exist · the gap we're closing · what we do ·
- *   how we stack up (the moat) · how we stack up (the market) · the model ·
- *   where we are today · how we get there (structure) · the long-term plan ·
- *   what could go wrong · the proposal · close
+ * a component. Rewritten from the "Founding Deck Content + Visual Blueprint
+ * v2" brief: identity -> market problem -> operating solution -> capability
+ * scope -> commercial wedge -> defensibility -> delivery economics -> proof ->
+ * expansion -> roadmap -> risks -> partnership decision -> close.
  *
  * PROVENANCE IS MANDATORY. Every datum carries a `source`:
  *   - a real citation string  -> renders as a source note under the frame
@@ -16,7 +14,11 @@
  *                                band on the slide
  * A figure without provenance cannot be expressed in this file — a plausible
  * fabricated number in an investor document is the worst failure this deck
- * can produce.
+ * can produce. Per the blueprint's own data notes, most figures on the newer
+ * slides (chord reuse weights, the market-sizing bands, the delivery-mix
+ * stack, the production calendar, the risk matrix, every roadmap KPI and
+ * every partnership term) are marked illustrative or left `TBD` — they are
+ * management targets and frameworks, not reported history.
  */
 
 export const ILLUSTRATIVE = "ILLUSTRATIVE" as const;
@@ -32,194 +34,226 @@ export type Figure = number | typeof TBD;
 export const DECK = {
   name: "Isthmus Meridian",
   proposition: "The private-markets back office,",
-  propositionAccent: "becoming the brain that runs it.",
-  classification: "A JOINT VENTURE FOR AND CAPITAL",
-  place: "DELAWARE · DUBAI",
-  date: "JULY 2026",
-  tagline: "The crossing, and the line you cross it by.",
+  propositionAccent: "built to think like the investment team.",
+  subhead: "Tech-enabled execution across deals, funds, portfolios and investors.",
+  meta: [
+    { label: "Firm", body: "Isthmus Meridian" },
+    { label: "Model", body: "Domain experts + governed technology" },
+    { label: "Stage", body: "Founding partnership discussion" },
+  ],
+  /** The cover's quiet circular graph — eight workstreams orbiting the operating
+   *  layer. `live` marks the three currently in production (brighter path). */
+  orbit: [
+    { key: "sourcing", label: "Sourcing", live: false },
+    { key: "diligence", label: "Diligence", live: false },
+    { key: "modeling", label: "Modeling", live: true },
+    { key: "ic", label: "IC materials", live: false },
+    { key: "fundops", label: "Fund ops", live: true },
+    { key: "monitoring", label: "Monitoring", live: true },
+    { key: "capital", label: "Capital formation", live: false },
+    { key: "data", label: "Data & AI", live: false },
+  ],
 };
 
 /* --------------------------------------------------------- II · what we are */
 
 export const IDENTITY = {
   eyebrow: "WHAT WE ARE",
-  title: "Not a tool.",
-  titleAccent: "The operating layer underneath the fund.",
+  title: "One operating layer",
+  titleAccent: "from deal pipeline to LP reporting.",
   desc:
-    "Isthmus Meridian runs the analytical, operational and reporting work behind a private-markets firm — one standing layer, not a seat license bolted onto a team that still does the work itself.",
-  hub: "OPERATING LAYER",
-  nodes: [
-    { key: "modeling", label: "Modeling" },
-    { key: "diligence", label: "Diligence" },
-    { key: "ic", label: "IC Materials" },
-    { key: "fundops", label: "Fund Ops" },
-    { key: "monitoring", label: "Monitoring" },
-    { key: "lp", label: "LP Reporting" },
-    { key: "capital", label: "Capital" },
-    { key: "data", label: "Data & AI" },
+    "Isthmus Meridian combines embedded private-markets professionals with a governed workflow, data and automation platform. We execute recurring, high-stakes work; the client retains judgment, approvals and investment authority.",
+  pillars: [
+    { label: "Embedded expertise", body: "Analysts and operators who understand private-equity, venture and growth workflows." },
+    { label: "Managed execution", body: "Named owners, service levels, review gates and an auditable delivery process." },
+    { label: "Shared data layer", body: "Reusable company, fund, portfolio and investor data instead of repeated spreadsheet reconstruction." },
+    { label: "Progressive automation", body: "AI-assisted drafting, extraction, reconciliation and monitoring, always paired with human review." },
   ],
+  /** Sunburst, innermost ring first. */
+  layers: [
+    { key: "data", label: "Shared data foundation" },
+    { key: "workflow", label: "Workflow + automation engine" },
+    { key: "delivery", label: "Domain-expert delivery" },
+    { key: "client", label: "Client decisions + approvals" },
+  ],
+  ring: ["Source", "Underwrite", "Invest", "Monitor", "Report", "Raise"],
+  ownership: {
+    isthmus: "What Isthmus owns: execution, quality control, process improvement.",
+    client: "What the client owns: investment judgment, fiduciary decisions, approvals.",
+  },
 };
 
-/* ---------------------------------------------------------- III · why we exist */
-
-export const THESIS = {
-  eyebrow: "WHY WE EXIST",
-  title: "We started with the part that kills most startups",
-  titleAccent: "already solved.",
-  desc:
-    "Most software companies raise money, then hunt for customers and beg for data. We began with all three already in hand — which is why the moat compounds instead of burning down.",
-  ring: [
-    { key: "anchor", label: "A live, paying anchor", value: 1, note: "Customer zero is already invoicing — real revenue, not a pilot." },
-    { key: "recurring", label: "Recurring revenue", value: 1, note: "The services business funds the build — no venture burn to survive." },
-    { key: "data", label: "A proprietary dataset", value: 1, note: "A continuously refreshing corpus of real private-markets deals." },
-  ],
-};
-
-/* -------------------------------------------------------------- IV · the gap */
+/* -------------------------------------------------------------- III · the gap */
 
 export const GAP = {
   eyebrow: "THE GAP",
-  title: "The capital scaled.",
-  titleAccent: "The operating layer never did.",
+  title: "Private-market assets scaled.",
+  titleAccent: "Operating capacity did not.",
   desc:
-    "Global private-capital AUM roughly tripled from 2015 to 2023. The way the work behind it gets done did not — every fund still runs it by hand.",
+    "Global private-capital AUM reached approximately $13.4T by mid-2023. Yet many managers still rebuild critical work across spreadsheets, inboxes, point tools and a small number of overloaded specialists.",
   years: [2015, 2021, 2023],
   series: {
-    aum: { label: "Global private-capital AUM", values: [4.3, 13.7, 13.4] },
+    aum: { label: "Global private-capital AUM", values: [4, 9.3, 13.43] },
   },
-  axisNote: "$ trillions, global private-capital AUM",
-  annotation: {
-    at: 2021,
-    label: "AUM nearly tripled in six years — headcount per fund did not",
-  },
-  source: "Preqin, cited in Pensions & Investments (2016) and Preqin Alternatives in North America (2024).",
+  source:
+    "Preqin — North America private capital AUM (June 2023) and Preqin's 2015–2021 global private-capital AUM forecast, via S&P Global. “Roughly tripled” follows Preqin's published series; exact annual scope definitions may differ year to year.",
+  friction: [
+    { label: "Deal teams", body: "Data-room extraction, model updates, IC formatting." },
+    { label: "Finance & operations", body: "Fragmented fund, portfolio and investor data." },
+    { label: "Investor relations", body: "Rebuilds LP materials every cycle." },
+    { label: "Leadership", body: "Key-person risk, no operating system." },
+  ],
 };
 
-/* ------------------------------------------------------------- V · what we do */
+/* ------------------------------------------------------------- IV · what we do */
 
 export const FUNCTIONS = {
   eyebrow: "WHAT WE DO",
-  title: "Eight functions.",
-  titleAccent: "One operating layer.",
+  title: "Eight workstreams.",
+  titleAccent: "One accountable operating partner.",
   desc:
-    "Twenty capabilities across the fund lifecycle — from sourcing to LP reporting — grouped to eight, so every one appears in exactly one place below.",
+    "Begin with one urgent workflow and expand without adding another vendor, data model or review process.",
+  stages: ["Source", "Underwrite", "Invest", "Operate", "Report", "Raise"],
   items: [
-    { n: "01", label: "Deal sourcing support", tag: null },
-    { n: "02", label: "Due diligence support", tag: null },
-    { n: "03", label: "Financial modeling & valuation", tag: "FLAGSHIP" },
-    { n: "04", label: "Capital formation, investor & IC materials", tag: null },
-    { n: "05", label: "Fund & investment operations", tag: null },
-    { n: "06", label: "Portfolio monitoring & LP reporting", tag: null },
-    { n: "07", label: "Data ops, automation & AI enablement", tag: "DIFFERENTIATOR" },
-    { n: "08", label: "Market research", tag: null },
+    { n: "01", label: "Sourcing + market intelligence", outputs: "Target screens; market maps; research; CRM and pipeline hygiene", stage: 0, live: false, tag: null },
+    { n: "02", label: "Due diligence", outputs: "Data-room review; trackers; commercial workstreams; red-flag synthesis", stage: 1, live: false, tag: null },
+    { n: "03", label: "Modeling + valuation", outputs: "Operating and returns models; comps; sensitivities; valuation updates", stage: 1, live: true, tag: "FLAGSHIP" },
+    { n: "04", label: "IC + investor materials", outputs: "Investment memos; committee decks; decision logs; investor presentations", stage: 2, live: false, tag: null },
+    { n: "05", label: "Fund + investment operations", outputs: "Closing checklists; capital activity; cash-flow schedules; administrator coordination", stage: 3, live: true, tag: null },
+    { n: "06", label: "Portfolio monitoring + LP reporting", outputs: "KPI packs; performance monitoring; quarterly reports; LP data requests", stage: 4, live: true, tag: null },
+    { n: "07", label: "Capital formation", outputs: "Track records; DDQ/RFP support; data rooms; fundraising pipeline", stage: 5, live: false, tag: null },
+    { n: "08", label: "Data operations, AI + automation", outputs: "Data models; integrations; workflow automation; fund-history copilot; controls", stage: null, live: false, tag: "DIFFERENTIATOR" },
   ],
+  aiNote:
+    "AI enablement: permission-aware search across prior deals and fund materials; precedent comparison; longitudinal founder/team tracking; fund-style drafting; evidence-linked, human-reviewed outputs.",
 };
 
-/* --------------------------------------------------- VI · how we stack up · moat */
+/* --------------------------------------------------- V · how we stack up · moat */
 
 export const MOAT = {
   eyebrow: "HOW WE STACK UP · THE MOAT",
-  title: "A moat you can't scrape",
-  titleAccent: "from the outside.",
+  title: "The moat compounds",
+  titleAccent: "inside the work.",
   desc:
-    "Point-solutions read documents from the outside on public and user-supplied data — a cancellable seat license, exposed to whichever platform ships next. We run the work from the inside, on proprietary end-to-end execution data no lab can see.",
-  axes: [
-    { key: "ownership", label: "Data ownership", wrappers: 2, ours: 9 },
-    { key: "depth", label: "Workflow depth", wrappers: 3, ours: 9 },
-    { key: "switching", label: "Switching cost", wrappers: 2, ours: 8 },
-    { key: "defense", label: "Defensibility, 18–36mo", wrappers: 3, ours: 8 },
+    "Every completed mandate strengthens the templates, controls, data model and automation used on the next one — while the human review layer captures exceptions that generic tools do not see.",
+  pillars: [
+    { label: "Workflow depth", body: "End-to-end process knowledge, including handoffs, approvals, edge cases and client-specific standards." },
+    { label: "Proprietary operating data", body: "Structured execution data, exception patterns and reusable fund/portfolio context generated through delivery." },
+    { label: "Embedded trust", body: "Recurring workflows, institutional memory and responsibility for client-ready outputs create durable relationships." },
+    { label: "Quality system", body: "Expert review, checklists, audit trails and feedback loops improve accuracy while defining what can safely automate." },
   ],
-  axisScale: 10,
-  source: "Qualitative scoring, 0–10 — our own comparative framework, not a benchmarked index.",
-  footnote:
-    "We do the work — technology and domain expertise are how we do it, at expanding margin. That's the defensibility the market now demands, built from the one place it can't be copied: the inside.",
-};
-
-/* ------------------------------------------------- VII · how we stack up · market */
-
-export const MARKET = {
-  eyebrow: "HOW WE STACK UP · THE MARKET",
-  title: "The market is already paying for this —",
-  titleAccent: "richly.",
-  desc:
-    "Those companies sell tools from the outside. We own the operating layer from the inside — and thousands of GPs run the same manual back office AND Capital does.",
-  compsLabel: "RECENT DEAL-INTELLIGENCE PLATFORM VALUATIONS",
-  comps: [
-    { name: "Rogo", note: "Series C", value: 750, display: "$750M" },
-    { name: "Hebbia", note: "", value: 700, display: "~$700M" },
+  flywheel: [
+    "Expert execution",
+    "Structured workflow",
+    "Reusable operating data",
+    "Safe automation",
+    "Faster, more consistent delivery",
   ],
-  compsAxis: [250, 500, 750, 1000],
-  compsSource:
-    "Rogo: $75M raised Jan 2026 — Sequoia, Henry Kravis, Wells Fargo, J.P. Morgan. Hebbia claims ~⅓ of top global asset managers by AUM.",
-  compsStale: "Comps stamped early 2026 — re-verify before sending.",
-  multiple: {
-    label: "WHERE COMPS TRADE · ARR MULTIPLE",
-    low: 15,
-    high: 40,
-    display: "40",
-    caption: "One of the richest-funded categories in the market.",
-    source: "Windsor Drake 2026 Vertical SaaS Valuation Report — AI-native SaaS growth rounds, 15–30x ARR (35–45x for breakout enterprise AI).",
+  /** Chord diagram — data reuse across the workflow. Illustrative weights. */
+  reuse: {
+    nodes: ["Sourcing", "Diligence", "IC", "Monitoring", "LP reporting", "Fundraising"],
+    edges: [
+      { source: "Sourcing", target: "Diligence", value: 8 },
+      { source: "Diligence", target: "IC", value: 9 },
+      { source: "IC", target: "Monitoring", value: 6 },
+      { source: "Monitoring", target: "LP reporting", value: 9 },
+      { source: "Diligence", target: "LP reporting", value: 5 },
+      { source: "LP reporting", target: "Fundraising", value: 7 },
+      { source: "Sourcing", target: "Fundraising", value: 4 },
+      { source: "IC", target: "LP reporting", value: 6 },
+      { source: "Diligence", target: "Monitoring", value: 5 },
+    ],
+    source: ILLUSTRATIVE,
   },
+  compare: {
+    columns: ["Point software", "BPO / staffing", "Isthmus"],
+    rows: [
+      { label: "Outcome ownership", values: ["no", "partial", "yes"] },
+      { label: "Domain experts embedded", values: ["no", "yes", "yes"] },
+      { label: "Compounding workflow IP", values: ["no", "no", "yes"] },
+      { label: "Reusable operating data", values: ["no", "no", "yes"] },
+    ] as Array<{ label: string; values: ["no" | "partial" | "yes", "no" | "partial" | "yes", "no" | "partial" | "yes"] }>,
+    source: "Comparative framework — our own assessment of category attributes, not a benchmarked index.",
+  },
+  footnote:
+    "The moat is not that we can read documents with AI. It is that we see the complete workflow from inputs to approved output, including every exception and review step. That execution context becomes proprietary operating knowledge.",
 };
 
-/* ---------------------------------------------------------------- VIII · the model */
+/* ---------------------------------------------------------- VI · commercial wedge */
+
+export const WEDGE = {
+  eyebrow: "COMMERCIAL WEDGE",
+  title: "A large existing spend pool —",
+  titleAccent: "fragmented across payroll, advisers, administrators and software.",
+  desc:
+    "Isthmus does not require a new budget category. It consolidates work that managers already fund through internal analysts and operators, specialist contractors, fund-administrator add-ons and disconnected point solutions.",
+  beachhead: "Emerging and mid-market managers with institutional expectations but no fully built operating platform.",
+  triggers: "New fund, first institutional LP, deal-flow growth, portfolio expansion or an operating-control gap.",
+  landExpand: "Baseline one visible recurring workflow, then add adjacent work that reuses the same data and review system.",
+  /** Three concentric bands, illustrative relative proportions — a market-sizing
+   *  framework, not a TAM, until a validated account list and pricing exist. */
+  bands: [
+    { key: "beachhead", label: "Beachhead accounts", value: 1 },
+    { key: "serviceable", label: "Serviceable manager segments", value: 4 },
+    { key: "universe", label: "Broader private-markets universe", value: 12 },
+  ],
+  spendPools: [
+    { label: "Internal headcount", body: "Already on payroll, doing this work." },
+    { label: "Specialist advisers", body: "Contractors, per deal or cycle." },
+    { label: "Administrator add-ons", body: "Fund admins' bolt-on modules." },
+    { label: "Point software", body: "Another interface, not an outcome." },
+  ],
+  source: ILLUSTRATIVE,
+};
+
+/* ---------------------------------------------------------------- VII · the model */
 
 export const MODEL = {
   eyebrow: "THE MODEL",
-  title: "Enter at a services multiple.",
-  titleAccent: "Exit at a software one.",
+  title: "Land with expert-led delivery.",
+  titleAccent: "Scale with software economics.",
   desc:
-    "Each function crosses from manual to automated on its own clock. Gross margin is the running total of those crossings — labour cost converting into software margin, one workflow at a time.",
-  quarters: ["Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Q8"],
-  series: {
-    margin: { label: "Gross margin", values: [34, 38, 44, 49, 56, 62, 67, 71] },
-    automated: { label: "Workflows automated", values: [1, 2, 4, 6, 9, 12, 16, 21] },
-  },
-  bands: [
-    { label: "Services multiple", from: 0, to: 3 },
-    { label: "Software multiple", from: 5, to: 7 },
+    "The delivery model progresses in three stages. Revenue begins before full automation; margin, speed and consistency improve as repeatable work is standardized and automated.",
+  stages: [
+    { n: "1", label: "Embed", body: "Experts run the workflow, establish the baseline, document decisions and own the output." },
+    { n: "2", label: "Standardize", body: "Common inputs, templates, controls, SLAs and exception categories become a repeatable operating product." },
+    { n: "3", label: "Automate", body: "Extraction, reconciliation, drafting, monitoring and routing are automated where confidence and controls permit." },
   ],
-  annotation: { at: "Q5", label: "Margin crosses the services/software line" },
-  source:
-    "Target operating model — modeled from the automation cadence in the roadmap, not AND Capital's actual revenue or delivery cost. Updates once those are supplied.",
+  commercialModel: "Core retainer / platform fee + recurring workflow modules + scoped transaction or transformation work.",
+  /** Stacked-area delivery mix, % of hours by category at each stage checkpoint. */
+  mix: {
+    categories: ["Expert judgment", "Analyst production", "Workflow automation", "Pure software execution"],
+    checkpoints: ["Embed", "Standardize", "Automate"],
+    series: [
+      [70, 25, 5, 0],
+      [40, 35, 20, 5],
+      [15, 20, 40, 25],
+    ],
+  },
+  source: "Management target — modeled from the automation cadence in the roadmap, not AND Capital's actual revenue or delivery cost. Updates once real monthly data is available.",
 };
 
-/* ------------------------------------------------------------- IX · where we are */
+/* ------------------------------------------------------------- VIII · where we are */
 
-export const CURRENT = {
-  eyebrow: "WHERE WE ARE TODAY",
-  title: "Already running,",
-  titleAccent: "not a plan on a slide.",
+/* ---------------------------------------- IX · go-to-market + operating footprint */
+
+export const GTM = {
+  eyebrow: "GO-TO-MARKET + OPERATING FOOTPRINT",
+  title: "One anchor proves the system.",
+  titleAccent: "Each fund expands the advantage.",
   desc:
-    "Isthmus Meridian already operates AND Capital's back office in Calgary — institutional decks, deal models, diligence and portfolio materials, with proprietary CIS deal flow running through it. This is the funnel from scope to production.",
-  funnel: [
-    { label: "Functions in scope", value: 8, displayValue: "8" },
-    { label: "Functions piloted with customer zero", value: 5, displayValue: "5" },
-    { label: "Functions live in production today", value: 3, displayValue: "3" },
-  ],
-  source:
-    "The eight in scope are defined; pilot and production counts are AND Capital's current status, pending confirmation for the signed version of this deck.",
-  panel: {
-    eyebrow: "ALREADY LIVE",
-    title: "Isthmus Meridian already runs your back office.",
-    body:
-      "Institutional decks, deal models, diligence and portfolio materials for AND Capital's Calgary growth-capital business in energy transition, real assets and health & wellness.",
+    "Commercial expansion leads with design-partner credibility and relationship-led selling into managers with the same workflow pain. Footprint follows customer, talent and capital — not the other way round.",
+  expansion: {
+    root: "Customer zero",
+    archetypes: ["Emerging PE", "Venture", "Growth", "Multi-strategy"],
+    anchors: ["Fund 2", "Fund 3", "Fund 4"],
+    source: ILLUSTRATIVE,
   },
-};
-
-/* ------------------------------------------------------ X · how we get there */
-
-export const STRUCTURE = {
-  eyebrow: "HOW WE GET THERE",
-  title: "Delaware first.",
-  titleAccent: "Dubai shortly after.",
-  desc:
-    "A US parent matches the near-term counterparty and the standard instruments. The Gulf entity follows for the corridor, the client-facing lane and proximity to the capital — structure follows the work.",
   nodes: [
-    { key: "calgary", label: "Calgary", note: "Customer zero", coord: [-114.07, 51.05], kind: "client" },
-    { key: "delaware", label: "Delaware", note: "Parent · IP", coord: [-75.53, 39.16], kind: "parent" },
-    { key: "london", label: "London", note: "Capital", coord: [-0.13, 51.51], kind: "client" },
-    { key: "difc", label: "Dubai", note: "DIFC entity", coord: [55.28, 25.2], kind: "hub" },
+    { key: "calgary", label: "Calgary", note: "Initial client · operating base", coord: [-114.07, 51.05], kind: "client" },
+    { key: "delaware", label: "Delaware", note: "Parent · IP · contracting", coord: [-75.53, 39.16], kind: "parent" },
+    { key: "london", label: "London", note: "Capital · ecosystem access", coord: [-0.13, 51.51], kind: "client" },
+    { key: "difc", label: "Dubai", note: "Gulf clients · regional delivery", coord: [55.28, 25.2], kind: "hub" },
   ],
   routes: [
     ["calgary", "delaware"],
@@ -231,116 +265,166 @@ export const STRUCTURE = {
     { kind: "hub", label: "Client-facing entity" },
     { kind: "client", label: "Capital & clients" },
   ],
-  caption: "Schematic. Node placement is geographic; route curvature is not.",
+  caption:
+    "Schematic. Node placement is geographic; route curvature is not. Legal, tax, regulatory and data-residency design requires counsel before any structure is final.",
 };
 
-/* -------------------------------------------------------- XI · the long-term plan */
+/* -------------------------------------------------------- X · 18-month plan */
 
 export const ROADMAP = {
-  eyebrow: "THE LONG-TERM PLAN",
-  title: "Eighteen months,",
-  titleAccent: "to a second fund.",
+  eyebrow: "18-MONTH PLAN",
+  title: "Eighteen months",
+  titleAccent: "to a repeatable second fund.",
   desc:
-    "Two workflows automate inside a quarter. The Gulf entity opens at month six. By month eighteen the model is proven on a second fund.",
+    "The roadmap proves four things in sequence: the company is formed, the first workflows are measurable, delivery expands without linear headcount, and a second anchor adopts the model.",
+  phases: [
+    { at: "M0–M3", label: "Instrument", body: "Close the founding structure; baseline current workflows; automate the first two repeatable steps; define security and QA controls." },
+    { at: "M4–M6", label: "Productize", body: "Standardize intake, templates, data model, review gates and SLA reporting; establish the Gulf entity only if commercially required." },
+    { at: "M7–M12", label: "Expand", body: "Move five workstreams into stable production; demonstrate improving unit economics; build a qualified anchor-fund pipeline." },
+    { at: "M13–M18", label: "Replicate", body: "Deploy the core operating layer for a second anchor; document implementation time, quality and gross-margin performance." },
+  ],
   months: ["M0", "M3", "M6", "M9", "M12", "M15", "M18"],
-  workflowsAutomated: [0, 2, 4, 6, 9, 12, 16],
-  /**
-   * The target sequence: which checkpoint (index into `months`) each of the
-   * eight functions (in FUNCTIONS.items order) goes live at. Modeling and
-   * portfolio monitoring first, per the M3 milestone; data ops/AI enablement
-   * last, since it depends on the corpus the earlier functions produce.
-   */
-  functionStage: [3, 2, 1, 3, 2, 1, 6, 4],
+  /** Gantt rows — one per workstream. Each `start` is a month-index (into
+   *  `months`) marking when Baseline / Standardize / Production / Automate
+   *  begins for that row. Proposed target dates, not a reported schedule. */
+  gantt: [
+    { label: "Sourcing + market intel", start: [0, 3, 9, 15] },
+    { label: "Due diligence", start: [0, 3, 9, 15] },
+    { label: "Modeling + valuation", start: [0, 0, 3, 9] },
+    { label: "IC + investor materials", start: [0, 3, 6, 12] },
+    { label: "Fund + investment ops", start: [0, 0, 6, 12] },
+    { label: "Portfolio & LP reporting", start: [0, 0, 3, 9] },
+    { label: "Capital formation", start: [0, 6, 12, 18] },
+    { label: "Data ops, AI + automation", start: [0, 3, 9, 12] },
+  ],
   milestones: [
     { at: "M0", label: "Delaware C corp incorporated" },
     { at: "M3", label: "First two workflows automated" },
     { at: "M6", label: "DIFC entity live" },
     { at: "M18", label: "Second anchor fund signed" },
   ],
-  table: [
-    { when: "MONTH 0", title: "Delaware C corp incorporated", body: "Founding partners on the cap table, data-and-IP agreement executed with customer zero." },
-    { when: "MONTH 3", title: "First two workflows automated", body: "Modeling and portfolio monitoring — the flagship and the most repetitive." },
-    { when: "MONTH 6–9", title: "DIFC entity live", body: "Client-facing contracting moves to the Gulf; delivery bench begins hiring." },
-    { when: "MONTH 18", title: "Second anchor fund signed", body: "The first workflow productized and sold rather than staffed." },
+  kpis: [
+    { label: "Automation coverage", from: TBD as Figure, m6: TBD as Figure, m18: TBD as Figure },
+    { label: "Turnaround", from: TBD as Figure, m6: TBD as Figure, m18: TBD as Figure },
+    { label: "First-pass acceptance", from: TBD as Figure, m6: TBD as Figure, m18: TBD as Figure },
+    { label: "Gross margin", from: TBD as Figure, m6: TBD as Figure, m18: TBD as Figure },
   ],
-  source: "Proposed roadmap — target dates, subject to signing and counsel.",
+  source:
+    "Proposed roadmap — target dates, subject to signing and counsel. Every KPI needs a current baseline, M6 target and M18 target from management before this deck is investor-ready.",
 };
 
-/* ------------------------------------------------------------ XII · what could go wrong */
+/* ------------------------------------------------------ XI · what could go wrong */
 
 export const RISKS = {
   eyebrow: "WHAT COULD GO WRONG",
-  title: "What could go wrong,",
-  titleAccent: "and what we've done about it.",
+  title: "Name the risks early.",
+  titleAccent: "Instrument the controls from day one.",
   desc:
-    "Risk precedes the ask. Five things could break this — each with the exposure we're carrying today and the mitigation already in motion.",
-  metrics: [
-    { key: "concentration", label: "Customer concentration" },
-    { key: "labs", label: "Lab encroachment" },
-    { key: "gravity", label: "Services gravity" },
-    { key: "rights", label: "Data-rights risk" },
-    { key: "crossborder", label: "Cross-border exposure" },
-  ],
-  exposure: { concentration: 78, labs: 55, gravity: 60, rights: 50, crossborder: 45 },
-  mitigated: { concentration: 45, labs: 40, gravity: 25, rights: 35, crossborder: 30 },
+    "The partnership manages the risks created by concentration, services intensity, sensitive data, automation, specialist talent and cross-border operations.",
+  scaleNote: "Likelihood, impact and control maturity scored 1 (low) – 3 (high) — our own qualitative framework, not a benchmarked index.",
   items: [
-    { risk: "Customer-zero concentration", body: "One anchor is most of the revenue. Losing it stalls the flywheel before the corpus is defensible.", mitigation: "Second anchor is the month-18 milestone; data rights survive termination." },
-    { risk: "The labs encroach faster than we automate", body: "Foundation models absorb generic document work, compressing the services margin we are borrowing against.", mitigation: "The moat is execution data and encoded workflow, not model capability." },
-    { risk: "Services gravity", body: "A profitable services business is a comfortable place to stay. The automation never happens and the multiple never re-rates.", mitigation: "Automation rate is the reported metric, not revenue." },
-    { risk: "Data rights fail to hold", body: "If a client disputes ownership of abstracted templates and eval sets, the corpus is not ours to build on.", mitigation: "Data-and-IP agreement is a founding document, executed before the entity is capitalised." },
-    { risk: "Cross-border structure and delivery", body: "A three-jurisdiction structure carries transfer-pricing, permanent-establishment and data-residency exposure.", mitigation: "Counsel engaged before the DIFC entity, not after." },
+    {
+      risk: "Customer concentration",
+      control: "Milestone-based diversification plan; no fixed-cost growth ahead of contracted revenue.",
+      indicator: "% revenue from largest client; qualified pipeline coverage",
+      likelihood: 2, impact: 3, maturity: 2,
+    },
+    {
+      risk: "Services gravity",
+      control: "Standard scope, reusable components, change control and automation eligibility criteria.",
+      indicator: "Hours/output; custom work share; gross margin by workflow",
+      likelihood: 2, impact: 2, maturity: 2,
+    },
+    {
+      risk: "Data rights + confidentiality",
+      control: "Contractual rights matrix, least-privilege access, segregation, retention rules and audit logs.",
+      indicator: "Access exceptions; unclassified data; security incidents",
+      likelihood: 1, impact: 3, maturity: 3,
+    },
+    {
+      risk: "AI / vendor dependency",
+      control: "Human approval gates, model evaluation, fallback procedures and portability for critical workflows.",
+      indicator: "Override rate; hallucination/error rate; vendor concentration",
+      likelihood: 2, impact: 2, maturity: 2,
+    },
+    {
+      risk: "Talent + quality",
+      control: "Role-based review, documented standards, training and capacity planning.",
+      indicator: "First-pass acceptance; rework; utilization; key-person exposure",
+      likelihood: 2, impact: 2, maturity: 2,
+    },
+    {
+      risk: "Cross-border complexity",
+      control: "Counsel-led entity, tax, employment, regulatory and data-residency design.",
+      indicator: "Unresolved legal dependencies; cross-border data flows",
+      likelihood: 2, impact: 2, maturity: 1,
+    },
   ],
+  footnote:
+    "The risk is not that services are involved; the risk is failing to convert delivery into standardized, measurable workflows. The leading indicators make that visible before it becomes an economics or quality problem.",
 };
 
-/* -------------------------------------------------------------------- XIII · the ask */
+/* -------------------------------------------------------- XII · partnership proposal */
 
 export const ASK = {
-  eyebrow: "THE PROPOSAL",
-  title: "Not a round.",
-  titleAccent: "A partner.",
+  eyebrow: "THE PARTNERSHIP PROPOSAL",
+  title: "Build the operating company",
+  titleAccent: "together.",
   desc:
-    "The hard part is already done — a paying customer, a working product, a proprietary dataset. What's left is who owns what comes next, split evenly because the risk from here is shared evenly.",
-  split: [
-    { label: "Isthmus Meridian", value: 50 },
-    { label: "Founding partners", value: 50 },
-  ],
+    "Isthmus Meridian contributes a live operating environment, workflow IP, a proprietary delivery system and the initial customer relationship. The founding partners contribute capital, commercial reach, governance and the capacity to secure the next anchor funds.",
   contributions: {
     ours: {
-      label: "ISTHMUS MERIDIAN BRINGS",
+      label: "ISTHMUS CONTRIBUTES",
       items: [
-        "A live, paying anchor — AND Capital's back office, running today",
-        "The operating layer itself: models, templates, eval sets, platform",
-        "The delivery bench and the workflow history behind the corpus",
-        "Data rights structured up front, surviving any one client's exit",
+        "Customer-zero access (subject to agreement)",
+        "Operating playbooks, templates and evaluation sets",
+        "Product and data architecture",
+        "Delivery leadership",
       ],
     },
     theirs: {
-      label: "FOUNDING PARTNERS BRING",
+      label: "PARTNERS CONTRIBUTE",
       items: [
-        "Capital sized to fund the second anchor and the delivery build-out",
-        "The commercial reach to close fund two, three and four",
-        "Standing with GPs and LPs that a two-person startup doesn't have",
-        "A board seat — and the accountability that comes with equal equity",
+        "Committed capital",
+        "Introductions and active sponsorship",
+        "Governance",
+        "Senior hiring support and access to fund two, three and four",
       ],
     },
   },
   terms: [
-    { label: "Ownership split", value: 50 as Figure, unit: "/50" },
-    { label: "Capital required", value: TBD as Figure, unit: "" },
     { label: "Vehicle", value: TBD as Figure, unit: "" },
+    { label: "Capital required", value: TBD as Figure, unit: "" },
+    { label: "Ownership split", value: TBD as Figure, unit: "" },
     { label: "Target close", value: TBD as Figure, unit: "" },
   ],
-  governance:
-    "One class of equity, one board, reserved matters agreed at signing — neither side gets diluted out of the layer they helped build.",
-  warning: "The capital figure, the vehicle and the close date are yours to set — we won't presume them.",
+  decisions: "Also to agree: board composition, reserved matters, IP/data rights, founder vesting and funding tranches.",
+  useOfFunds: [
+    { label: "Product & automation", value: TBD as Figure },
+    { label: "Domain delivery hires", value: TBD as Figure },
+    { label: "Security, legal & entity setup", value: TBD as Figure },
+    { label: "Commercial development", value: TBD as Figure },
+    { label: "Contingency", value: TBD as Figure },
+  ],
+  nextStep: "Immediate next step: a two-week diligence sprint ending in a signed term sheet and 90-day operating plan.",
+  warning: "The vehicle, capital amount, ownership split and close date are yours to set — we won't presume them.",
   cta: "Start the conversation",
 };
 
-/* ----------------------------------------------------------------- XIV · close */
+/* ----------------------------------------------------------------- XIII · close */
 
 export const CLOSING = {
-  statement: "The crossing, and the",
-  statementAccent: "line you cross it by.",
-  structure: "Delaware · Dubai",
-  opportunity: "AND Capital · 50/50 JV",
+  statement: "Build the operating layer",
+  statementAccent: "private markets have been missing.",
+  subline: "A live foundation. A repeatable workflow system. A path from expert delivery to software economics.",
+  steps: [
+    "Confirm the founding-partner diligence scope.",
+    "Agree the capital and governance framework.",
+    "Launch the 90-day operating plan and second-anchor pipeline.",
+  ],
+  crossing: { near: "Live customer zero", far: "Repeatable multi-fund operating layer" },
+  meta: [
+    { label: "Structure", body: "Delaware · Dubai operating corridor" },
+    { label: "Contact", body: "info@isthmusmeridian.com" },
+  ],
 };

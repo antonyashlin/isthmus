@@ -28,9 +28,20 @@ const EASE_SETTLE = "cubicBezier(0.22, 1, 0.36, 1)";
 const STAGGER = 45;
 const RISE = 520;
 
+function isStaticDeckMode() {
+  if (typeof window === "undefined") return false;
+  const params = new URLSearchParams(window.location.search);
+  return (
+    params.has("print") ||
+    params.has("pdf") ||
+    params.has("static") ||
+    window.matchMedia("print").matches
+  );
+}
+
 export const prefersReduced = () =>
-  typeof matchMedia === "function" &&
-  matchMedia("(prefers-reduced-motion: reduce)").matches;
+  (typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches) ||
+  isStaticDeckMode();
 
 /**
  * Lift a slide's contents in. Returns a cleanup that leaves everything settled,

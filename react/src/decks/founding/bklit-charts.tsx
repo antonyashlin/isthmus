@@ -1,23 +1,14 @@
 "use client";
 
 /**
- * The deck's line/area figures, on Bklit — replacing the ECharts line charts
- * that used to carry GAP and MODEL. CompsChart (bar) and StructureMap (geo)
- * stay on ECharts in `echart-charts.tsx`; those aren't line charts.
+ * The gap's area chart, on Bklit. Three sparse, unevenly-spaced years is
+ * exactly the case Bklit's own date axis can't carry (it assumes a dense,
+ * regular series) — everything else in the deck is on ECharts.
  */
 
 import { curveNatural } from "@visx/curve";
-import {
-  Area,
-  AreaChart,
-  ChartTooltip,
-  Grid,
-  Line,
-  LineChart,
-  XAxis,
-  YAxis,
-} from "@/components/charts";
-import { GAP, MODEL } from "./content";
+import { Area, AreaChart, ChartTooltip, Grid, YAxis } from "@/components/charts";
+import { GAP } from "./content";
 
 /* -------------------------------------------------------------- IV · the gap */
 
@@ -58,48 +49,6 @@ export function GapChart() {
           </span>
         ))}
       </div>
-    </div>
-  );
-}
-
-/* -------------------------------------------------------------- VIII · model */
-
-const MODEL_BASE = new Date(2026, 7, 1); // month 0 of the roadmap: August 2026
-
-export function ModelChart() {
-  const data = MODEL.quarters.map((_, i) => ({
-    date: new Date(MODEL_BASE.getFullYear(), MODEL_BASE.getMonth() + i * 3, 1),
-    margin: MODEL.series.margin.values[i],
-    automated: MODEL.series.automated.values[i],
-  }));
-
-  return (
-    <div className="fd-chart-fill">
-      <LineChart
-        aspectRatio="4.8 / 1"
-        data={data}
-        margin={{ top: 24, right: 56, bottom: 30, left: 48 }}
-      >
-        <Grid horizontal />
-        <Line
-          curve={curveNatural}
-          dataKey="margin"
-          stroke="var(--accent-ink)"
-          strokeWidth={2.5}
-          yAxisId="left"
-        />
-        <Line
-          curve={curveNatural}
-          dataKey="automated"
-          stroke="var(--tx-3)"
-          strokeWidth={2}
-          yAxisId="right"
-        />
-        <XAxis />
-        <YAxis formatValue={(v) => `${v}%`} yAxisId="left" />
-        <YAxis formatValue={(v) => `${v}`} orientation="right" yAxisId="right" />
-        <ChartTooltip />
-      </LineChart>
     </div>
   );
 }

@@ -248,13 +248,18 @@ line.fd-field-glow {
   display: grid;
 }
 
-/* A — heading, description, a large graph beneath. The default read. */
-.fd-lay-a { grid-template-rows: auto auto 1fr; }
+/* A — heading, description, a large graph beneath. The default read.
+ * `minmax(0, 1fr)`, not bare `1fr`: a bare `1fr` row has an automatic
+ * minimum equal to its content's min-content size, so a tall plate (a
+ * chart plus a card strip, say) blows the row — and the grid item — past
+ * its budget instead of being constrained to it. `minmax(0, 1fr)` is the
+ * standard fix: the row actually shrinks to the space available. */
+.fd-lay-a { grid-template-rows: auto auto minmax(0, 1fr); }
 .fd-lay-a .fd-blk-viz { margin-top: 24px; }
 
 /* B — the graph leads; heading and caption land underneath it, statement-
  * style. For slides where the evidence should hit before the claim does. */
-.fd-lay-b { grid-template-rows: 1fr auto auto; }
+.fd-lay-b { grid-template-rows: minmax(0, 1fr) auto auto; }
 .fd-lay-b .fd-blk-viz { order: 1; margin-top: 0; margin-bottom: 22px; }
 .fd-lay-b .fd-blk-desc { order: 2; margin-top: 0; }
 .fd-lay-b .fd-h { order: 3; margin-top: 14px; }
@@ -263,7 +268,7 @@ line.fd-field-glow {
  * description stack in a narrower right-hand column beside it. */
 .fd-lay-c {
   grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto minmax(0, 1fr);
   column-gap: 44px;
 }
 .fd-lay-c .fd-blk-viz { grid-column: 1; grid-row: 1 / span 2; align-self: stretch; margin-top: 0; }
@@ -272,12 +277,12 @@ line.fd-field-glow {
 
 /* D — heading spans the top; the graph area beneath splits into two panels
  * side by side (two figures, or a figure and a secondary block). */
-.fd-lay-d { grid-template-rows: auto auto 1fr; }
+.fd-lay-d { grid-template-rows: auto auto minmax(0, 1fr); }
 .fd-lay-d .fd-blk-desc { margin-top: 12px; }
 .fd-lay-d .fd-blk-viz {
   margin-top: 22px;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 28px;
 }
 .fd-lay-d .fd-blk-viz > .fd-viz-plate { margin: 0; }
@@ -366,6 +371,9 @@ line.fd-field-glow {
 .fd-rail-cols {
   display: grid;
   gap: 36px;
+}
+.fd-rail-col {
+  position: relative;
 }
 .fd-node {
   position: absolute;
@@ -456,16 +464,14 @@ line.fd-field-glow {
 
 /* ---------------------------------------------------------------- provenance */
 
+/* A quiet footnote, not a badge — the asterisk in the chart is the only
+ * visual call-out; this line just resolves it, same register as a source
+ * citation. */
 .fd-illustrative {
-  display: inline-block;
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--gold);
-  border: 1px dashed color-mix(in srgb, var(--gold) 42%, transparent);
-  border-radius: 999px;
-  padding: 5px 12px;
+  margin: 12px 0 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--tx-3);
 }
 .fd-gap {
   display: inline-block;
@@ -474,30 +480,35 @@ line.fd-field-glow {
   color: var(--tx-3);
 }
 
-/* ---------------------------------------------------------------- cover */
-
-.fd-cover-h {
+/* ---------------------------------------------------------------- cover ---
+ * A flowing block, not four independently-pinned absolute elements — the
+ * old per-element `top:` offsets were tuned for a 34px heading and would
+ * silently overlap the moment the heading grew past two short lines.
+ */
+.fd-cover-block {
   position: absolute;
-  top: 128px;
+  top: 82px;
   left: 96px;
-  right: 300px;
+  right: 220px;
   z-index: 1;
-  font-size: 34px;
+}
+.fd-cover-h {
+  font-size: 58px;
   font-weight: 300;
-  line-height: 1.26;
-  letter-spacing: -0.01em;
+  line-height: 1.1;
+  letter-spacing: -0.012em;
   color: var(--heading);
   margin: 0;
-  max-width: 26ch;
+  max-width: 20ch;
 }
 
 /* The wordmark, huge, bottom-right — exactly the site's hero lockup. */
 .fd-lockup {
   position: absolute;
-  left: 96px;
+  right: 76px;
   bottom: 92px;
   z-index: 1;
-  text-align: left;
+  text-align: right;
   line-height: 0.92;
 }
 .fd-lockup .lk-1 {
@@ -518,19 +529,6 @@ line.fd-field-glow {
   margin-top: 4px;
 }
 
-.fd-cover-meta {
-  position: absolute;
-  left: 96px;
-  top: 258px;
-  z-index: 1;
-  display: flex;
-  gap: 18px;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--tx-3);
-}
 
 /* ---------------------------------------------------------------- reveal */
 
@@ -540,6 +538,7 @@ line.fd-field-glow {
   .fdeck * { animation-duration: 0ms !important; transition-duration: 0ms !important; }
   .fd-rise { opacity: 1 !important; transform: none !important; }
   .fd-lamp { display: none; }
+  .fd-hero-field .fgl-spark { display: none; }
 }
 
 /* ---------------------------------------------------------------- nav */
@@ -562,6 +561,9 @@ line.fd-field-glow {
 }
 .fdeck:hover .fdeck-nav,
 .fdeck-nav:focus-within { opacity: 1; }
+.fdeck[data-static="true"] .fdeck-nav {
+  display: none !important;
+}
 
 .fdeck-dot {
   width: 6px;
@@ -600,10 +602,47 @@ line.fd-field-glow {
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
+  .fdeck-slide:last-child {
+    break-after: auto;
+    page-break-after: auto;
+  }
   .liquid-glass { backdrop-filter: none; -webkit-backdrop-filter: none; box-shadow: none; }
   .fdeck-nav { display: none; }
   .fd-rise { opacity: 1 !important; transform: none !important; }
-  .fd-lamp { display: none; }
+  .fd-lamp,
+  .fd-ribbon-lamp,
+  .fd-hero-field .fgl-spark,
+  .fdeck [style*="offset-path"] {
+    display: none !important;
+  }
+  .fdeck * {
+    animation: none !important;
+    transition: none !important;
+  }
+  .fdeck .animate-orbit {
+    transform:
+      rotate(calc(var(--angle) * 1deg))
+      translateY(calc(var(--radius) * 1px))
+      rotate(calc(var(--angle) * -1deg));
+  }
+}
+
+.fdeck[data-static="true"] .fd-rise {
+  opacity: 1 !important;
+  transform: none !important;
+}
+.fdeck[data-static="true"] .fd-lamp,
+.fdeck[data-static="true"] .fd-ribbon-lamp,
+.fdeck[data-static="true"] .fd-hero-field .fgl-spark,
+.fdeck[data-static="true"] [style*="offset-path"] {
+  display: none !important;
+}
+.fdeck[data-static="true"] .animate-orbit {
+  animation: none !important;
+  transform:
+    rotate(calc(var(--angle) * 1deg))
+    translateY(calc(var(--radius) * 1px))
+    rotate(calc(var(--angle) * -1deg));
 }
 
 /* ---------------------------------------------------------------- hero (I) ---
@@ -618,6 +657,15 @@ line.fd-field-glow {
   overflow: hidden;
   pointer-events: none;
   z-index: 0;
+}
+/* Closing carries a full column of read text on the left where Cover only
+ * has a few sparse lines — the hero field's arcs are full-bleed and diagonal,
+ * so narrowing the text column alone can't keep them clear of it at every
+ * angle. Fade the field out over the text column instead, precisely like the
+ * requested reference: the graphic reads only in the empty right two-fifths. */
+.fd-hero-field.fd-hero-right {
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, transparent 46%, black 68%);
+  mask-image: linear-gradient(to right, transparent 0%, transparent 46%, black 68%);
 }
 .fd-hero-field svg.fg {
   position: absolute;
@@ -679,13 +727,38 @@ line.fd-field-glow {
   display: flex;
   flex-direction: column;
 }
+/* Elevated glass, per the redesign brief: semi-transparent fill, a thin
+ * translucent border, a soft inner rim-light, backdrop blur, and a real
+ * ambient drop shadow so the plate reads as floating above the slide rather
+ * than painted flat onto it. */
 .fd-viz-plate {
   position: relative;
   flex: 1;
   min-height: 0;
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  background: color-mix(in srgb, var(--panel) 46%, transparent);
+  overflow: hidden;
+  border: 1px solid var(--line-2);
+  border-radius: 22px;
+  /* Opaque enough that the drop-shadow behind it (below) doesn't read
+   * through the fill — at the old 52% mix, the shadow's own darkness
+   * showed through the card's own face, not just at its edges. Still
+   * mixed, not flat, so the backdrop blur keeps some depth. */
+  background: color-mix(in srgb, var(--panel) 88%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  backdrop-filter: blur(18px) saturate(150%);
+  /* `filter: drop-shadow()`, not `box-shadow` — box-shadow is clipped by
+   * this same element's `overflow: hidden` (needed to keep chart/card
+   * content inside the rounded corners), which silently ate the whole
+   * elevation shadow at the card's edges. `filter` renders the shadow from
+   * the element's clipped, post-radius silhouette and is never clipped by
+   * its own overflow, so it survives right up to the rounded corner. Kept
+   * soft and close (small offsets) so little of it falls under the card's
+   * own footprint in the first place. */
+  filter:
+    drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3))
+    drop-shadow(0 3px 8px rgba(0, 0, 0, 0.2));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.03);
   padding: 26px 30px;
   box-sizing: border-box;
   display: flex;
@@ -711,112 +784,13 @@ line.fd-field-glow {
   color: var(--tx-3);
 }
 
-/* ---------------------------------------------------------- illustrations ---
- * Orbiting-circles / animated-beam network diagrams (magicui, vendored, not
- * hand-drawn) — the hub-and-function-set visuals on "what we are" / "what we
- * do". Kept to the deck's own ink: no gradient chrome, no drop shadow.
- */
-.fd-orbit-stage {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.fd-orbit-hub {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  width: 148px;
-  height: 148px;
-  border-radius: 50%;
-  border: 1px solid var(--line-3);
-  background: color-mix(in srgb, var(--panel) 70%, transparent);
-  color: var(--heading);
-  text-align: center;
-  box-shadow: 0 0 30px -6px color-mix(in srgb, var(--mer) 45%, transparent);
-}
-.fd-orbit-hub span {
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--accent-ink);
-  max-width: 9ch;
-  line-height: 1.5;
-}
-.fd-orbit-node {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  white-space: nowrap;
-  padding: 7px 13px;
-  border-radius: 999px;
-  border: 1px solid var(--line-3);
-  background: var(--bg);
-  color: var(--tx-2);
-  font-size: 11px;
-  letter-spacing: 0.03em;
-}
-
-.fd-net-stage {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-.fd-net-hub {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  width: 128px;
-  height: 128px;
-  border-radius: 50%;
-  border: 1px solid var(--line-3);
-  background: color-mix(in srgb, var(--panel) 78%, transparent);
-  text-align: center;
-  box-shadow: 0 0 30px -6px color-mix(in srgb, var(--mer) 45%, transparent);
-}
-.fd-net-hub b {
-  font-weight: 400;
-  font-size: 13px;
-  color: var(--heading);
-}
-.fd-net-hub span {
-  font-size: 9.5px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--accent-ink);
-}
-.fd-net-node {
-  position: absolute;
-  z-index: 2;
-  transform: translate(-50%, -50%);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 12px 7px 9px;
-  border-radius: 999px;
-  border: 1px solid var(--line-2);
-  background: var(--bg);
-  font-size: 11px;
-  color: var(--heading);
-  white-space: nowrap;
-}
-.fd-net-node .fd-net-n {
+/* A small numbered circle badge — the lifecycle ribbon's workstream numbers,
+ * the closing slide's step numbers. Standalone (not scoped to a parent), so
+ * any row of text can carry one. */
+.fd-net-n {
   display: grid;
   place-items: center;
+  flex: 0 0 auto;
   width: 16px;
   height: 16px;
   border-radius: 50%;
@@ -827,32 +801,564 @@ line.fd-field-glow {
 }
 
 /* ---------------------------------------------------------------- the ask ---
- * A fifty-fifty joint venture, drawn as one bar in two equal halves. The
- * proposal is the geometry: if the halves are not equal, the slide is lying.
+ * Contribution lists beside the bridge illustration.
  */
-.fd-split-bar{margin-top:23px}
-.sb-track{display:flex;gap:3px;height:10px}
-.sb-track span{display:block;border-radius:2px}
-.sb-ours{background:var(--mer)}
-.sb-theirs{background:color-mix(in srgb,var(--mer) 28%,transparent);
-  border:1px solid var(--line-2)}
-.sb-legend{display:flex;margin-top:10px}
-.sb-legend span{flex:1;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;
-  color:var(--tx-3)}
-.sb-legend b{font-weight:400;font-size:19px;letter-spacing:-0.01em;color:var(--heading);
-  margin-right:8px;text-transform:none}
-
-.fd-contribs{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:23px}
 .fd-contrib-list{list-style:none;margin:11px 0 0;padding:0;display:grid;gap:6px}
 .fd-contrib-list li{position:relative;padding-left:16px;font-size:13px;line-height:1.5;
   color:var(--tx-2)}
 .fd-contrib-list li::before{content:"";position:absolute;left:0;top:8px;width:5px;height:5px;
   border-radius:50%;background:var(--mer);opacity:.7}
 .fd-contrib-list li{line-height:1.45}
-
-.fd-ask-foot{display:grid;grid-template-columns:1fr auto;gap:46px;align-items:end;
-  margin-top:auto;padding-top:16px;border-top:1px solid var(--line)}
-.fd-ask-terms{display:flex;gap:34px;align-self:end;align-items:flex-end}
-.fd-ask-warn{display:flex;gap:12px;align-items:center;margin-top:10px}
 .fd-term-v{font-size:19px;font-weight:300;color:var(--heading);margin-top:10px;line-height:1.1}
-.fd-ask-cta{position:absolute;right:0;bottom:-44px}
+
+/* ---------------------------------------------------------------- cover graph
+ * The circular-graph illustration, sat quietly behind the wordmark. Brand
+ * texture, not a chart to be read — small, faint, non-interactive.
+ */
+.fd-cover-graph {
+  position: absolute;
+  right: -100px;
+  bottom: -100px;
+  width: 340px;
+  height: 340px;
+  z-index: 0;
+  opacity: 0.6;
+  overflow: hidden;
+  pointer-events: none;
+}
+.fd-cover-graph::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--bg);
+  opacity: 0.25;
+  z-index: 1;
+}
+.fd-cover-sub {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--tx-2);
+  margin: 22px 0 0;
+  max-width: 55ch;
+}
+
+/* ---------------------------------------------------------------- pillars ---
+ * The short definition list under a heading — "what we are" and the wedge's
+ * beachhead/triggers/land-and-expand. A rail without the hairline: just a
+ * quiet vertical stack of label + one line.
+ */
+.fd-pillars {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.fd-pillars li {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--tx-2);
+}
+.fd-pillars b {
+  font-weight: 500;
+  color: var(--heading);
+}
+
+/* ---------------------------------------------------------- sunburst ring ---
+ * Source / Underwrite / Invest / Monitor / Report / Raise, orbiting the
+ * identity sunburst — plain positioned labels, no chart underneath them.
+ */
+.fd-sunburst-ring {
+  position: absolute;
+  inset: 26px;
+  pointer-events: none;
+}
+.fd-sunburst-ring span {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--heading);
+  text-shadow: 0 0 10px var(--bg), 0 0 4px var(--bg), 0 1px 2px var(--bg);
+  white-space: nowrap;
+}
+
+/* -------------------------------------------------------------- ring key ---
+ * The wedge's two inner bands are too thin to hold their own text without
+ * crossing the boundary stroke — a swatch + label key beside the rings
+ * reads them directly instead, in the plate's own empty right margin.
+ */
+.fd-ring-key {
+  position: absolute;
+  right: 28px;
+  top: 50%;
+  transform: translateY(-50%);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+  max-width: 30%;
+}
+.fd-ring-key li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--heading);
+  line-height: 1.3;
+}
+.fd-ring-swatch {
+  flex: 0 0 auto;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+}
+.fd-ring-swatch-0 { background: var(--sky); }
+.fd-ring-swatch-1 { background: color-mix(in srgb, var(--steel) 73%, transparent); }
+
+/* -------------------------------------------------------------- phase strip
+ * The roadmap's four phases, as a slim footer row inside the Gantt's own
+ * plate rather than a second card row competing for the same height.
+ */
+.fd-phase-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  list-style: none;
+  flex: 0 0 auto;
+  margin: 14px 0 0;
+  padding: 12px 0 0;
+  border-top: 1px solid var(--line);
+}
+.fd-phase-strip li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.fd-phase-at {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--accent-ink);
+  white-space: nowrap;
+}
+.fd-phase-label {
+  font-size: 13px;
+  color: var(--heading);
+}
+
+/* ------------------------------------------------------------- spotlight ---
+ * A mouse-tracked radial glow on card surfaces — Aceternity's Card Spotlight
+ * / Sera UI's Spotlight Card / ReactBits' MagicBento, one shared
+ * implementation via `--mx`/`--my`.
+ */
+.fd-spot {
+  position: relative;
+  overflow: hidden;
+}
+.fd-spot::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    220px circle at var(--mx, 50%) var(--my, 50%),
+    color-mix(in srgb, var(--mer) 18%, transparent),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.28s var(--ease);
+  pointer-events: none;
+}
+.fd-spot:hover::before { opacity: 1; }
+
+/* ----------------------------------------------------------------- cards ---
+ * Short label/body cards in a row — the gap's friction points, the wedge's
+ * spend pools, the cover and closing meta. `auto-fit` rather than a fixed
+ * column count: the row carries 2, 3 or 4 cards depending on the slide, and
+ * should tile evenly either way rather than leaving a stub column.
+ */
+/* A separate row, not a divider glued inside the chart plate — each card is
+ * its own small floating surface, with real air around it. */
+.fd-card-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  flex: 0 0 auto;
+  margin-top: 20px;
+}
+.fd-mini-card {
+  border: 1px solid var(--line-2);
+  border-radius: 16px;
+  padding: 16px 18px;
+  background: color-mix(in srgb, var(--card) 60%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
+  box-shadow:
+    0 18px 32px -18px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+.fd-mini-card-label {
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+}
+.fd-mini-card-body {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 10.5px;
+  line-height: 1.35;
+  color: var(--tx-2);
+  margin: 5px 0 0;
+}
+
+/* ---------------------------------------------------------- lifecycle ribbon
+ * "What we do" — six lifecycle stages across the top, eight workstream nodes
+ * hanging under their stage, a travelling glow along the rail in the same
+ * offset-path family as `.fd-lamp` (simplified to a left% keyframe so it
+ * never depends on the rail's actual rendered width).
+ */
+.fd-ribbon {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+.fd-ribbon-stages {
+  position: relative;
+  height: 32px;
+  flex: 0 0 auto;
+}
+.fd-ribbon-stage {
+  position: absolute;
+  bottom: 0;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  white-space: nowrap;
+}
+.fd-ribbon-tick {
+  width: 2px;
+  height: 8px;
+  border-radius: 1px;
+  background: var(--mer);
+  box-shadow: 0 0 8px 1px color-mix(in srgb, var(--mer) 70%, transparent);
+}
+.fd-ribbon-track {
+  position: relative;
+  flex: 1;
+  min-height: 180px;
+  margin-top: 2px;
+}
+.fd-ribbon-rail {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  overflow: visible;
+}
+.fd-ribbon-rail line {
+  stroke: var(--line-3);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+.fd-ribbon-lamp {
+  position: absolute;
+  top: -3px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--mer);
+  box-shadow: 0 0 18px 4px color-mix(in srgb, var(--mer) 80%, transparent);
+  animation: fdRibbonRun 3.4s ease-in-out infinite alternate;
+}
+@keyframes fdRibbonRun {
+  from { left: 0%; }
+  to   { left: 100%; }
+}
+.fd-ribbon-node {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 158px;
+}
+.fd-ribbon-drop {
+  width: 1px;
+  background: linear-gradient(to bottom, var(--line-3), var(--line));
+}
+.fd-ribbon-card {
+  margin-top: -1px;
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 10px 12px;
+  border-radius: 13px;
+  border: 1px solid var(--line-2);
+  background: color-mix(in srgb, var(--card) 62%, transparent);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  backdrop-filter: blur(12px) saturate(140%);
+  box-shadow:
+    0 16px 28px -16px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+.fd-ribbon-label {
+  font-size: 11.5px;
+  line-height: 1.35;
+  color: var(--heading);
+}
+.fd-ribbon-tag {
+  display: block;
+  margin-top: 3px;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+}
+.fd-ribbon-cross {
+  flex: 0 0 auto;
+  margin: 14px 0 0;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line-2);
+  font-size: 11.5px;
+  color: var(--tx-3);
+}
+
+/* -------------------------------------------------------------- flywheel ---
+ * The moat's five-step compounding loop. `runFlywheel` in motion.ts drives
+ * `.fw-packet` around this ring via an `offset-path` matching `.fw-track`'s
+ * circle, lighting each `.fw-node` as it arrives.
+ */
+.fw-ring {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  max-width: 300px;
+  margin: auto;
+}
+.fw-track {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.fw-track circle {
+  fill: none;
+  stroke: var(--line-2);
+  stroke-width: 1;
+  stroke-dasharray: 2 5;
+}
+.fw-packet {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: var(--mer);
+  box-shadow: 0 0 14px 3px var(--mer);
+  offset-path: circle(42% at 50% 50%);
+  offset-distance: var(--t, 0%);
+  opacity: 0;
+}
+.fw-node-pos {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 108px;
+  text-align: center;
+}
+.fw-node {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1.5px solid var(--line-3);
+  background: var(--bg);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.fw-step {
+  font-size: 10.5px;
+  line-height: 1.35;
+  color: var(--tx-3);
+  transition: color 0.3s;
+}
+.fw-node.lit + .fw-step,
+.fw-node-pos:has(.fw-node.lit) .fw-step {
+  color: var(--heading);
+}
+
+/* ------------------------------------------------------------- comparison ---
+ * Point software / BPO-staffing / Isthmus — yes/partial/no, never a scored
+ * bar. A small table, direct labels, no legend.
+ */
+.fd-compare {
+  display: grid;
+  gap: 8px;
+}
+.fd-compare-row {
+  display: grid;
+  grid-template-columns: 1.4fr repeat(3, 0.7fr);
+  align-items: center;
+  gap: 8px;
+}
+.fd-compare-head { padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+.fd-compare-label {
+  font-size: 12px;
+  color: var(--tx-2);
+}
+.fd-compare-col-h {
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--tx-3);
+  text-align: center;
+}
+.fd-compare-v {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  margin: 0 auto;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 500;
+}
+.fd-compare-yes { background: color-mix(in srgb, var(--mer) 22%, transparent); color: var(--accent-ink); }
+.fd-compare-partial { background: color-mix(in srgb, var(--gold) 20%, transparent); color: var(--gold); }
+.fd-compare-no { background: var(--line); color: var(--tx-3); }
+
+/* ------------------------------------------------------------- risk key ---
+ * The matrix inverts its own colour direction (high control-maturity is
+ * good, high likelihood/impact is not) — a plain-language key removes the
+ * need to work that out from the numbers.
+ */
+.fd-risk-key {
+  display: flex;
+  gap: 22px;
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+}
+.fd-risk-key li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  color: var(--tx-2);
+}
+.fd-risk-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+.fd-risk-swatch-good { background: var(--accent-ink); }
+.fd-risk-swatch-mid { background: color-mix(in srgb, var(--steel) 60%, transparent); }
+.fd-risk-swatch-bad { background: var(--danger); }
+
+/* ----------------------------------------------------------------- bridge ---
+ * The ask's two contributions merging into the operating company, on the
+ * deck's own `AnimatedBeam`.
+ */
+.fd-bridge-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.fd-bridge-node {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line-2);
+  background: var(--bg);
+  font-size: 12px;
+  color: var(--heading);
+  white-space: nowrap;
+}
+.fd-bridge-node.ours { left: 6%; top: 24%; transform: translateY(-50%); color: var(--accent-ink); }
+.fd-bridge-node.theirs { left: 6%; top: 76%; transform: translateY(-50%); }
+.fd-bridge-hub {
+  position: absolute;
+  right: 8%;
+  top: 50%;
+  transform: translate(0, -50%);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 108px;
+  height: 108px;
+  border-radius: 50%;
+  border: 1px solid var(--line-3);
+  background: color-mix(in srgb, var(--panel) 78%, transparent);
+  text-align: center;
+  box-shadow: 0 0 30px -6px color-mix(in srgb, var(--mer) 45%, transparent);
+}
+.fd-bridge-hub b { font-weight: 400; font-size: 13px; color: var(--heading); }
+.fd-bridge-hub span { font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent-ink); }
+
+/* --------------------------------------------------------------- crossing ---
+ * The close: one line, drawn on via `drawPaths` (`.fd-draw`), from "live
+ * customer zero" to "repeatable multi-fund operating layer".
+ */
+.fd-crossing {
+  width: 420px;
+  max-width: 60vw;
+}
+.fd-crossing-svg {
+  width: 100%;
+  height: 12px;
+  overflow: visible;
+}
+.fd-crossing-labels {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--tx-2);
+}
+.fd-crossing-labels .serif-i { font-size: 14px; }
+
+.fd-closing-steps {
+  list-style: none;
+  margin: 26px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.fd-closing-steps li {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--tx-2);
+}

@@ -3,7 +3,7 @@
 import * as React from "react";
 
 import "./deck.css";
-import { revealSlide } from "./motion";
+import { drawPaths, revealSlide, runFlywheel } from "./motion";
 import { SLIDES } from "./slides";
 
 /**
@@ -22,8 +22,20 @@ import { SLIDES } from "./slides";
 const W = 1280;
 const H = 720;
 
+function isStaticDeckMode() {
+  if (typeof window === "undefined") return false;
+  const params = new URLSearchParams(window.location.search);
+  return (
+    params.has("print") ||
+    params.has("pdf") ||
+    params.has("static") ||
+    window.matchMedia("print").matches
+  );
+}
+
 export function FoundingDeck() {
   const [index, setIndex] = React.useState(0);
+  const [staticMode, setStaticMode] = React.useState(false);
   // Explicit centring: a scale factor plus the pixel offset that puts the
   // scaled stage's top-left in the right place. A top-left origin with px
   // offsets avoids the oversized-item cases that clip a slide's leading edge.
@@ -45,6 +57,20 @@ export function FoundingDeck() {
       window.removeEventListener("resize", compute);
       window.removeEventListener("orientationchange", compute);
       window.visualViewport?.removeEventListener("resize", compute);
+    };
+  }, []);
+
+  React.useEffect(() => {
+    const print = window.matchMedia("print");
+    const compute = () => setStaticMode(isStaticDeckMode());
+    compute();
+    window.addEventListener("beforeprint", compute);
+    window.addEventListener("afterprint", compute);
+    print.addEventListener("change", compute);
+    return () => {
+      window.removeEventListener("beforeprint", compute);
+      window.removeEventListener("afterprint", compute);
+      print.removeEventListener("change", compute);
     };
   }, []);
 
@@ -84,17 +110,23 @@ export function FoundingDeck() {
   }, []);
 
   // Reveal runs on the slide that just became active, and its cleanup settles
-  // anything still in flight when the deck moves on.
+  // anything still in flight when the deck moves on. All three motion
+  // primitives no-op harmlessly on a slide that carries none of their
+  // elements, and all three settle instantly (rather than animate) under
+  // reduced motion or static/PDF capture — see `prefersReduced` in motion.ts.
   React.useEffect(() => {
     const el = stage.current?.querySelector<HTMLElement>(
       `[data-slide-index="${index}"]`
     );
     if (!el) return;
-    return revealSlide(el);
-  }, [index]);
+    const cleanups = [revealSlide(el), runFlywheel(el), drawPaths(el)];
+    return () => {
+      for (const cleanup of cleanups) cleanup();
+    };
+  }, [index, staticMode]);
 
   return (
-    <div className="fdeck">
+    <div className="fdeck" data-static={staticMode ? "true" : undefined}>
       <div
         className="fdeck-stage"
         ref={stage}
@@ -113,7 +145,12 @@ export function FoundingDeck() {
               // biome-ignore lint/suspicious/noArrayIndexKey: slide order is the identity
               key={i}
             >
-              <Body active={i === index} index={i} total={SLIDES.length} />
+              <Body
+                active={staticMode || i === index}
+                index={i}
+                staticMode={staticMode}
+                total={SLIDES.length}
+              />
             </section>
           );
         })}

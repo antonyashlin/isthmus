@@ -19,12 +19,16 @@
 
 import {
   BarChart,
-  BoxplotChart,
+  ChordChart,
   CustomChart,
   EffectScatterChart,
+  GraphChart,
   HeatmapChart,
   LineChart,
   LinesChart,
+  PieChart,
+  SunburstChart,
+  TreeChart,
 } from "echarts/charts";
 import {
   GeoComponent,
@@ -45,8 +49,12 @@ echarts.use([
   LinesChart,
   EffectScatterChart,
   HeatmapChart,
-  BoxplotChart,
   CustomChart,
+  GraphChart,
+  TreeChart,
+  SunburstChart,
+  ChordChart,
+  PieChart,
   GeoComponent,
   GraphicComponent,
   GridComponent,
@@ -122,6 +130,37 @@ export type EChartProps = {
   alt: string;
 };
 
+function isStaticChartMode() {
+  if (typeof window === "undefined") return false;
+  const params = new URLSearchParams(window.location.search);
+  return (
+    params.has("print") ||
+    params.has("pdf") ||
+    params.has("static") ||
+    window.matchMedia("print").matches
+  );
+}
+
+function settleChartOption(option: Record<string, unknown>, staticMode: boolean) {
+  if (!staticMode) return option;
+  return {
+    ...option,
+    animation: false,
+    series: Array.isArray(option.series)
+      ? option.series.map((series) => {
+          const item = series as Record<string, unknown>;
+          return {
+            ...item,
+            animation: false,
+            effect: item.effect ? { ...(item.effect as Record<string, unknown>), show: false } : undefined,
+            rippleEffect: undefined,
+            showEffectOn: undefined,
+          };
+        })
+      : option.series,
+  };
+}
+
 export function EChart({ build, active = true, className, style, alt }: EChartProps) {
   const host = React.useRef<HTMLDivElement>(null);
   const chart = React.useRef<echarts.ECharts | null>(null);
@@ -131,7 +170,7 @@ export function EChart({ build, active = true, className, style, alt }: EChartPr
     const el = host.current;
     if (!el) return;
 
-    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches || isStaticChartMode();
     // No fixed width/height here: every slide mounts at once (only
     // `visibility` toggles), and on the very first paint a chart on a slide
     // that isn't index 0 can read a 0×0 box before the grid layout settles.
@@ -143,7 +182,7 @@ export function EChart({ build, active = true, className, style, alt }: EChartPr
     const inst = echarts.init(el, undefined, { renderer: "svg" });
     chart.current = inst;
     inst.resize();
-    inst.setOption(build(readPalette(el)), true);
+    inst.setOption(settleChartOption(build(readPalette(el)), reduce), true);
 
     // The still frame is the deliverable: with reduced motion the chart is
     // painted settled and never animates at all.
@@ -173,7 +212,7 @@ export function EChart({ build, active = true, className, style, alt }: EChartPr
     // Becoming the active slide is also the most reliable moment to
     // re-measure: the browser has definitely laid the box out by now.
     inst.resize();
-    inst.setOption(build(readPalette(el)), { replaceMerge: ["series"] });
+    inst.setOption(settleChartOption(build(readPalette(el)), isStaticChartMode()), { replaceMerge: ["series"] });
   }, [active, build]);
 
   return (
