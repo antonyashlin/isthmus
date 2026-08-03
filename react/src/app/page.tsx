@@ -15,6 +15,7 @@ import { AdoptionFunnel } from "@/components/site/AdoptionFunnel";
 import { BrainOrbit } from "@/components/site/BrainOrbit";
 import { ExpectationPanels } from "@/components/site/ExpectationPanels";
 import { FlowDiagram } from "@/components/site/FlowDiagram";
+import { InquiryCta } from "@/components/site/InquiryCta";
 import { JourneyFlow } from "@/components/site/JourneyFlow";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { OfferCards } from "@/components/site/OfferCards";
@@ -367,9 +368,7 @@ export default function Home() {
           <div className="wrap company-wrap">
             <h2 className="h-lg reveal company-head">We run the back office behind <span className="serif-i">private-market investors</span>.</h2>
           </div>
-          <a className="btn btn-glass liquid-glass inquiry-cta" href="/inquiry">
-            Make an inquiry
-          </a>
+          <InquiryCta />
           <div className="glassbar reveal">
             <span className="wm"><b>ISTHMUS</b> <i>MERIDIAN</i></span>
             <div className="contact">

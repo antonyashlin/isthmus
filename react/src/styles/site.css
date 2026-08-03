@@ -98,31 +98,45 @@ p{margin:0}
 .sec-field .sf{stroke:var(--mer);fill:none;stroke-width:1}
 .sec-field .sf-line{stroke:var(--mer);fill:none;stroke-width:1.1}
 
-/* Kokonut's liquid-glass rim, lifted verbatim from GLASS_SHADOW_DARK in
-   liquid-glass-card.tsx so the bar and the CTA match the cards elsewhere.
-   Applied as CSS rather than the component because both need to stay real
-   links, and LiquidButton renders a <button> with no asChild escape hatch. */
-.liquid-glass{
-  -webkit-backdrop-filter:blur(22px) saturate(165%);
-  backdrop-filter:blur(22px) saturate(165%);
-  box-shadow:
-    0 0 8px rgba(0,0,0,0.03),
-    0 2px 6px rgba(0,0,0,0.08),
-    inset 3px 3px 0.5px -3.5px rgba(255,255,255,0.09),
-    inset -3px -3px 0.5px -3.5px rgba(255,255,255,0.85),
-    inset 1px 1px 1px -0.5px rgba(255,255,255,0.6),
-    inset -1px -1px 1px -0.5px rgba(255,255,255,0.6),
-    inset 0 0 6px 6px rgba(255,255,255,0.12),
-    inset 0 0 2px 2px rgba(255,255,255,0.06),
-    0 0 12px rgba(0,0,0,0.15)}
+/* ---- liquid-glass (real: liquid-glass-react, not a hand-rolled backdrop-filter
+   rig) ----
+   The library composites its own blur/refraction/shadow/border as a stack of
+   absolutely-positioned siblings sized off the ONE element it can measure
+   (GlassContainer's own rendered box), and it centers that box via
+   top:50%/left:50% + translate(-50%,-50%) — which only resolves to "fill the
+   parent" when the parent is exactly the same size, and only computes
+   anything sane when width/height are given as real values. It has no mode
+   for "stretch to a fluid, content-driven size" — buttons and cards are what
+   it's built for.
+   So: every glass surface here is TWO layers inside a position:relative
+   shell. `.lg-decor` is the library itself, given no children, absolutely
+   filling the shell — purely a backdrop, contributing nothing to the shell's
+   own size. `.lg-content` is the real content in normal flow — text, links,
+   form fields — which is what actually SIZES the shell, whether that's a
+   fixed 64px bar or a button that's exactly as wide as its label. Because the
+   decor layer never participates in that sizing, there's no feedback loop
+   between "how big is the glass" and "how big is the thing it's filling."
+   `.glass` below is the library's own internal class name, not part of its
+   public API — reaching into it is the brittle half of "force it everywhere,"
+   accepted with eyes open; a library update could rename it. */
+.lg-shell{position:relative}
+.lg-shell>.lg-decor{pointer-events:none}
+.lg-shell>.lg-decor .glass{width:100%!important;height:100%!important;
+  padding:0!important;display:block!important}
+.lg-content{position:relative;z-index:1}
 @media (prefers-reduced-transparency: reduce){
-  .liquid-glass{backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none}
+  .lg-decor{display:none}
+  .lg-shell{background:rgba(4,10,16,0.86);border:1px solid var(--line)}
 }
 
-/* ---- nav ---- */
-.nav{position:fixed;inset:0 0 auto 0;z-index:30;display:flex;align-items:center;justify-content:space-between;
-  gap:24px;height:64px;padding:0 48px;background:rgba(4,10,16,0.42);
-  border-bottom:1px solid var(--line)}
+/* ---- nav ----
+   Floating: detached from the viewport edge with a visible margin, not the
+   edge-to-edge strip it was. cornerRadius on the glass itself (passed as a
+   prop, not set here) is half the bar's height — a true stadium, the shape
+   the whole "liquid glass" language is built around. */
+.nav{position:fixed;top:20px;left:var(--edge);right:var(--edge);z-index:30;height:64px}
+.nav-row{width:100%;height:100%;display:flex;align-items:center;justify-content:space-between;
+  gap:24px;padding:0 32px}
 .brand{display:flex;align-items:center;gap:12px}
 .brand .wm{font-size:12px;letter-spacing:0.22em}
 .brand .wm b{font-weight:700;color:#fff}
@@ -132,29 +146,37 @@ p{margin:0}
 .nav-links a:hover{color:#fff}
 .nav-cta{display:flex;align-items:center;gap:16px}
 
+/* every pill button on the site (nav CTA, drawer CTA, inquiry CTA, form
+   send) is a .lg-shell in its own right — a shell can hold another shell,
+   each with its own glass. Height lives on the shell so the glass fills
+   right to its edge; padding lives on .lg-content so the glass isn't inset
+   from ITS edge too. Two sizes cover every instance so far. */
+.glass-btn{display:inline-flex;align-items:center;justify-content:center;
+  font-family:var(--sans);font-weight:500;letter-spacing:0.005em;
+  white-space:nowrap;color:#fff;cursor:pointer}
+.glass-btn .lg-content{display:flex;align-items:center;height:100%}
+.glass-btn-sm{height:34px;font-size:12.5px}
+.glass-btn-sm .lg-content{padding:0 20px}
+.glass-btn-lg{height:48px;font-size:14px}
+.glass-btn-lg .lg-content{padding:0 28px}
+
 /* ---- mobile nav: burger + drawer (hidden until the 760px breakpoint below
    turns .nav-links off and gives this the job instead) ---- */
-.nav-burger{display:none;flex-shrink:0;align-items:center;justify-content:center;
-  width:38px;height:38px;border-radius:999px;background:rgba(255,255,255,0.06);
-  border:1px solid var(--line-2);color:#fff}
-.nav-burger:hover,.nav-burger:focus-visible{background:rgba(255,255,255,0.14)}
-/* the popup itself — .liquid-glass supplies the blur + rim, this supplies the
-   fill, the offset that clears the 64px bar below it, and the link list. The
-   bar sits at the bottom on mobile (see the 760px block), so the panel rises
-   from just above it: bottom/border-top/rounded-top, the mirror of a
-   top-anchored version. bottom/background/border override Tailwind utilities
-   the drawer primitive ships with; site.css is unlayered so it wins over
-   those without needing !important (same convention as the svg.hidden
-   override above). */
-.nav-drawer{bottom:64px;background:rgba(4,10,16,0.92);border:none;
-  border-top:1px solid rgba(255,255,255,0.12);border-radius:16px 16px 0 0;
-  padding:8px 20px 22px}
+.nav-burger{display:none;flex-shrink:0;width:38px;height:38px;color:#fff}
+.nav-burger .lg-content{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+/* the panel itself: also floating, matching the bar it hangs off. Position is
+   set in the 760px block below, where the bar's own floating offset is
+   known — the panel has to clear the bar plus the gap between them. */
+.nav-drawer{left:16px;right:16px}
+.nav-drawer-shell{width:100%}
+.nav-drawer-inner{padding:16px 20px 20px}
 .nav-drawer-links{display:flex;flex-direction:column}
 .nav-drawer-links a{display:block;padding:15px 4px;font-family:var(--sans);
   font-size:16px;color:rgba(255,255,255,0.82);border-bottom:1px solid rgba(255,255,255,0.08)}
 .nav-drawer-links a:last-child{border-bottom:none}
 .nav-drawer-links a:hover,.nav-drawer-links a:active{color:#fff}
 .nav-drawer-cta{width:100%;margin-top:16px}
+.nav-drawer-cta .lg-content{width:100%}
 
 /* ---- buttons ---- */
 .btn{display:inline-flex;align-items:center;justify-content:center;height:46px;padding:0 24px;border-radius:999px;
@@ -903,10 +925,11 @@ html.js .funnel{opacity:0}
 .company-body .btn-row{margin-top:34px}
 
 /* the inquiry CTA sits bottom-left of the last screen, above the contact bar.
-   +64px at mobile below: the fixed bottom nav covers that band of every
-   mobile screen, so it needs to clear it as well as .glassbar. */
-.inquiry-cta{position:absolute;left:var(--edge);bottom:96px;z-index:3;height:48px;padding:0 28px}
-@media (max-width:760px){ .inquiry-cta{left:22px;bottom:152px} }
+   At mobile below: the floating bottom bar's own footprint (16px gap + 64px
+   bar) plus the gap this keeps above it means the last 96px of every mobile
+   screen is spoken for, and .glassbar needs to clear the same band. */
+.inquiry-cta{position:absolute;left:var(--edge);bottom:96px;z-index:3}
+@media (max-width:760px){ .inquiry-cta{left:22px;bottom:178px} }
 
 /* ---- liquid-glass contact bar, pinned to the bottom of the company bound ---- */
 .glassbar{position:absolute;left:0;right:0;bottom:0;z-index:2;display:flex;align-items:center;
@@ -932,9 +955,8 @@ html.js .funnel{opacity:0}
 .form-back:hover{color:var(--accent-ink)}
 .form-head{margin-top:26px}
 .form-lede{margin-top:16px}
-.form{margin-top:34px;display:flex;flex-direction:column;gap:22px;
-  padding:30px 28px 28px;border-radius:18px;border:1px solid var(--line);
-  background:rgba(11,20,32,0.42)}
+.form{margin-top:34px}
+.form-fields{display:flex;flex-direction:column;gap:22px;padding:30px 28px 28px}
 .field{display:flex;flex-direction:column;gap:9px}
 .field-label{font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:var(--tx-3);
   font-weight:500}
@@ -946,10 +968,10 @@ html.js .funnel{opacity:0}
 .field-area{resize:vertical;min-height:150px}
 .field-input::placeholder{color:var(--tx-3)}
 .field-error{font-size:13px;color:var(--sky)}
-.form-send{align-self:flex-start;height:46px;padding:0 30px}
+.form-send{align-self:flex-start}
 @media (max-width:760px){
   .formpage{padding:96px 22px 56px;align-items:flex-start}
-  .form{padding:22px 18px 20px}
+  .form-fields{padding:22px 18px 20px}
 }
 
 /* ---- reveal — entrance choreography handed to Motion (see motion.js) ---- */
@@ -1047,12 +1069,14 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
   .wrap{padding:0 22px}
   /* thumb reach: the bar moves to the bottom edge, so the burger and the CTA
      — the two things worth a tap — land where a thumb already rests instead
-     of up at the top of a tall scroll. The border moves with it, top-to-
-     bottom, so the hairline stays on the edge that actually meets content. */
-  .nav{padding:0 20px;inset:auto 0 0 0;
-    border-bottom:none;border-top:1px solid var(--line)}
+     of up at the top of a tall scroll. */
+  .nav{top:auto;bottom:16px;left:16px;right:16px}
+  .nav-row{padding:0 20px}
   .nav-links{display:none}
-  .nav-burger{display:inline-flex}
+  .nav-burger{display:block}
+  /* the drawer clears the floating bar (16px gap below it + 64px bar height)
+     plus its own 16px gap above that, and matches the bar's side inset */
+  .nav-drawer{bottom:96px}
   .wbr{display:none}
 
   /* --- 9:16 panels --- */
@@ -1217,13 +1241,14 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
 
   .lay-e .blk-viz .chart-block{padding-bottom:8px}
   .company-head{max-width:14ch;margin-top:44vh;margin-left:auto;text-align:right}
-  /* +64px: the fixed bottom nav now covers that band of the screen, and this
-     bar's own bottom:0 (declared above, before this block) is measured off
-     .cta-sec's padding edge — it tracks the section's own box, not the
-     viewport, so it has to be pushed up here rather than by giving the
-     section extra bottom padding, which .glassbar's absolute position would
-     just track down again. */
-  .glassbar{bottom:64px;padding:14px 20px;gap:10px}
+  /* the floating bottom bar's footprint (16px gap + 64px bar + 10px
+     breathing room) covers that band of the screen, and this bar's own
+     bottom:0 (declared above, before this block) is measured off .cta-sec's
+     padding edge — it tracks the section's own box, not the viewport, so it
+     has to be pushed up here rather than by giving the section extra bottom
+     padding, which .glassbar's absolute position would just track down
+     again. */
+  .glassbar{bottom:90px;padding:14px 20px;gap:10px}
   .contact{font-size:11.5px;gap:10px}
 }
 
