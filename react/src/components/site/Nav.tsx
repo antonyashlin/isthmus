@@ -17,9 +17,10 @@ import {
  *
  * The panel is Base UI's real Drawer (already vendored for shadcn's `drawer`
  * primitive — @base-ui/react was already a dependency, so this is zero new
- * runtime weight), not a hand-built dropdown. `swipeDirection="up"` anchors
- * it under the bar and lets a swipe up dismiss it, the way a drawer usually
- * dismisses toward the edge it came from. `modal={false}` because a modal
+ * runtime weight), not a hand-built dropdown. The bar itself lives at the
+ * bottom of the screen on mobile (thumb reach), so `swipeDirection="down"`
+ * anchors the panel just above it and lets a swipe down dismiss it, toward
+ * the edge it rose from. `modal={false}` because a modal
  * drawer's backdrop is a full-screen div at a higher z-index than `.nav`
  * (z-index:30) — it would sit on top of the burger button and swallow the
  * tap meant to close it. Non-modal still closes on an outside press or a
@@ -65,7 +66,7 @@ export function Nav() {
           Reach out to us
         </a>
 
-        <Drawer modal={false} onOpenChange={setOpen} open={open} swipeDirection="up">
+        <Drawer modal={false} onOpenChange={setOpen} open={open} swipeDirection="down">
           <DrawerTrigger
             aria-expanded={open}
             aria-label={open ? "Close menu" : "Open menu"}

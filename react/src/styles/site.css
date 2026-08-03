@@ -139,12 +139,15 @@ p{margin:0}
   border:1px solid var(--line-2);color:#fff}
 .nav-burger:hover,.nav-burger:focus-visible{background:rgba(255,255,255,0.14)}
 /* the popup itself — .liquid-glass supplies the blur + rim, this supplies the
-   fill, the offset that clears the 64px bar above it, and the link list.
-   top/background/border override Tailwind utilities the drawer primitive
-   ships with; site.css is unlayered so it wins over those without needing
-   !important (same convention as the svg.hidden override above). */
-.nav-drawer{top:64px;background:rgba(4,10,16,0.92);border:none;
-  border-bottom:1px solid rgba(255,255,255,0.12);border-radius:0 0 16px 16px;
+   fill, the offset that clears the 64px bar below it, and the link list. The
+   bar sits at the bottom on mobile (see the 760px block), so the panel rises
+   from just above it: bottom/border-top/rounded-top, the mirror of a
+   top-anchored version. bottom/background/border override Tailwind utilities
+   the drawer primitive ships with; site.css is unlayered so it wins over
+   those without needing !important (same convention as the svg.hidden
+   override above). */
+.nav-drawer{bottom:64px;background:rgba(4,10,16,0.92);border:none;
+  border-top:1px solid rgba(255,255,255,0.12);border-radius:16px 16px 0 0;
   padding:8px 20px 22px}
 .nav-drawer-links{display:flex;flex-direction:column}
 .nav-drawer-links a{display:block;padding:15px 4px;font-family:var(--sans);
@@ -899,9 +902,11 @@ html.js .funnel{opacity:0}
 .company-body{margin-top:clamp(40px,7vh,88px);max-width:56ch}
 .company-body .btn-row{margin-top:34px}
 
-/* the inquiry CTA sits bottom-left of the last screen, above the contact bar */
+/* the inquiry CTA sits bottom-left of the last screen, above the contact bar.
+   +64px at mobile below: the fixed bottom nav covers that band of every
+   mobile screen, so it needs to clear it as well as .glassbar. */
 .inquiry-cta{position:absolute;left:var(--edge);bottom:96px;z-index:3;height:48px;padding:0 28px}
-@media (max-width:760px){ .inquiry-cta{left:22px;bottom:88px} }
+@media (max-width:760px){ .inquiry-cta{left:22px;bottom:152px} }
 
 /* ---- liquid-glass contact bar, pinned to the bottom of the company bound ---- */
 .glassbar{position:absolute;left:0;right:0;bottom:0;z-index:2;display:flex;align-items:center;
@@ -1040,7 +1045,12 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
   .hero,main>section{scroll-snap-align:none}
 
   .wrap{padding:0 22px}
-  .nav{padding:0 20px}
+  /* thumb reach: the bar moves to the bottom edge, so the burger and the CTA
+     — the two things worth a tap — land where a thumb already rests instead
+     of up at the top of a tall scroll. The border moves with it, top-to-
+     bottom, so the hairline stays on the edge that actually meets content. */
+  .nav{padding:0 20px;inset:auto 0 0 0;
+    border-bottom:none;border-top:1px solid var(--line)}
   .nav-links{display:none}
   .nav-burger{display:inline-flex}
   .wbr{display:none}
@@ -1207,7 +1217,13 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
 
   .lay-e .blk-viz .chart-block{padding-bottom:8px}
   .company-head{max-width:14ch;margin-top:44vh;margin-left:auto;text-align:right}
-  .glassbar{padding:14px 20px;gap:10px}
+  /* +64px: the fixed bottom nav now covers that band of the screen, and this
+     bar's own bottom:0 (declared above, before this block) is measured off
+     .cta-sec's padding edge — it tracks the section's own box, not the
+     viewport, so it has to be pushed up here rather than by giving the
+     section extra bottom padding, which .glassbar's absolute position would
+     just track down again. */
+  .glassbar{bottom:64px;padding:14px 20px;gap:10px}
   .contact{font-size:11.5px;gap:10px}
 }
 
