@@ -3,6 +3,17 @@
 @import "./tokens.css";
 @import "shadcn/tailwind.css";
 
+/* Tailwind's content scan skips node_modules by default, so a dependency
+ * shipping its OWN Tailwind classes in its compiled output — rather than
+ * source Tailwind ever sees — gets no CSS generated for them. That silently
+ * broke liquid-glass-react's "over light" darkening: it's built from classes
+ * like bg-black, opacity-20 and mix-blend-overlay that only ever appear
+ * inside its own dist file, never in this project's source, so the glass's
+ * blur/refraction (all inline styles, unaffected) rendered fine while the
+ * tint that's supposed to darken it for a bright background silently did
+ * nothing. */
+@source "../../node_modules/liquid-glass-react/dist/*.js";
+
 @custom-variant dark (&:is(.dark *));
 
 /* Expose the Isthmus tokens to Tailwind v4's theme so utilities like
