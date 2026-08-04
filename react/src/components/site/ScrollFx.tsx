@@ -81,9 +81,9 @@ export function ScrollFx() {
       stops.push(stop);
     });
 
-    // Theme flip: a thin trigger band at ~58% of the viewport → the incoming
-    // screen takes the colour early in the transition, so the background has
-    // settled by the time the snap lands.
+    // Theme flip: a thin trigger band near the bottom of the viewport — the
+    // incoming screen takes the colour as soon as it starts arriving from
+    // below, not once it's most of the way in.
     const themeIO = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
@@ -94,7 +94,7 @@ export function ScrollFx() {
           }
         });
       },
-      { rootMargin: "-56% 0px -42% 0px", threshold: 0 }
+      { rootMargin: "-85% 0px -10% 0px", threshold: 0 }
     );
     document
       .querySelectorAll("header.hero, main > section")

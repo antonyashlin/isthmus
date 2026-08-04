@@ -1104,22 +1104,23 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
 
   /* --- 9:16 panels --- */
   /* 9:16 is the FLOOR now, not a fixed ratio — capping it forced content to be
-     hidden, so screens grow past it whenever the content needs the room. */
-  .hero,.sec{height:auto;min-height:calc(100vw * 16 / 9);overflow:hidden}
-  .sec{display:flex;justify-content:center;padding:0}
+     hidden, so screens grow past it whenever the content needs the room. The
+     hero gets its own, taller floor (20:9) — more room for the field behind
+     the wordmark before the first screen hands off to the next. */
+  .sec{height:auto;min-height:calc(100vw * 16 / 9);overflow:hidden;display:flex;justify-content:center;padding:0}
+  .hero{height:auto;min-height:calc(100vw * 20 / 9);overflow:hidden;padding:84px 22px 40px}
   .sec.slide-sec{padding:0}
-  .hero{padding:84px 22px 40px}
   /* the lockup moves up out of a space-between and sits just under the tagline,
      leaving the lower half of the panel to the meridian field */
-  /* the panel is 177.8vw tall, so a vw-based offset keeps the lockup at a
+  /* the panel is now 222.2vw tall, so a vw-based offset keeps the lockup at a
      consistent fraction of it — this lands it just past the halfway mark */
-  .hero-inner{height:auto;min-height:calc(100vw * 16 / 9 - 124px);
+  .hero-inner{height:auto;min-height:calc(100vw * 20 / 9 - 124px);
     justify-content:flex-start;gap:0}
   .hero-top{max-width:none}
   .hero-tag{font-family:var(--serif);font-style:normal;
     font-size:clamp(15px,4.1vw,19px);line-height:1.5;letter-spacing:0;
     text-align:left;color:var(--tx-2)}
-  .hero-bottom{margin-top:clamp(250px,74vw,520px)}
+  .hero-bottom{margin-top:clamp(312px,92vw,650px)}
   .wordmark .w-isth{font-size:clamp(44px,13vw,62px)}
   .wordmark .w-mer{font-size:clamp(40px,11.6vw,56px)}
 
