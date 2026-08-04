@@ -28,6 +28,24 @@ import type { CSSProperties, ReactNode } from "react";
  * translate(-50%,-50%) shifts the visible box a further half-width/
  * half-height off from where its siblings land. GLASS_FILL sets them
  * explicitly so every instance matches.
+ *
+ * A second one, found after the first shipped: the library's own "over
+ * light" tint — the thing meant to darken the glass over a bright
+ * background — is two layers, one plain and one `mix-blend-mode:overlay`,
+ * both filled with pure black, sitting inside the SAME stacking context as
+ * the backdrop-filter blur (`.nav` is `position:fixed` + `z-index`, which
+ * establishes one). Overlay blending black against whatever that context
+ * composites to does not reliably darken — over a dark screen it read as
+ * BRIGHTER, the opposite of the intent. Rather than fight backdrop-filter
+ * and mix-blend-mode interaction (inconsistent across browsers, not
+ * something to hand-tune blind), those two layers are switched off outright
+ * in site.css (`.lg-shell>[class*="bg-black"]`, no class of mine needed —
+ * they're the only children with that string in their name) and replaced
+ * with `.lg-scrim`: a single flat rgba fill, plain alpha, no blend mode,
+ * invisible until `body.on-light`. The library's OTHER overLight effects —
+ * a heavier box-shadow, no text-shadow, halved displacement — are all plain
+ * inline styles with no blend-mode involved, so `overLight` is still passed
+ * through for those.
  */
 
 const GLASS = {
@@ -108,6 +126,7 @@ export function GlassLabel({
       >
         {null}
       </LiquidGlass>
+      <span aria-hidden="true" className="lg-scrim" style={{ borderRadius: radius }} />
       <span className="lg-content">{children}</span>
     </>
   );
@@ -135,6 +154,7 @@ export function GlassPanel({
       <LiquidGlass className="lg-decor" cornerRadius={radius} overLight={overLight} style={GLASS_FILL} {...GLASS}>
         {null}
       </LiquidGlass>
+      <span aria-hidden="true" className="lg-scrim" style={{ borderRadius: radius }} />
       <div className="lg-content">{children}</div>
     </div>
   );

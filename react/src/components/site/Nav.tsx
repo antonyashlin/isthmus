@@ -53,6 +53,7 @@ export function Nav() {
       >
         {null}
       </LiquidGlass>
+      <span aria-hidden="true" className="lg-scrim" style={{ borderRadius: GLASS_RADIUS }} />
       <div className="nav-row lg-content">
         <a className="brand" href="#top" aria-label="Isthmus Meridian home">
           <svg viewBox="0 0 48 48" width="26" height="26" aria-hidden="true">

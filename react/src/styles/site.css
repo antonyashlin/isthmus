@@ -123,6 +123,20 @@ p{margin:0}
 .lg-shell>.lg-decor{pointer-events:none}
 .lg-shell>.lg-decor .glass{width:100%!important;height:100%!important;
   padding:0!important;display:block!important}
+/* the library's own "over light" tint — off outright, not tuned. It is two
+   black fills, one plain and one mix-blend-mode:overlay, composited inside
+   the SAME stacking context as the backdrop-filter blur (.nav is
+   position:fixed + z-index, which is one) — overlay-blending black there
+   does not reliably darken; over a dark screen it read as BRIGHTER. Neither
+   layer carries a class of mine — [class*="bg-black"] is the only string
+   they share, and the only other thing near it is .lg-content's own real
+   children, which never start with "bg-black". .lg-scrim (below) replaces
+   the effect with a flat rgba fill: plain alpha, no blend mode, so there is
+   nothing left to interact with the blur unpredictably. */
+.lg-shell>[class*="bg-black"]{display:none!important}
+.lg-shell>.lg-scrim{position:absolute;inset:0;z-index:0;pointer-events:none;
+  opacity:0;transition:opacity .2s var(--ease)}
+body.on-light .lg-shell>.lg-scrim{opacity:1;background:rgba(0,0,0,0.18)}
 .lg-content{position:relative;z-index:1}
 @media (prefers-reduced-transparency: reduce){
   .lg-decor{display:none}
