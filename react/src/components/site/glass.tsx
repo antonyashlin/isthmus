@@ -1,6 +1,7 @@
 "use client";
 
 import LiquidGlass from "liquid-glass-react";
+import { useEffect, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 
 /**
@@ -16,8 +17,8 @@ import type { CSSProperties, ReactNode } from "react";
  * Every glass surface on this site is still built from it (see `.lg-shell`
  * in site.css for why forcing it into bar/panel roles works: two layers, a
  * decorative fill that takes no part in sizing, and the real content in
- * normal flow that does). This file holds the two "house" tunings and the
- * two shell shapes everything else composes from — a button label, and an
+ * normal flow that does). This file holds the one house tuning and the two
+ * shell shapes everything else composes from — a button label, and an
  * auto-height panel (nav drawer, the inquiry form).
  *
  * One correctness note that cost real debugging time: the library's OWN
@@ -29,23 +30,21 @@ import type { CSSProperties, ReactNode } from "react";
  * explicitly so every instance matches.
  */
 
-const GLASS_BAR = {
-  blurAmount: 0.06,
-  saturation: 150,
-  aberrationIntensity: 0.6,
-  displacementScale: 50,
-  elasticity: 0, // persistent chrome shouldn't wobble toward the cursor
+const GLASS = {
+  displacementScale: 162,
+  blurAmount: 0.6,
+  saturation: 160,
+  aberrationIntensity: 2,
+  elasticity: 0.75,
   mode: "standard" as const,
 };
 
-const GLASS_BUTTON = {
-  blurAmount: 0.08,
-  saturation: 150,
-  aberrationIntensity: 0.8,
-  displacementScale: 60,
-  elasticity: 0.2, // a little of the library's own "liquid" feel, for something self-contained and tappable
-  mode: "standard" as const,
-};
+/* CSS clamps border-radius to at most half of an element's own height/width
+   per axis, so 43px still reads as a full stadium on anything shorter than
+   ~86px (every button, and the 64px bar) — it only becomes a visibly
+   separate, larger corner on the taller auto-height panels (the drawer, the
+   form). One radius, not a per-shape set. */
+const RADIUS = 43;
 
 const GLASS_FILL: CSSProperties = {
   position: "absolute",
@@ -54,6 +53,27 @@ const GLASS_FILL: CSSProperties = {
   width: "100%",
   height: "100%",
 };
+
+/**
+ * Whether the nearest ancestor a glass surface floats over is currently a
+ * light ("paper") screen — `ScrollFx` toggles `body.on-light` as the user
+ * scrolls, driving the globe field's colour flip the same way. `overLight`
+ * is a React prop the library reads at render time, not something CSS can
+ * hand it, so this mirrors that class onto state via a MutationObserver
+ * rather than re-deriving scroll position independently.
+ */
+export function useOnLight() {
+  const [onLight, setOnLight] = useState(false);
+  useEffect(() => {
+    const body = document.body;
+    const sync = () => setOnLight(body.classList.contains("on-light"));
+    sync();
+    const mo = new MutationObserver(sync);
+    mo.observe(body, { attributeFilter: ["class"] });
+    return () => mo.disconnect();
+  }, []);
+  return onLight;
+}
 
 /**
  * A button-shaped glass label: the decorative layer plus its real content,
@@ -69,14 +89,23 @@ const GLASS_FILL: CSSProperties = {
  */
 export function GlassLabel({
   children,
-  radius = 999,
+  overLight = false,
+  radius = RADIUS,
 }: {
   children: ReactNode;
+  overLight?: boolean;
   radius?: number;
 }) {
   return (
     <>
-      <LiquidGlass className="lg-decor" cornerRadius={radius} onClick={() => {}} style={GLASS_FILL} {...GLASS_BUTTON}>
+      <LiquidGlass
+        className="lg-decor"
+        cornerRadius={radius}
+        onClick={() => {}}
+        overLight={overLight}
+        style={GLASS_FILL}
+        {...GLASS}
+      >
         {null}
       </LiquidGlass>
       <span className="lg-content">{children}</span>
@@ -93,15 +122,17 @@ export function GlassLabel({
 export function GlassPanel({
   children,
   className,
-  radius = 26,
+  overLight = false,
+  radius = RADIUS,
 }: {
   children: ReactNode;
   className?: string;
+  overLight?: boolean;
   radius?: number;
 }) {
   return (
     <div className={className ? `lg-shell ${className}` : "lg-shell"}>
-      <LiquidGlass className="lg-decor" cornerRadius={radius} style={GLASS_FILL} {...GLASS_BAR}>
+      <LiquidGlass className="lg-decor" cornerRadius={radius} overLight={overLight} style={GLASS_FILL} {...GLASS}>
         {null}
       </LiquidGlass>
       <div className="lg-content">{children}</div>
@@ -109,4 +140,4 @@ export function GlassPanel({
   );
 }
 
-export { GLASS_BAR, GLASS_BUTTON, GLASS_FILL };
+export { GLASS, GLASS_FILL, RADIUS as GLASS_RADIUS };

@@ -4,7 +4,7 @@ import LiquidGlass from "liquid-glass-react";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 
-import { GLASS_BAR, GLASS_FILL, GlassLabel, GlassPanel } from "@/components/site/glass";
+import { GLASS, GLASS_FILL, GLASS_RADIUS, GlassLabel, GlassPanel, useOnLight } from "@/components/site/glass";
 import {
   Drawer,
   DrawerClose,
@@ -40,10 +40,17 @@ const LINKS = [
 
 export function Nav() {
   const [open, setOpen] = useState(false);
+  const onLight = useOnLight();
 
   return (
     <nav className="nav lg-shell">
-      <LiquidGlass className="lg-decor" cornerRadius={32} style={GLASS_FILL} {...GLASS_BAR}>
+      <LiquidGlass
+        className="lg-decor"
+        cornerRadius={GLASS_RADIUS}
+        overLight={onLight}
+        style={GLASS_FILL}
+        {...GLASS}
+      >
         {null}
       </LiquidGlass>
       <div className="nav-row lg-content">
@@ -68,7 +75,7 @@ export function Nav() {
         </div>
         <div className="nav-cta">
           <a className="glass-btn glass-btn-sm lg-shell" href="#company">
-            <GlassLabel>Reach out to us</GlassLabel>
+            <GlassLabel overLight={onLight}>Reach out to us</GlassLabel>
           </a>
 
           <Drawer modal={false} onOpenChange={setOpen} open={open} swipeDirection="down">
@@ -77,7 +84,7 @@ export function Nav() {
               aria-label={open ? "Close menu" : "Open menu"}
               className="nav-burger lg-shell"
             >
-              <GlassLabel>
+              <GlassLabel overLight={onLight}>
                 {open ? (
                   <X aria-hidden="true" size={18} strokeWidth={1.6} />
                 ) : (
@@ -92,7 +99,7 @@ export function Nav() {
                 popup's own slide-in positioning. So the panel is a plain div
                 one level inside it. */}
             <DrawerContent className="nav-drawer">
-              <GlassPanel className="nav-drawer-shell" radius={26}>
+              <GlassPanel className="nav-drawer-shell" overLight={onLight}>
                 <div className="nav-drawer-inner">
                   <div className="nav-drawer-links">
                     {LINKS.map((l) => (
@@ -106,7 +113,7 @@ export function Nav() {
                     nativeButton={false}
                     render={<a href="#company" />}
                   >
-                    <GlassLabel>Reach out to us</GlassLabel>
+                    <GlassLabel overLight={onLight}>Reach out to us</GlassLabel>
                   </DrawerClose>
                 </div>
               </GlassPanel>

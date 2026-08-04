@@ -3,7 +3,7 @@
 import LiquidGlass from "liquid-glass-react";
 import { useState } from "react";
 
-import { GLASS_BAR, GLASS_FILL, GlassLabel } from "@/components/site/glass";
+import { GLASS, GLASS_FILL, GLASS_RADIUS, GlassLabel } from "@/components/site/glass";
 
 /**
  * Inquiry form.
@@ -65,7 +65,7 @@ export default function Inquiry() {
             <form> for onSubmit, so the two-layer pattern is built by hand
             here instead, same shape as GlassPanel itself. */}
         <form className="form lg-shell" noValidate onSubmit={submit}>
-          <LiquidGlass className="lg-decor" cornerRadius={18} style={GLASS_FILL} {...GLASS_BAR}>
+          <LiquidGlass className="lg-decor" cornerRadius={GLASS_RADIUS} style={GLASS_FILL} {...GLASS}>
             {null}
           </LiquidGlass>
           <div className="form-fields lg-content">

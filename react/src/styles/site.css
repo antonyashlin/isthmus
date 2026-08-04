@@ -132,8 +132,16 @@ p{margin:0}
 /* ---- nav ----
    Floating: detached from the viewport edge with a visible margin, not the
    edge-to-edge strip it was. cornerRadius on the glass itself (passed as a
-   prop, not set here) is half the bar's height — a true stadium, the shape
-   the whole "liquid glass" language is built around. */
+   prop, not set here — GLASS_RADIUS in glass.tsx, 43px) clamps to a full
+   stadium on anything this bar's height or shorter, the shape the whole
+   "liquid glass" language is built around.
+   Text stays hardcoded white/black rather than the --heading/--tx tokens on
+   purpose: the bar floats over both dark and light screens as you scroll,
+   and neither theme's own ink is legible against the OTHER theme's content
+   showing through the glass. body.on-light (ScrollFx's own theme-flip class)
+   switches it explicitly instead, to --deep — the one token in :root that
+   already means "dark ink for a light ground" (the travelling-light sparks
+   use it the same way). */
 .nav{position:fixed;top:20px;left:var(--edge);right:var(--edge);z-index:30;height:64px}
 .nav-row{width:100%;height:100%;display:flex;align-items:center;justify-content:space-between;
   gap:24px;padding:0 32px}
@@ -141,9 +149,13 @@ p{margin:0}
 .brand .wm{font-size:12px;letter-spacing:0.22em}
 .brand .wm b{font-weight:700;color:#fff}
 .brand .wm i{font-style:normal;font-weight:300;color:rgba(255,255,255,0.66)}
+body.on-light .brand .wm b{color:var(--deep)}
+body.on-light .brand .wm i{color:color-mix(in srgb,var(--deep) 66%,transparent)}
 .nav-links{display:flex;align-items:center;gap:30px}
 .nav-links a{font-family:var(--sans);font-weight:500;font-size:12px;letter-spacing:0.02em;color:rgba(255,255,255,0.6)}
 .nav-links a:hover{color:#fff}
+body.on-light .nav-links a{color:color-mix(in srgb,var(--deep) 62%,transparent)}
+body.on-light .nav-links a:hover{color:var(--deep)}
 .nav-cta{display:flex;align-items:center;gap:16px}
 
 /* every pill button on the site (nav CTA, drawer CTA, inquiry CTA, form
@@ -155,6 +167,11 @@ p{margin:0}
   font-family:var(--sans);font-weight:500;letter-spacing:0.005em;
   white-space:nowrap;color:#fff;cursor:pointer}
 .glass-btn .lg-content{display:flex;align-items:center;height:100%}
+/* scoped to .nav-row, not .glass-btn generally: the drawer's own CTA is the
+   SAME class, but Base UI portals DrawerContent out to document.body, so it
+   is never a DOM descendant of .nav-row — this can't accidentally reach it.
+   It needs to be excluded on purpose (see the note above .nav-drawer-links). */
+body.on-light .nav-row .glass-btn{color:var(--deep)}
 .glass-btn-sm{height:34px;font-size:12.5px}
 .glass-btn-sm .lg-content{padding:0 20px}
 .glass-btn-lg{height:48px;font-size:14px}
@@ -164,9 +181,15 @@ p{margin:0}
    turns .nav-links off and gives this the job instead) ---- */
 .nav-burger{display:none;flex-shrink:0;width:38px;height:38px;color:#fff}
 .nav-burger .lg-content{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+body.on-light .nav-burger{color:var(--deep)}
 /* the panel itself: also floating, matching the bar it hangs off. Position is
    set in the 760px block below, where the bar's own floating offset is
-   known — the panel has to clear the bar plus the gap between them. */
+   known — the panel has to clear the bar plus the gap between them.
+   Its own text stays white always, unlike the thin bar above — the bar is
+   translucent enough that the page's true colour dominates it, but this
+   panel is a much larger, more opaque glass card that reads dark regardless
+   of what is behind it (overLight darkens it further, if anything), so there
+   is no light surface here for dark text to ever need to answer to. */
 .nav-drawer{left:16px;right:16px}
 .nav-drawer-shell{width:100%}
 .nav-drawer-inner{padding:16px 20px 20px}
