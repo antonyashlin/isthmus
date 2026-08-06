@@ -49,14 +49,18 @@ export function ExpectationPanels() {
       });
     }
 
+    // scaleX, not width: this replays on every hover, and animating width
+    // forces layout + paint on each of ~54 frames. The bar is laid out at
+    // full width in CSS and collapses toward its left anchor (transform-origin
+    // 0 50%), which is visually identical and rides the compositor.
     if (which === 1) {
       const bar = el.querySelector(".xp-bar-fill");
       if (!bar) return;
-      utils.set(bar, { width: "100%" });
+      utils.set(bar, { scaleX: 1 });
       if (!reduce) {
-        animate(bar, { width: "14%", duration: 900, ease: "inOut(3)" });
+        animate(bar, { scaleX: 0.14, duration: 900, ease: "inOut(3)" });
       } else {
-        utils.set(bar, { width: "14%" });
+        utils.set(bar, { scaleX: 0.14 });
       }
     }
 

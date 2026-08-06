@@ -149,7 +149,11 @@ export function ApproachRoutes() {
     }
 
     utils.set(bars, { scaleY: 0 });
-    utils.set(nodes, { scale: 0, opacity: 1 });
+    /* not scale:0 — a stroked r=7 circle at zero is a point, and it pops. 0.9
+       with an opacity fade is the arrival. The bars and the funnel keep their
+       zero: each grows from a real anchored edge (baseline / top), which is the
+       diagram's meaning, not an entrance trick. */
+    utils.set(nodes, { scale: 0.9, opacity: 0 });
     if (funnel) utils.set(funnel, { scaleY: 0 });
     utils.set(drops, { opacity: 0 });
 
@@ -197,7 +201,7 @@ export function ApproachRoutes() {
         el.classList.add("ready");
         const tl = createTimeline({ defaults: { ease: EASE } });
         tl.add(bars, { scaleY: 1, duration: 620, delay: stagger(90) }, 0)
-          .add(nodes, { scale: 1, duration: 520, delay: stagger(80) }, 120)
+          .add(nodes, { scale: 1, opacity: 1, duration: 520, delay: stagger(80) }, 120)
           .add(funnel ?? [], { scaleY: 1, duration: 600 }, 200);
         tl.then(startIdle);
       },

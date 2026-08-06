@@ -76,8 +76,19 @@ export function TrustBadges() {
         width={18}
       />
       <div className="badges">
+        {/* The lift is a Motion gesture, not a CSS :hover rule: BlurFade renders
+            this element as a motion.div and writes `transform` inline, which
+            beats any stylesheet transform — the CSS lift never fired at all.
+            The border-colour half still lives in CSS. whileHover also ignores
+            touch pointers, so a tap no longer leaves a card stuck lifted. */}
         {BADGES.map(({ key, label, note, icon: Icon, fig }, i) => (
-          <BlurFade className="badge" delay={i * 0.08} inView key={key}>
+          <BlurFade
+            className="badge"
+            delay={i * 0.08}
+            inView
+            key={key}
+            whileHover={{ y: -3, transition: { duration: 0.2, ease: [0.22, 1, 0.36, 1] } }}
+          >
             <div className="badge-plate">{fig}</div>
             <div className="badge-label">
               <span className="badge-icon">

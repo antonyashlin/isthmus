@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useState } from "react";
 
 import { MeridianMark } from "@/decks/isthmus/Meridian";
@@ -37,6 +38,9 @@ const QUALITIES: Quality[] = [
 
 const SUMMARY = "Point at one to see what it replaces.";
 
+/* the site's one curve (--ease, site.css) in motion/react's tuple form */
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
 /* OrbitingCircles takes radius in px, so it cannot come from a clamp() — the
    breakpoint is read here instead and the drawn ring follows it in CSS. */
 function useRadius() {
@@ -59,6 +63,7 @@ function useRadius() {
 export function BrainOrbit() {
   const [held, setHeld] = useState<Quality | null>(null);
   const radius = useRadius();
+  const reduced = useReducedMotion();
 
   const chip = (q: Quality) => (
     // biome-ignore lint/a11y/noNoninteractiveTabindex: focus stop so keyboard users get the same reading as hover
@@ -67,8 +72,15 @@ export function BrainOrbit() {
       key={q.ours}
       onBlur={() => setHeld((c) => (c === q ? null : c))}
       onFocus={() => setHeld(q)}
-      onMouseEnter={() => setHeld(q)}
-      onMouseLeave={() => setHeld((c) => (c === q ? null : c))}
+      /* pointerType, not a media query: on a hybrid laptop the query would say
+         "you have a fine pointer" while the user is actually using the screen.
+         A touch tap here would pause the orbit for good — nothing clears `held`. */
+      onPointerEnter={(e) => {
+        if (e.pointerType !== "touch") setHeld(q);
+      }}
+      onPointerLeave={(e) => {
+        if (e.pointerType !== "touch") setHeld((c) => (c === q ? null : c));
+      }}
       tabIndex={0}
     >
       {q.ours}
@@ -89,17 +101,30 @@ export function BrainOrbit() {
         </OrbitingCircles>
       </div>
 
-      <p className="bo-detail">
-        {held ? (
-          <>
-            <span className="bo-ours">{held.ours}</span>
-            <span className="bo-sep">not</span>
-            <span className="bo-theirs">{held.theirs}</span>
-          </>
-        ) : (
-          SUMMARY
-        )}
-      </p>
+      {/* the outer box owns the reserved height, so the line can crossfade
+          without the orbit above it or the screen below it ever moving */}
+      <div className="bo-detail">
+        <AnimatePresence initial={false} mode="wait">
+          <motion.p
+            animate={{ opacity: 1, y: 0 }}
+            className="bo-detail-line"
+            exit={reduced ? { opacity: 0 } : { opacity: 0, y: -3 }}
+            initial={reduced ? { opacity: 0 } : { opacity: 0, y: 3 }}
+            key={held?.ours ?? "summary"}
+            transition={{ duration: 0.14, ease: EASE }}
+          >
+            {held ? (
+              <>
+                <span className="bo-ours">{held.ours}</span>
+                <span className="bo-sep">not</span>
+                <span className="bo-theirs">{held.theirs}</span>
+              </>
+            ) : (
+              SUMMARY
+            )}
+          </motion.p>
+        </AnimatePresence>
+      </div>
     </div>
   );
 }

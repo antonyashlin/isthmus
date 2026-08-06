@@ -1,6 +1,7 @@
 "use client";
 
 import { animate, createDrawable, cubicBezier, stagger } from "animejs";
+import { motion, useReducedMotion } from "motion/react";
 import {
   Boxes,
   BrainCircuit,
@@ -16,7 +17,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { MeridianMark } from "@/decks/isthmus/Meridian";
 import { BlurFade } from "@/components/ui/blur-fade";
 import { BorderBeam } from "@/components/ui/border-beam";
-import { TextAnimate } from "@/components/ui/text-animate";
 
 /**
  * The operating tree — root → three branches → seven functions.
@@ -42,6 +42,8 @@ export type TreeBranch = { key: string; name: string; leaves: TreeLeaf[] };
    function is imported and passed directly — the string was silently falling
    back to the default. */
 const EASE = cubicBezier(0.22, 1, 0.36, 1);
+/* the same curve as EASE above, in the tuple form motion/react takes */
+const EASE_MOTION: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 /* One lucide glyph per function, so hovering a leaf swaps the illustration in
    the detail card as well as the description. */
@@ -172,6 +174,7 @@ export function ServicesTree({
 
   const leaf = active ? layout.leaves.find((l) => l.key === active) : undefined;
   const Icon = active ? LEAF_ICONS[active] : undefined;
+  const reduced = useReducedMotion();
 
   /* memoised so `active` changing re-renders the detail card only — the plot's
      element tree is reused wholesale and React reconciles nothing inside it */
@@ -233,8 +236,15 @@ export function ServicesTree({
     <div className="tree" ref={scope}>
       {plot}
 
-      {/* the illustration: a glyph that blurs in and copy that types itself
-          back in, both keyed on the hovered leaf so every swap replays */}
+      {/* the illustration: a glyph that blurs in and copy that crossfades,
+          both keyed on the hovered leaf so every swap replays.
+
+          The copy is ONE element, not one span per word. Seven leaves stacked
+          vertically means a single pointer sweep crosses all of them, and a
+          per-word entrance made that seven word-by-word sequences, each
+          restarting from zero because the changing key remounts the component.
+          AnimatePresence keeps the replay but pays for one animation per swap
+          instead of forty. */}
       <div className={`tree-detail${active ? " lit" : ""}`}>
         <BlurFade className="td-glyph" direction="up" key={`g-${active ?? "0"}`}>
           {Icon ? (
@@ -243,17 +253,20 @@ export function ServicesTree({
             <MeridianMark title="" />
           )}
         </BlurFade>
-        <TextAnimate
-          animation="blurInUp"
-          as="p"
-          by="word"
+        {/* A plain key-remount, exactly as the old TextAnimate did — no
+            AnimatePresence. There is nothing to animate OUT of here (the copy
+            is replaced, not dismissed), and mode="wait" left the first swap
+            after mount stuck at its initial state: the exit ran, the incoming
+            paragraph mounted at opacity 0 and never animated in. */}
+        <motion.p
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           className="td-copy"
-          duration={0.4}
+          initial={reduced ? { opacity: 0 } : { opacity: 0, y: 6, filter: "blur(3px)" }}
           key={`t-${active ?? "0"}`}
-          startOnView={false}
+          transition={{ duration: 0.16, ease: EASE_MOTION }}
         >
           {leaf?.desc ?? summary}
-        </TextAnimate>
+        </motion.p>
         {active ? (
           <BorderBeam
             borderWidth={1.5}

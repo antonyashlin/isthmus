@@ -28,24 +28,32 @@ export function ScrollFx() {
       );
     };
 
+    // The five journey dots and the four sign-off dots. There is no longer a
+    // `.journey-track` / `.flow-track` element to draw — both rows are strung
+    // together by AnimatedBeams now (see the note at site.css:576) — so this
+    // only handles the dots themselves. They enter from 0.9 with an opacity
+    // fade rather than scale(0): a 15px ring with a glow that pops out of
+    // nothing reads as a glitch, and bounce stays subtle to match the rest.
     const tracks = (section: Element) => {
-      const track = section.querySelector(".journey-track, .flow-track");
-      const dots = section.querySelectorAll(".jdot, .fdot");
+      const dots = section.querySelectorAll(".jdot, .sodot");
+      if (!dots.length) return;
       if (REDUCE) {
-        if (track) (track as HTMLElement).style.transform = "scaleX(1)";
-        dots.forEach((d) => ((d as HTMLElement).style.transform = "none"));
+        dots.forEach((d) => {
+          (d as HTMLElement).style.transform = "none";
+          (d as HTMLElement).style.opacity = "1";
+        });
         return;
       }
-      if (track) {
-        (track as HTMLElement).style.transformOrigin = "left center";
-        animate(track, { scaleX: [0, 1] }, { duration: 0.85, ease: EASE, delay: 0.2 });
-      }
-      if (dots.length)
-        animate(
-          dots,
-          { scale: [0, 1] },
-          { type: "spring", bounce: 0.5, visualDuration: 0.5, delay: (i: number) => 0.4 + i * 0.11 }
-        );
+      animate(
+        dots,
+        { scale: [0.9, 1], opacity: [0, 1] },
+        {
+          type: "spring",
+          duration: 0.5,
+          bounce: 0.2,
+          delay: (i: number) => 0.4 + i * 0.11,
+        }
+      );
     };
 
     const counts = (section: Element) => {

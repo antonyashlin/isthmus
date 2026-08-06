@@ -14,7 +14,21 @@
      labels, not data, so they are sans 500 uppercase tracked instead. */
   --sans:var(--font-archivo),"Helvetica Neue",Arial,sans-serif;
   --serif:var(--font-serif),Georgia,"Times New Roman",serif;
-  --max:1200px; --ease:cubic-bezier(0.22,1,0.36,1);
+  --max:1200px;
+  /* ---- motion ----
+     --ease is the site's ease-out and the default for everything: entrances,
+     hovers, reveals. --ease-in-out is for something MORPHING on screen rather
+     than arriving (the offer card's 180 degree turn is the only case so far).
+     Durations: a four-step scale. Anything above --dur-4 is explanatory motion
+     (a chart drawing itself, the globe breathing, the card turning) and stays a
+     literal at its call site, because those are one-offs tuned to their own
+     content rather than steps on a scale. */
+  --ease:cubic-bezier(0.22,1,0.36,1);
+  --ease-in-out:cubic-bezier(0.77,0,0.175,1);
+  --dur-1:160ms;   /* press feedback, instant acknowledgement */
+  --dur-2:200ms;   /* colour + opacity on a hover-frequency element */
+  --dur-3:300ms;   /* card / panel state change */
+  --dur-4:450ms;   /* a panel or drawer arriving */
   /* vertical rhythm — one deliberate two-tier scale for caption->evidence gaps.
      --stack: a component follows its caption. --stack-lg: a distinct beat (diagram groups). */
   --stack:clamp(22px,4.6vh,56px); --stack-lg:clamp(30px,6vh,80px);
@@ -69,7 +83,7 @@ img,svg{display:block;max-width:100%}
    unlayered, so the rule above would otherwise beat Tailwind's `hidden` and
    leave an empty 150px block inside every card. */
 svg.hidden{display:none}
-a{color:var(--accent-ink);text-decoration:none;transition:color .2s var(--ease)}
+a{color:var(--accent-ink);text-decoration:none;transition:color var(--dur-2) var(--ease)}
 :focus-visible{outline:2px solid var(--sky);outline-offset:3px;border-radius:2px}
 .btn:focus-visible{outline-offset:2px}
 .wrap{position:relative;z-index:1;width:100%;max-width:var(--max);margin:0 auto;padding:0 48px}
@@ -98,44 +112,28 @@ p{margin:0}
 .sec-field .sf{stroke:var(--mer);fill:none;stroke-width:1}
 .sec-field .sf-line{stroke:var(--mer);fill:none;stroke-width:1.1}
 
-/* ---- liquid-glass (real: liquid-glass-react, not a hand-rolled backdrop-filter
-   rig) ----
-   The library composites its own blur/refraction/shadow/border as a stack of
-   absolutely-positioned siblings sized off the ONE element it can measure
-   (GlassContainer's own rendered box), and it centers that box via
-   top:50%/left:50% + translate(-50%,-50%) — which only resolves to "fill the
-   parent" when the parent is exactly the same size, and only computes
-   anything sane when width/height are given as real values. It has no mode
-   for "stretch to a fluid, content-driven size" — buttons and cards are what
-   it's built for.
-   So: every glass surface here is TWO layers inside a position:relative
-   shell. `.lg-decor` is the library itself, given no children, absolutely
-   filling the shell — purely a backdrop, contributing nothing to the shell's
-   own size. `.lg-content` is the real content in normal flow — text, links,
-   form fields — which is what actually SIZES the shell, whether that's a
-   fixed 64px bar or a button that's exactly as wide as its label. Because the
-   decor layer never participates in that sizing, there's no feedback loop
-   between "how big is the glass" and "how big is the thing it's filling."
-   `.glass` below is the library's own internal class name, not part of its
-   public API — reaching into it is the brittle half of "force it everywhere,"
-   accepted with eyes open; a library update could rename it. */
+/* ---- liquid-glass ----
+   This used to run through liquid-glass-react (github.com/rdev/liquid-glass-react)
+   for its refraction warp and mouse-elastic stretch. Dropped: verified live,
+   via Chrome DevTools Protocol against a real GPU-accelerated window, that
+   Chromium never composites backdrop-filter on anything the library renders
+   — a plain 34px button fails exactly like the 64px bar, computed style
+   reports the blur correctly the whole time, and nothing (removing the
+   library's own SVG filter, stripping every sibling, mounting fresh
+   client-side with no SSR involved) brings it back. A trivial React-rendered
+   `<div>` with nothing but backdrop-filter, sitting right next to the
+   broken one, blurs fine — so the plain mechanism below is what actually
+   ships, at the cost of the library's cosmetic warp/stretch, which were
+   riding on top of a blur that, empirically, was never rendering anyway.
+   `.lg-decor` is a decorative backdrop-filter layer, absolutely filling its
+   `.lg-shell` parent and contributing nothing to that parent's own size;
+   `.lg-content` is the real content in normal flow — text, links, form
+   fields — which is what actually SIZES the shell, whether that's a fixed
+   64px bar or a button exactly as wide as its label. */
 .lg-shell{position:relative}
-.lg-shell>.lg-decor{pointer-events:none}
-.lg-shell>.lg-decor .glass{width:100%!important;height:100%!important;
-  padding:0!important;display:block!important}
-/* the library's own "over light" tint — off outright, not tuned. It is two
-   black fills, one plain and one mix-blend-mode:overlay, composited inside
-   the SAME stacking context as the backdrop-filter blur (.nav is
-   position:fixed + z-index, which is one) — overlay-blending black there
-   does not reliably darken; over a dark screen it read as BRIGHTER. Neither
-   layer carries a class of mine — [class*="bg-black"] is the only string
-   they share, and the only other thing near it is .lg-content's own real
-   children, which never start with "bg-black". .lg-scrim (below) replaces
-   the effect with a flat rgba fill: plain alpha, no blend mode, so there is
-   nothing left to interact with the blur unpredictably. */
-.lg-shell>[class*="bg-black"]{display:none!important}
+.lg-shell>.lg-decor{position:absolute;inset:0;pointer-events:none}
 .lg-shell>.lg-scrim{position:absolute;inset:0;z-index:0;pointer-events:none;
-  opacity:0;transition:opacity .2s var(--ease)}
+  opacity:0;transition:opacity var(--dur-2) var(--ease)}
 body.on-light .lg-shell>.lg-scrim{opacity:1;background:rgba(0,0,0,0.18)}
 .lg-content{position:relative;z-index:1}
 @media (prefers-reduced-transparency: reduce){
@@ -179,7 +177,8 @@ body.on-light .nav-links a:hover{color:var(--deep)}
    from ITS edge too. Two sizes cover every instance so far. */
 .glass-btn{display:inline-flex;align-items:center;justify-content:center;
   font-family:var(--sans);font-weight:500;letter-spacing:0.005em;
-  white-space:nowrap;color:#fff;cursor:pointer}
+  white-space:nowrap;color:#fff;cursor:pointer;
+  transition:transform var(--dur-1) var(--ease)}
 .glass-btn .lg-content{display:flex;align-items:center;height:100%}
 /* scoped to .nav-row, not .glass-btn generally: the drawer's own CTA is the
    SAME class, but Base UI portals DrawerContent out to document.body, so it
@@ -190,12 +189,44 @@ body.on-light .nav-row .glass-btn{color:var(--deep)}
 .glass-btn-sm .lg-content{padding:0 20px}
 .glass-btn-lg{height:48px;font-size:14px}
 .glass-btn-lg .lg-content{padding:0 28px}
+/* press feedback: scale(0.97) over 160ms — the SHELL scales, so the glass
+   layer, the scrim and the label all go together and no unblurred hairline
+   appears at the pill's edge. These four buttons (nav CTA, drawer CTA, inquiry
+   CTA, form send) are every button on the site; the .btn block below is left
+   over from the static build and nothing uses it. */
+.glass-btn:active{transform:scale(0.97)}
+@media (prefers-reduced-motion:reduce){
+  .glass-btn{transition:none}
+  .glass-btn:active{transform:none}
+}
 
 /* ---- mobile nav: burger + drawer (hidden until the 760px breakpoint below
    turns .nav-links off and gives this the job instead) ---- */
 .nav-burger{display:none;flex-shrink:0;width:38px;height:38px;color:#fff}
 .nav-burger .lg-content{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
 body.on-light .nav-burger{color:var(--deep)}
+/* The theme flip: `.lg-scrim` already crossfades over --dur-2 (see the
+   .lg-shell block above), but the bar's ink used to cut on one frame, so the
+   two halves of one change happened at different speeds — a scrim fading in
+   underneath five hard colour cuts. Everything body.on-light repaints now
+   shares that timing. `color` only: the glass blur and its shadow stay a cut
+   on purpose, because transitioning a backdrop-filter over the scrolling globe
+   field means re-blurring the whole bar every frame for 200ms — the same cost
+   already measured and rejected for .viz-plate. */
+.brand .wm b,.brand .wm i,
+.nav-links a,
+.nav-burger{transition:color var(--dur-2) var(--ease)}
+/* the nav CTA needs BOTH: this selector is more specific than .glass-btn, so
+   listing only `color` here would silently drop its press feedback */
+.nav-row .glass-btn{transition:color var(--dur-2) var(--ease),
+  transform var(--dur-1) var(--ease)}
+/* Reduced motion drops the SIZE change but keeps the colour fade — a crossfade
+   aids comprehension and is not movement. This has to sit AFTER the rule above
+   rather than in the press-feedback block higher up: same specificity, so
+   source order decides, and up there it would lose. */
+@media (prefers-reduced-motion:reduce){
+  .nav-row .glass-btn{transition:color var(--dur-2) var(--ease)}
+}
 /* the panel itself: also floating, matching the bar it hangs off. Position is
    set in the 760px block below, where the bar's own floating offset is
    known — the panel has to clear the bar plus the gap between them.
@@ -417,7 +448,7 @@ body.at-hero .gf-rule,body.at-end .gf-rule{display:none}
    reserved, never an animated height — a bound must not change size under you. */
 .routes{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
 .route{padding:22px 30px 28px;border-left:1px solid var(--line);
-  transition:opacity .3s var(--ease),transform .3s var(--ease)}
+  transition:opacity var(--dur-3) var(--ease),transform var(--dur-3) var(--ease)}
 .route:first-child{border-left:none;padding-left:0}
 .route.off{opacity:.42}
 .route.on{transform:translateY(-5px)}
@@ -449,8 +480,8 @@ body.at-hero .gf-rule,body.at-end .gf-rule{display:none}
 /* ---- pressure radar (Bklit) — plot and key share one active index ---- */
 .radarw{width:100%}
 .radarw-plot{width:100%;max-width:387px;margin-left:0;margin-right:auto}
-.rdr-lab{fill:var(--tx-2);font-family:var(--sans);font-size:12.5px;transition:fill .2s var(--ease)}
-.rdr-val{fill:var(--accent-ink);font-family:var(--sans);font-weight:500;font-size:12px;transition:fill .2s var(--ease)}
+.rdr-lab{fill:var(--tx-2);font-family:var(--sans);font-size:12.5px;transition:fill var(--dur-2) var(--ease)}
+.rdr-val{fill:var(--accent-ink);font-family:var(--sans);font-weight:500;font-size:12px;transition:fill var(--dur-2) var(--ease)}
 .rdr-lab.on{fill:var(--heading)}
 .rdr-val.on{fill:var(--sky)}
 .rdr-dot{fill:var(--sky);stroke:var(--bg);stroke-width:2}
@@ -459,13 +490,13 @@ body.at-hero .gf-rule,body.at-end .gf-rule{display:none}
   display:grid;grid-template-columns:1fr 1fr;gap:4px 18px}
 .rk{display:block;width:100%;text-align:left;background:none;border:0;border-radius:10px;
   padding:8px 12px 10px;font:inherit;color:inherit;cursor:pointer;
-  transition:background .25s var(--ease)}
+  transition:background var(--dur-3) var(--ease)}
 .rk.on{background:color-mix(in srgb,var(--accent-ink) 13%,transparent)}
 .rk-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
 .rk-label{font-size:14px;color:var(--tx-2)}
 .rk-val{font-family:var(--sans);font-weight:500;font-size:13px;color:var(--accent-ink)}
 .rk-note{display:block;margin-top:6px;font-size:12.5px;line-height:1.45;color:var(--tx-3);
-  opacity:0;transform:translateY(4px);transition:opacity .28s var(--ease),transform .28s var(--ease)}
+  opacity:0;transform:translateY(4px);transition:opacity var(--dur-3) var(--ease),transform var(--dur-3) var(--ease)}
 .rk.on .rk-note{opacity:1;transform:none}
 
 /* ---- glass plate behind a graph ----
@@ -498,7 +529,7 @@ html.js .tree:not(.ready) .tr-node{opacity:0}
 .tr-root{font-family:var(--serif);font-style:italic;font-weight:500;
   font-size:clamp(18px,min(1.6vw,2.6vh),23px);color:var(--accent-ink);line-height:1.2}
 .tr-branch{font-size:clamp(15px,1.3vw,19px);color:var(--tx-2);letter-spacing:-0.01em;
-  line-height:1.25;transition:color .25s var(--ease)}
+  line-height:1.25;transition:color var(--dur-3) var(--ease)}
 .tr-branch.lit{color:var(--heading)}
 .tr-leaf{background:none;border:0;padding:0;font:inherit;cursor:pointer;
   font-size:clamp(15px,min(1.4vw,2.3vh),20px);color:var(--heading);letter-spacing:-0.01em;line-height:1.25;
@@ -541,7 +572,7 @@ html.js .tree:not(.ready) .tr-node{opacity:0}
 .dial.off{opacity:.48}
 .dial-label{margin-top:8px;font-size:15.5px;color:var(--heading);letter-spacing:-0.01em}
 .dial-note{margin-top:9px;max-width:28ch;font-size:12.5px;line-height:1.45;color:var(--tx-3);
-  opacity:0;transform:translateY(4px);transition:opacity .28s var(--ease),transform .28s var(--ease)}
+  opacity:0;transform:translateY(4px);transition:opacity var(--dur-3) var(--ease),transform var(--dur-3) var(--ease)}
 .dial.on .dial-note{opacity:1;transform:none}
 
 /* ---- data screen (charts breathe on the ground, no box) ---- */
@@ -579,7 +610,7 @@ html.js .funnel{opacity:0}
 
 /* ---- services grid ---- */
 .svc{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;margin-top:var(--stack-lg);background:var(--line);border:1px solid var(--line);border-radius:18px;overflow:hidden}
-.svc article{background:var(--card);padding:34px 32px 38px;min-height:210px;display:flex;flex-direction:column;transition:background .3s var(--ease)}
+.svc article{background:var(--card);padding:34px 32px 38px;min-height:210px;display:flex;flex-direction:column;transition:background var(--dur-3) var(--ease)}
 .svc article:hover{background:var(--card-hover)}
 .svc .idx{font-family:var(--serif);font-style:italic;font-size:20px;color:var(--accent-ink)}
 .svc h3{margin-top:auto;font-size:21px;font-weight:400;letter-spacing:-0.01em;color:var(--heading)}
@@ -774,8 +805,10 @@ html.js .funnel{opacity:0}
 .badge{position:relative;overflow:hidden;
   display:flex;flex-direction:column;gap:10px;padding:16px 16px 18px;
   border-radius:14px;border:1px solid var(--line);background:var(--card);
-  transition:border-color .3s var(--ease),transform .3s var(--ease)}
-.badge:hover,.badge:focus-visible{border-color:var(--line-3);transform:translateY(-3px)}
+  transition:border-color .3s var(--ease)}
+/* the lift lives in TrustBadges.tsx as a Motion whileHover — this element is a
+   BlurFade motion.div, so an inline transform beats anything declared here */
+.badge:hover,.badge:focus-visible{border-color:var(--line-3)}
 /* the beam only traces the card being pointed at — evidence, not a loop */
 .badge-beam{opacity:0;transition:opacity .3s var(--ease)}
 .badge:hover .badge-beam,.badge:focus-within .badge-beam{opacity:1}
@@ -810,7 +843,7 @@ html.js .funnel{opacity:0}
 .cardflip{position:relative;flex:1;min-width:0;
   height:clamp(268px,min(26vw,42vh),360px);perspective:2000px;outline:none}
 .cf-turn{position:relative;width:100%;height:100%;transform-style:preserve-3d;
-  transition:transform .55s cubic-bezier(0.77,0,0.175,1)}
+  transition:transform .55s var(--ease-in-out)}
 .cf-turn.flipped{transform:rotateY(180deg)}
 @media (prefers-reduced-motion:reduce){ .cf-turn{transition:none} }
 
@@ -840,7 +873,12 @@ html.js .funnel{opacity:0}
 .cf-pulse span{position:absolute;width:46px;height:46px;border-radius:50%;opacity:0;
   border:1px solid color-mix(in srgb,var(--accent-ink) 45%,transparent);
   animation:cf-scale 3.4s linear infinite}
-.cardflip:hover .cf-pulse span{animation-duration:2.3s}
+/* No `animation-duration` change on hover. Retiming a running keyframe
+   animation re-maps its elapsed time against the new duration, so all eight
+   rings jump to new phases — by different amounts, since each carries its own
+   inline animation-delay (card-flip.tsx). Hovering already flips the card,
+   which hides this face ~150ms later anyway, so the speed-up bought almost
+   nothing for a guaranteed artefact. */
 @keyframes cf-scale{
   0%{transform:scale(2.1);opacity:0}
   50%{transform:translateY(-5px) scale(1);opacity:.62}
@@ -854,7 +892,7 @@ html.js .funnel{opacity:0}
   letter-spacing:0.14em;text-transform:uppercase;color:var(--accent-ink)}
 .cf-caps{list-style:none;margin:14px 0 0;padding:0}
 .cf-caps li{display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.5;
-  color:var(--tx-2);transition:transform .3s cubic-bezier(0.23,1,0.32,1),opacity .3s cubic-bezier(0.23,1,0.32,1)}
+  color:var(--tx-2);transition:transform var(--dur-3) var(--ease),opacity var(--dur-3) var(--ease)}
 .cf-caps li + li{margin-top:9px}
 .cf-caps svg{flex:none;margin-top:3px;color:var(--accent-ink)}
 @media (prefers-reduced-motion:reduce){ .cf-caps li{transition:none} }
@@ -874,7 +912,12 @@ html.js .funnel{opacity:0}
 .xpanel{display:flex;flex-direction:column;gap:16px;padding:22px 22px 24px;border-radius:16px;
   border:1px solid var(--line);background:var(--card);
   transition:border-color .3s var(--ease),transform .3s var(--ease)}
-.xpanel:hover,.xpanel:focus-visible{border-color:var(--line-3);transform:translateY(-4px)}
+/* :focus-visible stays ungated — it never fires from a tap. The hover lift
+   does, and on touch it would stick with no mouseleave to clear it. */
+.xpanel:focus-visible{border-color:var(--line-3);transform:translateY(-4px)}
+@media (hover: hover) and (pointer: fine){
+  .xpanel:hover{border-color:var(--line-3);transform:translateY(-4px)}
+}
 .xp-figure{font-size:clamp(28px,3vw,40px);font-weight:200;color:var(--heading);
   letter-spacing:-0.02em;font-variant-numeric:tabular-nums;line-height:1}
 .xp-unit{font-size:0.62em;margin-left:2px}
@@ -882,7 +925,8 @@ html.js .funnel{opacity:0}
 .xp-tick{flex:1;height:100%;border-radius:1px;background:var(--accent-ink);
   transform-origin:50% 100%}
 .xp-bar{position:relative;height:48px;display:flex;align-items:center}
-.xp-bar-fill{position:absolute;left:0;top:50%;height:6px;margin-top:-3px;border-radius:3px;
+.xp-bar-fill{position:absolute;left:0;top:50%;width:100%;height:6px;margin-top:-3px;
+  border-radius:3px;transform-origin:0 50%;
   background:linear-gradient(90deg,var(--steel),var(--sky))}
 .xp-bar-from,.xp-bar-to{position:absolute;top:0;font-family:var(--sans);font-weight:500;font-size:11px;
   letter-spacing:0.12em;text-transform:uppercase;color:var(--tx-3)}
@@ -925,15 +969,26 @@ html.js .funnel{opacity:0}
   font-size:clamp(13px,1.15vw,16px);letter-spacing:-0.005em;color:var(--heading);
   transition:border-color .25s var(--ease),color .25s var(--ease),
     background-color .25s var(--ease),opacity .25s var(--ease)}
-.bo-chip:hover,.bo-chip:focus-visible{border-color:var(--line-3);color:var(--accent-ink);
+.bo-chip:focus-visible{border-color:var(--line-3);color:var(--accent-ink);
   background:color-mix(in srgb,var(--accent-ink) 12%,transparent)}
 /* holding one chip quiets the rest, so the pair below reads against one label */
 .brainorbit.holding .bo-chip{opacity:.5}
-.brainorbit.holding .bo-chip:hover,.brainorbit.holding .bo-chip:focus-visible{opacity:1}
+.brainorbit.holding .bo-chip:focus-visible{opacity:1}
 .brainorbit.holding .animate-orbit{animation-play-state:paused}
+/* the hover half, gated: on touch a tap would dim the other five chips and
+   leave the orbit paused for good, since nothing clears `held`. */
+@media (hover: hover) and (pointer: fine){
+  .bo-chip:hover{border-color:var(--line-3);color:var(--accent-ink);
+    background:color-mix(in srgb,var(--accent-ink) 12%,transparent)}
+  .brainorbit.holding .bo-chip:hover{opacity:1}
+}
 
-.bo-detail{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:center;gap:10px;
-  min-height:2.4em;margin:0;text-align:center;
+/* the outer box owns the reserved height and the centring; the inner line is
+   what crossfades, so the box never resizes as the copy changes */
+.bo-detail{display:flex;align-items:center;justify-content:center;
+  min-height:2.4em;margin:0}
+.bo-detail-line{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:center;gap:10px;
+  margin:0;text-align:center;
   font-size:clamp(15px,1.35vw,19px);line-height:1.5;color:var(--tx-3)}
 .bo-ours{font-size:clamp(18px,1.75vw,25px);color:var(--heading);letter-spacing:-0.01em}
 .bo-sep{font-family:var(--sans);font-weight:500;font-size:11px;letter-spacing:0.16em;
@@ -978,7 +1033,7 @@ html.js .funnel{opacity:0}
 .glassbar .wm b{color:var(--heading);font-weight:700}.glassbar .wm i{font-style:normal;font-weight:300;color:var(--tx-3)}
 .contact{display:flex;align-items:center;gap:clamp(16px,2vw,28px);flex-wrap:wrap;font-family:var(--sans);font-weight:500;font-size:12.5px}
 .contact-label{color:var(--tx-3);text-transform:uppercase;letter-spacing:0.16em;font-size:11px}
-.contact a{color:var(--tx);text-decoration:none;transition:color .2s var(--ease)}
+.contact a{color:var(--tx);text-decoration:none;transition:color var(--dur-2) var(--ease)}
 .contact a:hover{color:var(--sky)}
 @media (prefers-reduced-transparency: reduce){ .glassbar{background:#0a141e;backdrop-filter:none;-webkit-backdrop-filter:none} }
 .foot-nav a{color:var(--tx-2)}.foot-nav a:hover{color:#fff}
@@ -994,17 +1049,35 @@ html.js .funnel{opacity:0}
 .form-lede{margin-top:16px}
 .form{margin-top:34px}
 .form-fields{display:flex;flex-direction:column;gap:22px;padding:30px 28px 28px}
+/* the two error slots are always present, so a collapsed one must not
+   contribute the column gap — otherwise the resting form grows by 44px */
+.field-error-slot:not([data-open]){margin-top:-22px}
 .field{display:flex;flex-direction:column;gap:9px}
 .field-label{font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:var(--tx-3);
   font-weight:500}
 .field-input{width:100%;padding:13px 14px;border-radius:10px;
   border:1px solid var(--line-2);background:rgba(4,10,16,0.5);
   color:var(--tx);font-family:var(--sans);font-size:15.5px;line-height:1.5;
-  transition:border-color .2s var(--ease)}
+  transition:border-color var(--dur-2) var(--ease)}
 .field-input:focus-visible{border-color:var(--accent-ink)}
 .field-area{resize:vertical;min-height:150px}
 .field-input::placeholder{color:var(--tx-3)}
-.field-error{font-size:13px;color:var(--sky)}
+/* The error is always in the DOM, in a grid row that is 0fr until it opens.
+   0fr -> 1fr animates a reveal to the content's real height without ever
+   hardcoding one, so the fields below (and the Send button the pointer is
+   resting on) slide rather than jump. The message itself settles slightly
+   faster than the space holding it, so it lands rather than trails. */
+.field-error-slot{display:grid;grid-template-rows:0fr;
+  transition:grid-template-rows var(--dur-3) var(--ease)}
+.field-error-slot[data-open]{grid-template-rows:1fr}
+.field-error{overflow:hidden;font-size:13px;color:var(--sky);
+  opacity:0;transform:translateY(-4px);
+  transition:opacity var(--dur-2) var(--ease),transform var(--dur-2) var(--ease)}
+.field-error-slot[data-open] .field-error{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  .field-error-slot,.field-error{transition:none}
+  .field-error{transform:none}
+}
 .form-send{align-self:flex-start}
 @media (max-width:760px){
   .formpage{padding:96px 22px 56px;align-items:flex-start}
@@ -1029,7 +1102,11 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
 @media (prefers-reduced-motion: reduce){
   html.js .reveal{opacity:1;transform:none}
   .mg-spark,.fgl-spark{display:none}
-  html{scroll-snap-type:none}
+  /* `scroll-behavior:auto` as well as the snap: a nav-link jump on a desktop
+     viewport is 100vh of animated travel, which is exactly what this setting
+     is asking us not to do. The two viewport queries below already reset it
+     for the same reason. */
+  html{scroll-snap-type:none;scroll-behavior:auto}
 }
 @keyframes mg-draw{to{stroke-dashoffset:0}}
 @keyframes mg-fade{to{opacity:1}}
@@ -1189,7 +1266,7 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
   /* each switch gets its own card, two per row — the three-column row layout
      wasted most of the width on a phone */
   .bo-chip{padding:5px 10px;font-size:12px}
-  .bo-detail{font-size:13px;gap:7px}
+  .bo-detail-line{font-size:13px;gap:7px}
   .xp-cap{font-size:12.5px}
 
   /* the tree keeps its connectors; the percentage geometry scales, so only the
@@ -1264,15 +1341,24 @@ html.js .reveal{opacity:0}         /* hidden only when Motion will animate them 
   .jstep h3{margin-top:6px;font-size:18px}
   .jstep p{margin-top:6px;font-size:13.5px;max-width:none}
 
-  /* the capability list is the card's substance — it stays, and since touch has
-     no hover it is simply always shown */
-  .offers{gap:14px}
-  .offer{padding:22px 20px 24px}
-  .offer h3{font-size:20px}
-  .offer p{margin-top:10px;font-size:14px}
-  /* the flip needs a real card height even when the grid goes single-column */
+  /* The capability list is the card's substance — it stays, and since touch has
+     no hover it is simply always shown. That means no flip at all here: a tap
+     fires mouseenter with no mouseleave to follow, so the card would turn and
+     stay turned with no way back, and tapping a second card would leave two
+     cards showing their backs. The card stops being a card at this width — the
+     front's copy and the back's capability list both show, stacked, in normal
+     flow. (The rules here used to target `.offer`, a class the Kokonut
+     card-flip component replaced; they had been dead for a while.) */
   .offers{grid-template-columns:1fr;gap:14px}
-  .cardflip{height:clamp(230px,64vw,290px)}
+  .cardflip{height:auto;perspective:none}
+  .cf-turn{transform:none;transition:none;transform-style:flat}
+  .cf-turn.flipped{transform:none}
+  .cf-face{position:relative;inset:auto;backface-visibility:visible}
+  .cf-front{min-height:clamp(150px,40vw,190px);border-radius:18px 18px 0 0}
+  .cf-back{transform:none;margin-top:-1px;border-radius:0 0 18px 18px}
+  /* these three are inline styles on the <li> (card-flip.tsx:80-84), so a class
+     selector cannot reach them at any specificity */
+  .cf-caps li{transform:none!important;opacity:1!important;transition-delay:0ms!important}
   .cf-front h3,.cf-back h3{font-size:19px}
   .cf-front p{font-size:13px;margin-top:8px}
   .cf-caps li{font-size:12px}

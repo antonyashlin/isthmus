@@ -1,9 +1,8 @@
 "use client";
 
-import LiquidGlass from "liquid-glass-react";
 import { useState } from "react";
 
-import { GLASS, GLASS_FILL, GLASS_RADIUS, GlassLabel } from "@/components/site/glass";
+import { GlassDecor, GlassLabel } from "@/components/site/glass";
 
 /**
  * Inquiry form.
@@ -65,9 +64,7 @@ export default function Inquiry() {
             <form> for onSubmit, so the two-layer pattern is built by hand
             here instead, same shape as GlassPanel itself. */}
         <form className="form lg-shell" noValidate onSubmit={submit}>
-          <LiquidGlass className="lg-decor" cornerRadius={GLASS_RADIUS} style={GLASS_FILL} {...GLASS}>
-            {null}
-          </LiquidGlass>
+          <GlassDecor />
           <div className="form-fields lg-content">
             <label className="field" htmlFor="inq-who">
               <span className="field-label">Name and organisation</span>
@@ -85,11 +82,14 @@ export default function Inquiry() {
               />
             </label>
 
-            {touched && noWho ? (
+            {/* The slot stays mounted so CSS has something to transition from;
+                the TEXT stays conditional so role="alert" still fires on the
+                change rather than announcing on page load. */}
+            <div className="field-error-slot" data-open={touched && noWho ? "" : undefined}>
               <p className="field-error" id="inq-who-error" role="alert">
-                Tell us who you are so we can reply.
+                {touched && noWho ? "Tell us who you are so we can reply." : null}
               </p>
-            ) : null}
+            </div>
 
             <label className="field" htmlFor="inq-type">
               <span className="field-label">Type of inquiry</span>
@@ -123,11 +123,11 @@ export default function Inquiry() {
               />
             </label>
 
-            {touched && empty ? (
+            <div className="field-error-slot" data-open={touched && empty ? "" : undefined}>
               <p className="field-error" id="inq-error" role="alert">
-                Add a short note so we know what you need.
+                {touched && empty ? "Add a short note so we know what you need." : null}
               </p>
-            ) : null}
+            </div>
 
             <button className="glass-btn glass-btn-lg form-send lg-shell" type="submit">
               <GlassLabel>Send</GlassLabel>
