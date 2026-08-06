@@ -1,10 +1,9 @@
 "use client";
 
-import LiquidGlass from "liquid-glass-react";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 
-import { GLASS, GLASS_FILL, GLASS_RADIUS, GlassLabel, GlassPanel, useOnLight } from "@/components/site/glass";
+import { GLASS_RADIUS, GlassDecor, GlassLabel, GlassPanel, useOnLight } from "@/components/site/glass";
 import {
   Drawer,
   DrawerClose,
@@ -44,15 +43,7 @@ export function Nav() {
 
   return (
     <nav className="nav lg-shell">
-      <LiquidGlass
-        className="lg-decor"
-        cornerRadius={GLASS_RADIUS}
-        overLight={onLight}
-        style={GLASS_FILL}
-        {...GLASS}
-      >
-        {null}
-      </LiquidGlass>
+      <GlassDecor overLight={onLight} />
       <span aria-hidden="true" className="lg-scrim" style={{ borderRadius: GLASS_RADIUS }} />
       <div className="nav-row lg-content">
         <a className="brand" href="#top" aria-label="Isthmus Meridian home">

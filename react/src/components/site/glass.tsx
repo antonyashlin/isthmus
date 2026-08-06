@@ -1,84 +1,54 @@
 "use client";
 
-import LiquidGlass from "liquid-glass-react";
 import { useEffect, useState } from "react";
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 
 /**
- * liquid-glass-react (github.com/rdev/liquid-glass-react) is a self-contained
- * floating widget — a composited stack of absolutely-positioned siblings
- * (the visible glass box, two "over light" tint layers, two border-gradient
- * layers, and up to three hover-glow layers), sized by measuring its OWN
- * rendered box and centered via top:50%/left:50% plus a
- * transform:translate(-50%,-50%) it applies unconditionally. It has no mode
- * for "stretch to fill a fluid, content-driven size" — it is built for
- * buttons and cards, exactly the two examples in its own README.
+ * Every glass surface here used to be liquid-glass-react
+ * (github.com/rdev/liquid-glass-react) — a composited stack of
+ * absolutely-positioned siblings giving a blur, a refraction warp, and a
+ * mouse-elastic stretch. It is not used anymore: verified live, with Chrome
+ * DevTools Protocol against a real GPU-accelerated window (not just a
+ * headless one, in case that was the confound) — a `.glass__warp` span with
+ * nothing on it but `backdrop-filter` fails to composite ANY blur, on a
+ * plain 34px button exactly as on the 64px bar, the instant it is rendered
+ * by that library. Computed style reports the blur correctly the whole
+ * time; nothing paints. A hand-built clone of the identical
+ * position:fixed>absolute(transform)>relative(overflow:hidden)>absolute
+ * nesting blurs fine, as does a trivial React-rendered sibling `<div>` with
+ * nothing but `backdropFilter` sitting right next to the broken one on the
+ * same page — so it is not backdrop-filter, not the nesting, not hydration,
+ * not element size, not the library's own SVG displacement filter (removing
+ * it live changes nothing). It is something specific to that component's
+ * own render path in this Chromium build, underneath all of the above.
+ * Given that, the fix is to stop routing the effect through the library at
+ * all: a plain `backdrop-filter` div gets the actual "frosted glass" look
+ * (blur, saturation lift, tint, shadow) — verified working — at the cost of
+ * the library's mouse-elastic stretch and refraction warp, which were
+ * cosmetic on top of a blur that, empirically, was never rendering anyway.
  *
- * Every glass surface on this site is still built from it (see `.lg-shell`
- * in site.css for why forcing it into bar/panel roles works: two layers, a
- * decorative fill that takes no part in sizing, and the real content in
- * normal flow that does). This file holds the one house tuning and the two
- * shell shapes everything else composes from — a button label, and an
- * auto-height panel (nav drawer, the inquiry form).
- *
- * One correctness note that cost real debugging time: the library's OWN
- * decorative siblings default their top/left to "50%" when unset (via
- * `baseStyle.top || "50%"`), but the VISIBLE glass box does not — it takes
- * `style` raw. Leave top/left out of `GLASS_FILL` and the always-applied
- * translate(-50%,-50%) shifts the visible box a further half-width/
- * half-height off from where its siblings land. GLASS_FILL sets them
- * explicitly so every instance matches.
- *
- * A second one, found after the first shipped: the library's own "over
- * light" tint — the thing meant to darken the glass over a bright
- * background — is two layers, one plain and one `mix-blend-mode:overlay`,
- * both filled with pure black, sitting inside the SAME stacking context as
- * the backdrop-filter blur (`.nav` is `position:fixed` + `z-index`, which
- * establishes one). Overlay blending black against whatever that context
- * composites to does not reliably darken — over a dark screen it read as
- * BRIGHTER, the opposite of the intent. Rather than fight backdrop-filter
- * and mix-blend-mode interaction (inconsistent across browsers, not
- * something to hand-tune blind), those two layers are switched off outright
- * in site.css (`.lg-shell>[class*="bg-black"]`, no class of mine needed —
- * they're the only children with that string in their name) and replaced
- * with `.lg-scrim`: a single flat rgba fill, plain alpha, no blend mode,
- * invisible until `body.on-light`. The library's OTHER overLight effects —
- * a heavier box-shadow, no text-shadow, halved displacement — are all plain
- * inline styles with no blend-mode involved, so `overLight` is still passed
- * through for those.
+ * The two-layer shell survives unchanged: `.lg-decor` is a decorative
+ * backdrop-filter layer, absolutely filling its `.lg-shell` parent and
+ * contributing nothing to that parent's own size; `.lg-content` is the real
+ * content in normal flow, which is what actually sizes the shell — a fixed
+ * 64px bar, or a button exactly as wide as its label.
  */
 
-const GLASS = {
-  displacementScale: 162,
-  blurAmount: 0.6,
-  saturation: 160,
-  aberrationIntensity: 2,
-  elasticity: 0.75,
-  mode: "standard" as const,
-};
-
-/* CSS clamps border-radius to at most half of an element's own height/width
-   per axis, so 43px still reads as a full stadium on anything shorter than
-   ~86px (every button, and the 64px bar) — it only becomes a visibly
-   separate, larger corner on the taller auto-height panels (the drawer, the
-   form). One radius, not a per-shape set. */
 const RADIUS = 43;
+const BLUR = 23;
+const BLUR_OVER_LIGHT = 31;
+const SATURATE = 160;
 
-const GLASS_FILL: CSSProperties = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  width: "100%",
-  height: "100%",
-};
+function glassFilter(overLight: boolean) {
+  return `blur(${overLight ? BLUR_OVER_LIGHT : BLUR}px) saturate(${SATURATE}%)`;
+}
 
 /**
  * Whether the nearest ancestor a glass surface floats over is currently a
  * light ("paper") screen — `ScrollFx` toggles `body.on-light` as the user
- * scrolls, driving the globe field's colour flip the same way. `overLight`
- * is a React prop the library reads at render time, not something CSS can
- * hand it, so this mirrors that class onto state via a MutationObserver
- * rather than re-deriving scroll position independently.
+ * scrolls, driving the globe field's colour flip the same way. This mirrors
+ * that class onto React state via a MutationObserver rather than re-deriving
+ * scroll position independently.
  */
 export function useOnLight() {
   const [onLight, setOnLight] = useState(false);
@@ -93,17 +63,27 @@ export function useOnLight() {
   return onLight;
 }
 
+function GlassDecor({ overLight = false, radius = RADIUS }: { overLight?: boolean; radius?: number }) {
+  return (
+    <div
+      aria-hidden="true"
+      className="lg-decor"
+      style={{
+        borderRadius: radius,
+        backdropFilter: glassFilter(overLight),
+        WebkitBackdropFilter: glassFilter(overLight),
+        boxShadow: overLight ? "0 16px 70px rgba(0,0,0,0.75)" : "0 12px 40px rgba(0,0,0,0.25)",
+      }}
+    />
+  );
+}
+
 /**
  * A button-shaped glass label: the decorative layer plus its real content,
  * stacked per the .lg-shell pattern. The CALLER is the shell (an <a>,
  * <button>, or Base UI trigger/close element) — it needs className="lg-shell"
  * and must not itself carry a position the glass would clobber (see the
  * comment on the drawer's own wrapper in Nav.tsx for the failure mode).
- *
- * `onClick={() => {}}` is a deliberate no-op, not the real handler — it
- * exists only so the library's `Boolean(onClick)` check turns on its hover/
- * press glow, which a real control should have even though activation is
- * handled by whatever wraps this.
  */
 export function GlassLabel({
   children,
@@ -116,16 +96,7 @@ export function GlassLabel({
 }) {
   return (
     <>
-      <LiquidGlass
-        className="lg-decor"
-        cornerRadius={radius}
-        onClick={() => {}}
-        overLight={overLight}
-        style={GLASS_FILL}
-        {...GLASS}
-      >
-        {null}
-      </LiquidGlass>
+      <GlassDecor overLight={overLight} radius={radius} />
       <span aria-hidden="true" className="lg-scrim" style={{ borderRadius: radius }} />
       <span className="lg-content">{children}</span>
     </>
@@ -135,8 +106,7 @@ export function GlassLabel({
 /**
  * An auto-height glass panel: same two-layer pattern, for a container whose
  * size is driven by real, variable content (the nav drawer's link count, the
- * inquiry form's validation state) rather than a fixed shape. No onClick —
- * a panel isn't a button, and shouldn't glow like one.
+ * inquiry form's validation state) rather than a fixed shape.
  */
 export function GlassPanel({
   children,
@@ -151,13 +121,11 @@ export function GlassPanel({
 }) {
   return (
     <div className={className ? `lg-shell ${className}` : "lg-shell"}>
-      <LiquidGlass className="lg-decor" cornerRadius={radius} overLight={overLight} style={GLASS_FILL} {...GLASS}>
-        {null}
-      </LiquidGlass>
+      <GlassDecor overLight={overLight} radius={radius} />
       <span aria-hidden="true" className="lg-scrim" style={{ borderRadius: radius }} />
       <div className="lg-content">{children}</div>
     </div>
   );
 }
 
-export { GLASS, GLASS_FILL, RADIUS as GLASS_RADIUS };
+export { GlassDecor, RADIUS as GLASS_RADIUS };

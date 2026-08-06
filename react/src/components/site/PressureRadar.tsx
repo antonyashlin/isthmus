@@ -25,8 +25,8 @@ export type PressureMetric = {
   note: string;
 };
 
-/** the radar's own domain is 0–100; the series tops out just under the rim */
-const SCALE_MAX = 55;
+/** metrics arrive as 0–100 percentages already, matching the radar's own domain */
+const SCALE_MAX = 100;
 
 function Vertices({
   metrics,
