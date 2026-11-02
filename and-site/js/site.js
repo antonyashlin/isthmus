@@ -78,8 +78,8 @@
   /* ------------------------------------------------------------------
    * Opening. "Andean Capital" rises in, the "ean" closes up to leave
    * "And Capital", which gives way to the wordmark. Nine nodes fill with
-   * the real load, the AND node last. Then the black lifts and the
-   * wordmark settles into the header.
+   * the real load, the AND node last. The wordmark leaves in place, the
+   * black lifts, and the hero line comes in.
    * ------------------------------------------------------------------ */
   const opening = $(".opening");
   const owName = $(".ow-name");
@@ -138,27 +138,23 @@
     owName.classList.add("is-cut");
     await wait(820);
 
-    // "And Capital" gives way to the wordmark.
+    // "And Capital" gives way to the wordmark, centred.
     owName.classList.add("is-out");
     owLogo.classList.add("is-on");
-    await wait(1050);
+    await wait(1650);
 
-    // The black lifts and the wordmark settles into the header.
+    // The wordmark leaves where it stands.
     nodesEl.classList.add("is-out");
+    owLogo.classList.add("is-gone");
+    await wait(750);
+
+    // The black lifts, then the hero line comes in.
     opening.classList.add("is-opening");
     document.body.classList.remove("is-loading");
-    const target = $(".chrome-logo").getBoundingClientRect();
-    const from = owLogo.getBoundingClientRect();
-    const dx = target.left + target.width / 2 - (from.left + from.width / 2);
-    const dy = target.top + target.height / 2 - (from.top + from.height / 2);
-    const s = target.width / from.width;
-
-    if (window.gsap) {
-      gsap.fromTo(heroVideo, { scale: 1.2 }, { scale: 1.12, duration: 2.6, ease: "expo.out" });
-      gsap.to(owLogo, { x: dx, y: dy, scale: s, duration: 1.2, ease: "expo.inOut" });
-      setTimeout(startHero, 450);
-      await wait(1250);
-    } else startHero();
+    if (window.gsap) gsap.fromTo(heroVideo, { scale: 1.2 }, { scale: 1.12, duration: 2.6, ease: "expo.out" });
+    await wait(450);
+    startHero();
+    await wait(800);
     document.body.classList.add("is-ready");
     opening.classList.add("is-done");
   }
