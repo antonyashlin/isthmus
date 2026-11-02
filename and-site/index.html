@@ -8,29 +8,29 @@
 <meta name="theme-color" content="#050706">
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
 <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700&display=swap">
-<link rel="stylesheet" href="css/site.css">
+<link rel="stylesheet" href="css/site.css?v=4">
 </head>
 <body class="is-loading">
 
 <!-- ============ Opening: the wait is the first scene ============ -->
 <div class="opening" aria-hidden="true">
-  <div class="opening-gate"><span></span><span></span></div>
   <div class="opening-word">
-    <div class="ow-type"><span class="ow-text"></span><span class="ow-caret"></span></div>
+    <div class="ow-name"><span class="ow-a">And</span><span class="ow-cut">ean</span><span class="ow-b">&nbsp;Capital</span></div>
     <div class="ow-logo" data-logo></div>
   </div>
-  <div class="opening-row">
-    <span class="cap" data-o-cap>Global Investment Portfolio</span>
-    <span class="cap" data-o-cap>Health / Real Assets / Energy</span>
-    <span class="cap" data-o-cap><span class="opening-state">Initialising</span>&nbsp;<span class="opening-pct">000</span></span>
-  </div>
-  <div class="opening-rule"><span></span></div>
+  <div class="opening-nodes" data-nodes></div>
 </div>
 
 <!-- ============ Chrome ============ -->
 <header class="chrome">
-  <span class="chrome-side cap">Private Markets</span>
   <a class="chrome-logo" href="#top" aria-label="AND Capital, home" data-logo></a>
+  <nav class="chrome-nav" aria-label="Primary">
+    <a href="#philosophy">Philosophy</a>
+    <a href="#focus">Focus</a>
+    <a href="#partners">Limited Partners</a>
+    <a href="#team">Team</a>
+    <a href="#news">Perspective</a>
+  </nav>
   <a class="tag" href="#contact"><i data-icon="contact" data-size="14"></i><span>Contact</span></a>
 </header>
 
@@ -41,7 +41,6 @@
     <div class="hero-media media">
       <video autoplay muted loop playsinline preload="auto" poster="assets/hero.jpg">
         <source src="assets/hero.mp4" type="video/mp4">
-        <source src="https://andcapitalventures.com/hero-video.mp4" type="video/mp4">
       </video>
     </div>
     <div class="hero-shade"></div>
@@ -51,13 +50,6 @@
         <span class="line">The most important risks</span>
         <span class="line">are the least understood</span>
       </h1>
-      <nav class="hero-nav" aria-label="Primary">
-        <a href="#philosophy">Investment Philosophy</a><span>/</span>
-        <a href="#partners">Limited Partners</a><span>/</span>
-        <a href="#focus">For Companies</a><span>/</span>
-        <a href="#team">Team</a><span>/</span>
-        <a href="#news">News</a>
-      </nav>
     </div>
     <p class="hero-foot" data-words>
       <b>Disciplined capital deployment,</b> repeatable execution, and <b>durable value creation</b> across market cycles.
@@ -68,7 +60,7 @@
   <!-- ============ 2. The problem ============ -->
   <section class="intro" id="philosophy">
     <div class="wrap">
-      <p class="cap section-cap" data-blink>The Problem We See</p>
+      <p class="cap section-cap" data-blink><span class="cap-num">01</span>The Problem We See</p>
       <h2 class="display" data-text-fade>Accessing capital has become more complex. <em>Not less.</em></h2>
       <div class="intro-grid">
         <div class="intro-copy">
@@ -82,11 +74,28 @@
           <p class="body" data-words>The result is <b>friction, mispricing, and value leakage</b> precisely when precision is required.</p>
           <a class="btn" href="#decide"><span>Explore our Investment Policy</span><i data-icon="arrow" data-size="16"></i></a>
         </div>
-        <figure class="intro-media media" data-reveal>
-          <video muted loop playsinline preload="none" poster="assets/core.jpg" data-lazy>
-            <source src="assets/core.mp4" type="video/mp4">
-          </video>
-          <figcaption class="cap"><span>AND / 01</span><span>Complexity, priced</span></figcaption>
+        <figure class="intro-media diagram" data-reveal>
+          <svg viewBox="0 0 800 500" aria-hidden="true">
+            <g class="dg-grid" data-dg-grid></g>
+            <g class="dg-lines">
+              <path pathLength="1" d="M90 90 H250 V200 H400 V250"/>
+              <path pathLength="1" d="M710 90 H560 V160 H400 V250"/>
+              <path pathLength="1" d="M90 410 H230 V310 H400 V250"/>
+              <path pathLength="1" d="M710 410 H590 V330 H400 V250"/>
+            </g>
+            <g class="dg-nodes">
+              <rect x="86" y="86" width="8" height="8"/><rect x="706" y="86" width="8" height="8"/>
+              <rect x="86" y="406" width="8" height="8"/><rect x="706" y="406" width="8" height="8"/>
+            </g>
+            <rect class="dg-and" x="392" y="242" width="16" height="16"/>
+            <g class="dg-labels">
+              <text x="90" y="66">CROWDED MARKETS</text>
+              <text x="710" y="66" text-anchor="end">FRAGMENTED PROCESS</text>
+              <text x="90" y="446">CAUTIOUS CAPITAL</text>
+              <text x="710" y="446" text-anchor="end">MISALIGNED INCENTIVES</text>
+              <text class="dg-and-label" x="424" y="255">AND</text>
+            </g>
+          </svg>
         </figure>
       </div>
     </div>
@@ -96,6 +105,7 @@
   <section class="split">
     <div class="wrap split-grid">
       <div class="split-head">
+        <p class="cap section-cap" data-blink><span class="cap-num">02</span>Thesis</p>
         <h2 class="display sticky" data-text-fade>Why complexity <em>is mispriced.</em></h2>
       </div>
       <div class="split-body">
@@ -136,6 +146,7 @@
       </video>
     </div>
     <div class="focus-head">
+      <p class="cap section-cap center" data-blink><span class="cap-num">03</span>Focus Areas</p>
       <h2 class="title-sm" data-text-fade>We focus where complexity <br>hides durable value</h2>
       <p class="cap" data-blink>Technology and data, applied to complex operations</p>
     </div>
@@ -158,11 +169,12 @@
   <!-- ============ 5. Numbers ============ -->
   <section class="stats" id="partners">
     <div class="wrap">
+      <p class="cap section-cap center" data-blink><span class="cap-num">04</span>Track Record</p>
       <h2 class="title-sm center" data-text-fade>A Record That <br>Speaks for Itself</h2>
       <div class="stats-grid">
         <figure class="stat stat-ring">
           <div class="stat-art"><svg class="ring" viewBox="0 0 400 400" data-ring></svg></div>
-          <div class="stat-num" data-scramble="$10B+">$10B+</div>
+          <div class="stat-num" data-count="$10B+">$10B+</div>
           <figcaption class="stat-cap">In transactions across healthcare, <br>financial services, and real assets</figcaption>
         </figure>
         <figure class="stat stat-orbits">
@@ -171,7 +183,7 @@
               <circle cx="150" cy="200" r="138"/><circle cx="250" cy="200" r="138"/><circle cx="200" cy="200" r="62"/>
             </svg>
           </div>
-          <div class="stat-num" data-scramble="$1B+">$1B+</div>
+          <div class="stat-num" data-count="$1B+">$1B+</div>
           <figcaption class="stat-cap">Across prior funds <br>and investment vehicles</figcaption>
         </figure>
       </div>
@@ -187,12 +199,8 @@
 
   <!-- ============ 6. How we decide ============ -->
   <section class="decide" id="decide">
-    <div class="decide-media media">
-      <video muted loop playsinline preload="none" poster="assets/detail-a.jpg" data-lazy>
-        <source src="assets/detail-a.mp4" type="video/mp4">
-      </video>
-    </div>
     <div class="decide-head">
+      <p class="cap section-cap center" data-blink><span class="cap-num">05</span>Process</p>
       <h2 class="title-sm center" data-text-fade>How We <br>Decide.</h2>
       <p class="body center" data-words>Our investment decisions combine <b>AI-powered analytics with human judgment,</b> a systematic approach that exceeds traditional risk assessment.</p>
     </div>
@@ -208,7 +216,7 @@
   <section class="infra">
     <div class="wrap infra-grid">
       <div class="infra-head">
-        <p class="cap section-cap" data-blink>Our Institutional Infrastructure</p>
+        <p class="cap section-cap" data-blink><span class="cap-num">06</span>Our Institutional Infrastructure</p>
         <h2 class="display" data-text-fade>Systematic process. <em>Human judgment.</em></h2>
         <p class="body" data-words>We build systematic processes and <b>institutional-grade infrastructure</b> that enhance traditional investment capabilities. Our integrated approach to data, analytics, and operational excellence creates <b>the transparency and efficiency</b> sophisticated investors expect.</p>
       </div>
@@ -236,29 +244,23 @@
   <section class="team" id="team">
     <div class="wrap">
       <div class="team-head">
-        <h2 class="display" data-text-fade>Our People. <em>Experienced leadership.</em></h2>
+        <div>
+          <p class="cap section-cap" data-blink><span class="cap-num">07</span>People</p>
+          <h2 class="display" data-text-fade>Our People. <em>Experienced leadership.</em></h2>
+        </div>
         <p class="body" data-words>Driving value across <b>healthcare, minerals, and real assets.</b></p>
       </div>
     </div>
-    <div class="team-rail" data-rail>
+    <div class="team-rail">
       <figure class="person"><div class="person-img"><img loading="lazy" src="https://andcapitalventures.com/team/teruel-carrasco-lg.webp" alt="Teruel Carrasco"></div><figcaption><b>Teruel Carrasco</b><span>Co-Founder &amp; CEO</span></figcaption></figure>
       <figure class="person"><div class="person-img"><img loading="lazy" src="https://andcapitalventures.com/team/rod-heard-lg.webp" alt="Rod Heard"></div><figcaption><b>Rod Heard</b><span>Co-Founder &amp; MD</span></figcaption></figure>
-      <figure class="person"><div class="person-img"><img loading="lazy" src="https://andcapitalventures.com/team/loren-brink-lg.webp" alt="Loren Brink"></div><figcaption><b>Loren Brink</b><span>President, Corporate Development</span></figcaption></figure>
-      <figure class="person"><div class="person-img"><img loading="lazy" src="https://andcapitalventures.com/team/jennifer-sethre-lg.webp" alt="Jennifer Sethre"></div><figcaption><b>Jennifer Sethre</b><span>COO &amp; GP, Health Innovation Fund</span></figcaption></figure>
-      <figure class="person"><div class="person-img"><img loading="lazy" src="https://andcapitalventures.com/team/david-chung-lg.webp" alt="David D. Chung"></div><figcaption><b>David D. Chung</b><span>Head of Capital Formation</span></figcaption></figure>
-      <figure class="person"><div class="person-img"><img loading="lazy" src="https://andcapitalventures.com/team/denise-brown-lg.webp" alt="Denise S. Brown, MD"></div><figcaption><b>Denise S. Brown, MD</b><span>General Partner</span></figcaption></figure>
-      <figure class="person"><div class="person-img"><img loading="lazy" src="https://andcapitalventures.com/team/joe-park-lg.webp" alt="Joe Park"></div><figcaption><b>Joe Park</b><span>GP, Energy Transition Fund</span></figcaption></figure>
     </div>
   </section>
 
   <!-- ============ 9. The letter ============ -->
   <section class="letter" id="news">
-    <div class="letter-media media">
-      <video muted loop playsinline preload="none" poster="assets/detail-b.jpg" data-lazy>
-        <source src="assets/detail-b.mp4" type="video/mp4">
-      </video>
-    </div>
     <div class="wrap">
+      <p class="cap section-cap center" data-blink><span class="cap-num">08</span>Perspective</p>
       <blockquote class="letter-quote" data-scrub-words>
         Complexity is not the enemy of returns. It is the source of sustainable competitive advantage for those willing to understand it.
       </blockquote>
@@ -308,6 +310,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
 <script src="js/icons.js"></script>
-<script src="js/site.js"></script>
+<script src="js/site.js?v=3"></script>
 </body>
 </html>

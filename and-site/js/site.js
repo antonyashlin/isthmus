@@ -1,4 +1,4 @@
-/* AND Capital — behaviour. Opening, TGE-style text effects, scroll choreography. */
+/* AND Capital — behaviour. Opening, text rise, scroll choreography. */
 (function () {
   "use strict";
 
@@ -42,13 +42,14 @@
   window.ANDIcons && ANDIcons.mount();
 
   /* ------------------------------------------------------------------
-   * Splitting. Wraps words and characters while keeping inline markup
-   * (<b>, <em>, <br>) intact. Sets --word, --char and --wchar.
+   * Splitting. Wraps each word as .split-word > .split-in, keeping inline
+   * markup (<b>, <em>, <br>) intact, and numbers the words with --word.
+   * The outer span is the mask, the inner one is what moves.
    * ------------------------------------------------------------------ */
-  function split(el, { chars = true } = {}) {
+  function split(el) {
     if (el.dataset.split) return;
     el.dataset.split = "1";
-    let w = 0, c = 0;
+    let w = 0;
     const walk = (node) => {
       Array.from(node.childNodes).forEach((n) => {
         if (n.nodeType === 3) {
@@ -60,19 +61,10 @@
             const ws = document.createElement("span");
             ws.className = "split-word";
             ws.style.setProperty("--word", w);
-            if (chars) {
-              let wc = 0;
-              for (const ch of tok) {
-                c++; wc++;
-                const cs = document.createElement("span");
-                cs.className = "split-char";
-                cs.textContent = ch;
-                cs.style.setProperty("--char", c);
-                cs.style.setProperty("--wchar", wc);
-                cs.style.setProperty("--word", w);
-                ws.appendChild(cs);
-              }
-            } else ws.textContent = tok;
+            const wi = document.createElement("span");
+            wi.className = "split-in";
+            wi.textContent = tok;
+            ws.appendChild(wi);
             frag.appendChild(ws);
           });
           n.replaceWith(frag);
@@ -81,22 +73,26 @@
     };
     walk(el);
   }
-  $$("[data-text-fade], [data-hero-title]").forEach((el) => split(el));
-  $$("[data-blink], [data-words], [data-scrub-words]").forEach((el) => split(el, { chars: false }));
+  $$("[data-text-fade], [data-hero-title], [data-words], [data-scrub-words]").forEach((el) => split(el));
 
   /* ------------------------------------------------------------------
-   * Opening. Types "Andean Capital Advisors", backspaces to "And Capital",
-   * which becomes the wordmark at the centre; the gate parts around it
-   * and the wordmark settles into the header.
+   * Opening. "Andean Capital" rises in, the "ean" closes up to leave
+   * "And Capital", which gives way to the wordmark. Nine nodes fill with
+   * the real load, the AND node last. Then the black lifts and the
+   * wordmark settles into the header.
    * ------------------------------------------------------------------ */
   const opening = $(".opening");
-  const owText = $(".ow-text");
-  const caret = $(".ow-caret");
+  const owName = $(".ow-name");
+  const owCut = $(".ow-cut");
   const owLogo = $(".ow-logo");
-  const pctEl = $(".opening-pct");
-  const stateEl = $(".opening-state");
-  const ruleEl = $(".opening-rule span");
+  const nodesEl = $("[data-nodes]");
   const heroVideo = $(".hero-media video");
+
+  // Perimeter clockwise, then the centre: every line meets at AND.
+  const NODE_ORDER = [0, 1, 2, 5, 8, 7, 6, 3, 4];
+  nodesEl.innerHTML = "<i></i>".repeat(9);
+  const nodes = NODE_ORDER.map((i) => nodesEl.children[i]);
+  nodes[8].classList.add("is-and");
 
   // Real loading progress: fonts, the hero video's first frames, the window.
   let loaded = 0;
@@ -119,86 +115,36 @@
     const target = Math.min(100, (loaded / tasks.length) * 100);
     shown += (target - shown) * 0.08 + (target > shown ? 0.25 : 0);
     shown = Math.min(shown, target);
-    const v = Math.round(shown);
-    pctEl.textContent = String(v).padStart(3, "0");
-    ruleEl.style.transform = `scaleX(${shown / 100})`;
-    if (v < 100) requestAnimationFrame(tickPct);
+    const lit = Math.floor((shown / 100) * nodes.length + 0.001);
+    nodes.forEach((n, i) => n.classList.toggle("is-on", i < lit));
+    if (shown < 100) requestAnimationFrame(tickPct);
   }
   const pctDone = new Promise((res) => {
-    const check = () => (Math.round(shown) >= 100 ? res() : requestAnimationFrame(check));
+    const check = () => (shown >= 100 ? res() : requestAnimationFrame(check));
     check();
   });
 
-  function charSpan(ch) {
-    const s = document.createElement("span");
-    s.className = "split-char";
-    s.textContent = ch;
-    return s;
-  }
-  async function type(str, speed) {
-    caret.classList.add("is-typing");
-    for (const ch of str) {
-      owText.insertBefore(charSpan(ch), caret);
-      await wait(speed + (ch === " " ? speed : 0) + Math.random() * 18);
-    }
-    caret.classList.remove("is-typing");
-  }
-  async function backspaceAfter(el, count, speed) {
-    // Move the caret to sit after el, then delete leftwards.
-    owText.insertBefore(caret, el.nextSibling);
-    caret.classList.add("is-typing");
-    await wait(260);
-    for (let i = 0; i < count; i++) {
-      const prev = caret.previousElementSibling;
-      if (!prev) break;
-      prev.remove();
-      await wait(speed);
-    }
-    caret.classList.remove("is-typing");
-  }
-
   async function openingSequence() {
-    owText.appendChild(caret);
     requestAnimationFrame(tickPct);
-    await wait(500);
-    await type("Andean Capital Advisors", 52);
-    await wait(650);
-    // "Andean" -> "And": delete n, a, e
-    let typed = Array.from(owText.querySelectorAll(".split-char"));
-    await backspaceAfter(typed[5], 3, 85);
-    await wait(240);
-    // "Advisors" and the space before it, from the end
-    typed = Array.from(owText.querySelectorAll(".split-char"));
-    await backspaceAfter(typed[typed.length - 1], 9, 48);
-    await wait(380);
-    stateEl.textContent = "Loading";
-    await allLoaded;
-    await pctDone;
-    stateEl.textContent = "Ready";
+    await wait(120);
+    owName.classList.add("is-in");
+    // Hold the name long enough to read, and until the page is ready.
+    await Promise.all([allLoaded.then(() => pctDone), wait(1300)]);
+    await wait(180);
 
-    // "And Capital" -> the wordmark. n and d strike to capitals first.
-    caret.style.opacity = 0;
-    const chars = Array.from(owText.querySelectorAll(".split-char"));
-    [chars[1], chars[2]].forEach((c) => {
-      c.style.animation = "none";
-      void c.offsetWidth;
-      c.textContent = c.textContent.toUpperCase();
-      c.style.animation = "color-blink-in .42s var(--ease-out) both";
-    });
-    await wait(520);
-    // The typed name flickers out, then the wordmark lightning-strikes in, glyph by glyph.
-    chars.forEach((c, i) => {
-      c.style.animation = `blink-out .26s linear ${i * 22}ms both`;
-    });
-    await wait(260 + chars.length * 22);
-    $(".ow-type").style.visibility = "hidden";
-    owLogo.style.opacity = 1;
+    // "Andean" closes up to "And".
+    owCut.style.width = owCut.getBoundingClientRect().width + "px";
+    void owCut.offsetWidth;
+    owName.classList.add("is-cut");
+    await wait(820);
+
+    // "And Capital" gives way to the wordmark.
+    owName.classList.add("is-out");
     owLogo.classList.add("is-on");
-    await wait(1100);
+    await wait(1050);
 
-    // Status row flickers out; the gate parts; the wordmark settles in the header.
-    opening.classList.add("is-closing-ui");
-    await wait(380);
+    // The black lifts and the wordmark settles into the header.
+    nodesEl.classList.add("is-out");
     opening.classList.add("is-opening");
     document.body.classList.remove("is-loading");
     const target = $(".chrome-logo").getBoundingClientRect();
@@ -208,15 +154,11 @@
     const s = target.width / from.width;
 
     if (window.gsap) {
-      gsap.to(".opening-gate span:first-child", { yPercent: -101, duration: 1.6, ease: "expo.inOut" });
-      gsap.to(".opening-gate span:last-child", { yPercent: 101, duration: 1.6, ease: "expo.inOut" });
-      gsap.fromTo(heroVideo, { scale: 1.22 }, { scale: 1.12, duration: 2.6, ease: "expo.out" });
-      await wait(700);
-      gsap.to(owLogo, { x: dx, y: dy, scale: s, duration: 1.3, ease: "expo.inOut" });
-      await wait(650);
-      startHero();
-      await wait(700);
-    }
+      gsap.fromTo(heroVideo, { scale: 1.2 }, { scale: 1.12, duration: 2.6, ease: "expo.out" });
+      gsap.to(owLogo, { x: dx, y: dy, scale: s, duration: 1.2, ease: "expo.inOut" });
+      setTimeout(startHero, 450);
+      await wait(1250);
+    } else startHero();
     document.body.classList.add("is-ready");
     opening.classList.add("is-done");
   }
@@ -275,7 +217,15 @@
     .filter((el) => !el.closest(".hero"))
     .forEach((el) => io.observe(el));
   // Stagger the problem lines.
-  $$("[data-line]").forEach((el, i) => (el.style.animationDelay = `${i * 140}ms`));
+  $$("[data-line]").forEach((el, i) => (el.style.transitionDelay = `${i * 110}ms`));
+
+  // The convergence diagram's dot grid.
+  const dg = $("[data-dg-grid]");
+  if (dg) {
+    let d = "";
+    for (let x = 50; x <= 750; x += 50) for (let y = 50; y <= 450; y += 50) d += `<rect x="${x - 1}" y="${y - 1}" width="2" height="2"/>`;
+    dg.innerHTML = d;
+  }
 
   // Lazy videos play only while on screen.
   const vio = new IntersectionObserver(
@@ -320,16 +270,15 @@
       scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true },
     });
 
-    // Slow drift on every section film.
-    $$(".intro-media, .focus-media, .decide-media, .letter-media").forEach((m) => {
-      const v = m.classList.contains("focus-media") ? m.querySelectorAll("video") : m.querySelector("video");
-      gsap.fromTo(v, { yPercent: -6, scale: 1.12 }, {
+    // Slow drift on the focus films.
+    $$(".focus-media").forEach((m) => {
+      gsap.fromTo(m.querySelectorAll("video"), { yPercent: -6, scale: 1.12 }, {
         yPercent: 6, scale: 1.04, ease: "none",
         scrollTrigger: { trigger: m, start: "top bottom", end: "bottom top", scrub: true },
       });
     });
 
-    // Focus names drift apart, like TGE's sector list.
+    // Focus names settle into their offsets.
     $$(".focus-item").forEach((li, i) => {
       gsap.fromTo(li, { x: (i % 2 ? 1 : -1) * 40 }, {
         x: 0, ease: "none",
@@ -358,7 +307,7 @@
   }
 
   /* ------------------------------------------------------------------
-   * Stats: the tick ring and the scramble numerals.
+   * Stats: the tick ring and the count-up figures.
    * ------------------------------------------------------------------ */
   const ring = $("[data-ring]");
   if (ring) {
@@ -372,21 +321,20 @@
     }
     ring.innerHTML = s;
   }
-  const GLYPHS = "0123456789$%#B+";
-  function scramble(el) {
-    const final = el.dataset.scramble;
-    const dur = 1500;
+  // Figures count up on one long ease, then rest on the stated value.
+  function countUp(el) {
+    const final = el.dataset.count;
+    const m = final.match(/^(\D*)([\d.]+)(.*)$/);
+    if (!m) return;
+    const [, pre, num, suf] = m;
+    const n = parseFloat(num);
+    const dur = 1800;
     const t0 = performance.now();
     const frame = (t) => {
       const p = Math.min(1, (t - t0) / dur);
-      let out = "";
-      for (let i = 0; i < final.length; i++) {
-        const settle = (i + 1) / final.length;
-        out += p >= settle * 0.85 + 0.15 ? final[i] : GLYPHS[(Math.random() * GLYPHS.length) | 0];
-      }
-      el.textContent = out;
+      const v = n * (1 - Math.pow(2, -10 * p));
+      el.textContent = p < 1 ? pre + (n < 10 ? v.toFixed(1) : Math.round(v)) + suf : final;
       if (p < 1) requestAnimationFrame(frame);
-      else el.textContent = final;
     };
     requestAnimationFrame(frame);
   }
@@ -394,8 +342,8 @@
     (entries) => entries.forEach((e) => {
       if (!e.isIntersecting) return;
       const stat = e.target;
-      const num = $("[data-scramble]", stat);
-      if (!reduced) scramble(num);
+      const num = $("[data-count]", stat);
+      if (!reduced) countUp(num);
       const ticks = $$(".ring line", stat);
       if (ticks.length && window.gsap && !reduced) {
         gsap.fromTo(ticks, { opacity: 0 }, { opacity: 1, duration: 0.01, stagger: 0.008, ease: "none" });
@@ -441,7 +389,7 @@
   }
 
   /* ------------------------------------------------------------------
-   * Focus list and team rail.
+   * Focus list.
    * ------------------------------------------------------------------ */
   $$(".focus-item").forEach((li) => {
     const b = $(".focus-name", li);
@@ -460,20 +408,4 @@
     li.addEventListener("mouseleave", () => matchMedia("(hover: hover)").matches && open(false));
     b.addEventListener("click", () => open(!li.classList.contains("is-open")));
   });
-
-  const rail = $("[data-rail]");
-  if (rail) {
-    let down = false, sx = 0, sl = 0, moved = 0;
-    rail.addEventListener("pointerdown", (e) => {
-      if (e.pointerType !== "mouse") return;
-      down = true; moved = 0; sx = e.clientX; sl = rail.scrollLeft;
-      rail.classList.add("is-drag");
-    });
-    addEventListener("pointermove", (e) => {
-      if (!down) return;
-      moved = Math.abs(e.clientX - sx);
-      rail.scrollLeft = sl - (e.clientX - sx);
-    });
-    addEventListener("pointerup", () => { down = false; rail.classList.remove("is-drag"); });
-  }
 })();
