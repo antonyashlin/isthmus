@@ -19,9 +19,18 @@
 <nav><button data-f="health">Health</button><button data-f="assets">Real Assets</button><button data-f="energy">Energy</button><button data-f="hero">Hero</button></nav>
 <div id="fps"></div>
 <script type="module">
-  import { createFilms, THREE } from "./js/films.js?v=2"; window.THREE = THREE;
+  import { createFilms, THREE } from "./js/films.js?v=15"; window.THREE = THREE;
   const q = new URLSearchParams(location.search);
   const start = q.get("f") || "health";
+  if (q.has("render")) {
+    // Offline: a fixed 4K canvas, frames rendered on demand.
+    const c = document.getElementById("c");
+    const f = q.get("f");
+    const films = createFilms(c, { names: [f], start: f, dpr: 1, size: [+(q.get("w") || 3840), +(q.get("h") || 2160)], grain: +(q.get("grain") || 0.03) });
+    window.renderFrame = (i, n) => { films.frame(f, i / n, i / 24); return c.toDataURL("image/jpeg", 0.95); };
+    document.querySelector("nav").remove();
+    throw "render mode";
+  }
   const films = createFilms(document.getElementById("c"), { names: ["health", "assets", "energy", "hero"], start, freeze: q.has("p") ? +q.get("p") : null });
   window.films = films;
   films.play();

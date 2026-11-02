@@ -70,7 +70,12 @@ function engraving(size, draw, { rough = 0.4, groove = 0.75, brushed = 0, repeat
     }
     g.strokeStyle = line; g.fillStyle = line;
     g.lineCap = "butt"; g.lineJoin = "miter";
-    draw(g, size, rng(11));
+    const layer = document.createElement("canvas");
+    layer.width = layer.height = size;
+    const lg = layer.getContext("2d");
+    lg.strokeStyle = line; lg.fillStyle = line; lg.lineCap = "butt"; lg.lineJoin = "miter";
+    draw(lg, size, rng(11));
+    g.drawImage(layer, 0, 0);
     const t = new THREE.CanvasTexture(c);
     t.wrapS = t.wrapT = THREE.RepeatWrapping;
     t.anisotropy = 8;
@@ -88,12 +93,38 @@ function engraving(size, draw, { rough = 0.4, groove = 0.75, brushed = 0, repeat
 }
 
 // Technical markings: ticks, labels, traces, dot fields.
-const LABELS = ["AND-03", "LOT 41·07", "S355 J2", "Ø 24", "41.2°", "N 0412", "R-07", "Σ 1.18", "QA ✓", "07/26", "AX-2", "1:250", "B-12", "Δ 0.04"];
-function label(g, r, x, y, px, rot = 0) {
+// Banknote and certificate engraving: serial numbers, roman numerals, the name.
+const LABELS = ["AND CAPITAL", "No. 004127", "MMXXVI", "SERIES I", "No. 000918", "AND CAPITAL", "FOLIO XII", "No. 031406"];
+function label(g, r, x, y, px, rot = 0, text) {
   g.save(); g.translate(x, y); g.rotate(rot);
-  g.font = `500 ${px}px "Helvetica Neue", Helvetica, Arial, sans-serif`;
-  g.fillText(LABELS[Math.floor(r() * LABELS.length)], 0, 0);
+  g.font = `400 ${px}px "Times New Roman", Times, serif`;
+  g.letterSpacing = `${px * 0.28}px`;
+  g.fillText(text || LABELS[Math.floor(r() * LABELS.length)], 0, 0);
   g.restore();
+}
+// A guilloché rosette: interlaced sine rings, as on a banknote or a share certificate.
+function guilloche(g, cx, cy, r0, amp, n, lines, lw) {
+  g.lineWidth = lw;
+  for (let j = 0; j < lines; j++) {
+    const ph = (j / lines) * (TAU / n);
+    g.beginPath();
+    for (let i = 0; i <= 720; i++) {
+      const t = (i / 720) * TAU;
+      const rr = r0 + amp * Math.sin(n * t + ph) + amp * 0.35 * Math.sin(n * 3 * t - ph * 2);
+      const x = cx + Math.cos(t) * rr, y = cy + Math.sin(t) * rr;
+      i ? g.lineTo(x, y) : g.moveTo(x, y);
+    }
+    g.stroke();
+  }
+}
+// Fine parallel rules across a box, at an angle.
+function rules(g, x, y, w, h, gap, angle, lw) {
+  g.save(); g.beginPath(); g.rect(x, y, w, h); g.clip();
+  g.translate(x + w / 2, y + h / 2); g.rotate(angle); g.lineWidth = lw;
+  const L = Math.hypot(w, h);
+  g.beginPath();
+  for (let k = -L; k <= L; k += gap) { g.moveTo(-L, k); g.lineTo(L, k); }
+  g.stroke(); g.restore();
 }
 function ruler(g, x, y, len, step, h, vertical = false) {
   g.lineWidth = Math.max(1, step * 0.12);
@@ -105,20 +136,6 @@ function ruler(g, x, y, len, step, h, vertical = false) {
   }
   g.stroke();
 }
-function trace(g, r, x, y, steps, unit) {
-  g.beginPath(); g.moveTo(x, y);
-  let dir = Math.floor(r() * 4) * (Math.PI / 2);
-  for (let i = 0; i < steps; i++) {
-    const turn = r();
-    if (turn < 0.3) dir += Math.PI / 4; else if (turn < 0.6) dir -= Math.PI / 4;
-    const l = unit * (1 + Math.floor(r() * 3));
-    x += Math.cos(dir) * l; y += Math.sin(dir) * l;
-    g.lineTo(x, y);
-  }
-  g.stroke();
-  g.beginPath(); g.arc(x, y, unit * 0.32, 0, TAU); g.fill();
-}
-
 // A soft-edged slit, projected by the key light.
 function slitTexture(width = 0.16, soft = 0.05, angle = 0) {
   const s = 512, c = document.createElement("canvas");
@@ -197,10 +214,10 @@ function dust(count, box, seed = 3) {
 
 // Final grade: emerald-black shadows, cool desaturated highlights, vignette, edge fringe, grain.
 const GradeShader = {
-  uniforms: { tDiffuse: { value: null }, uTime: { value: 0 }, uRes: { value: new THREE.Vector2(1, 1) }, uFade: { value: 1 } },
+  uniforms: { tDiffuse: { value: null }, uTime: { value: 0 }, uRes: { value: new THREE.Vector2(1, 1) }, uFade: { value: 1 }, uGrain: { value: 0.045 } },
   vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
   fragmentShader: `
-    uniform sampler2D tDiffuse; uniform float uTime; uniform vec2 uRes; uniform float uFade; varying vec2 vUv;
+    uniform sampler2D tDiffuse; uniform float uTime; uniform vec2 uRes; uniform float uFade; uniform float uGrain; varying vec2 vUv;
     float hash(vec2 p){ p = fract(p * vec2(443.897, 441.423)); p += dot(p, p.yx + 19.19); return fract((p.x + p.y) * p.x); }
     void main(){
       vec2 c = vUv - 0.5;
@@ -208,120 +225,90 @@ const GradeShader = {
       vec2 off = c * r2 * 0.012;
       vec3 col = vec3(texture2D(tDiffuse, vUv - off).r, texture2D(tDiffuse, vUv).g, texture2D(tDiffuse, vUv + off).b);
       float l = dot(col, vec3(0.2126, 0.7152, 0.0722));
-      col = mix(vec3(l), col, 0.5);
-      col *= vec3(0.9, 1.0, 0.96);
-      col += vec3(0.006, 0.012, 0.009) * (1.0 - smoothstep(0.0, 0.25, l));
+      col = mix(vec3(l), col, 0.45);
+      col *= vec3(0.8, 1.0, 0.88);
+      col = pow(col, vec3(1.22));
+      float hl = smoothstep(0.42, 0.95, l);
+      col = mix(col, vec3(0.84, 1.0, 0.92) * min(1.0, l * 1.3), hl * 0.6);
+      col += vec3(0.0, 0.011, 0.006) * (1.0 - smoothstep(0.0, 0.2, l));
       col *= mix(0.25, 1.0, smoothstep(0.95, 0.2, length(c * vec2(1.0, 1.25))));
       float g = hash(floor(vUv * uRes) + floor(uTime * 24.0) * 17.0) - 0.5;
-      col += g * 0.045 * (1.0 - l * 0.5);
+      col += g * uGrain * (1.0 - l * 0.5);
       gl_FragColor = vec4(col * uFade, 1.0);
     }`,
 };
 
 /* ---------- Scenes ---------- */
 
-// Health & Wellness: a living lattice of engraved hex cells.
+// Health & Wellness: an MRI scanner, the light travelling around its bore.
 function health(ctx) {
   const { scene, camera, renderer } = ctx;
-  scene.fog = new THREE.FogExp2(0x000000, 0.06);
-  scene.environment = studio(renderer, [[14, 1.6, 0, 9, -6, 3.5], [1.2, 10, -9, 2, 4, 1.4], [1.2, 10, 9, 3, -2, 0.8, [0.85, 1, 0.92]]]);
-  scene.environmentIntensity = 0.22;
+  scene.fog = new THREE.FogExp2(0x000000, 0.035);
+  scene.environment = studio(renderer, [[16, 1.4, 0, 10, 2, 3.2], [1.2, 12, -10, 2, 6, 1.4], [1.2, 10, 10, 2, -4, 0.8, [0.85, 1, 0.92]]]);
+  scene.environmentIntensity = 0.34;
 
-  const R = 1, gap = 0.085;
-  const shape = new THREE.Shape();
-  for (let i = 0; i < 6; i++) { const a = Math.PI / 6 + (i * Math.PI) / 3; i ? shape.lineTo(R * Math.cos(a), R * Math.sin(a)) : shape.moveTo(R * Math.cos(a), R * Math.sin(a)); }
-  shape.closePath();
-  const geo = new THREE.ExtrudeGeometry(shape, { depth: 0.5, bevelEnabled: true, bevelThickness: 0.06, bevelSize: 0.06, bevelSegments: 5, curveSegments: 1 });
-  geo.rotateX(-Math.PI / 2);
-  geo.translate(0, -0.56, 0);
-
-  // Three engraved faces: circuit, dot field with a chip, a calibrated ring.
-  const faces = [
-    (g, s, r) => {
-      g.lineWidth = s * 0.006;
-      hexPath(g, s, 0.84); g.stroke();
-      g.lineWidth = s * 0.0045;
-      for (let i = 0; i < 14; i++) trace(g, r, s * (0.3 + r() * 0.4), s * (0.3 + r() * 0.4), 4 + Math.floor(r() * 4), s * 0.03);
-      g.lineWidth = s * 0.004; g.strokeRect(s * 0.4, s * 0.42, s * 0.2, s * 0.16);
-      label(g, r, s * 0.41, s * 0.66, s * 0.035);
-    },
-    (g, s, r) => {
-      g.lineWidth = s * 0.006; hexPath(g, s, 0.84); g.stroke();
-      for (let y = 0; y < 9; y++) for (let x = 0; x < 9; x++) if (r() > 0.25) { g.beginPath(); g.arc(s * (0.34 + x * 0.04), s * (0.3 + y * 0.04), s * 0.007, 0, TAU); g.fill(); }
-      g.lineWidth = s * 0.0045;
-      for (let i = 0; i < 6; i++) trace(g, r, s * (0.35 + r() * 0.3), s * (0.62 + r() * 0.08), 3 + Math.floor(r() * 3), s * 0.03);
-      label(g, r, s * 0.36, s * 0.27, s * 0.03);
-    },
-    (g, s, r) => {
-      g.lineWidth = s * 0.006; hexPath(g, s, 0.84); g.stroke();
-      g.lineWidth = s * 0.004;
-      g.beginPath(); g.arc(s / 2, s / 2, s * 0.18, 0, TAU); g.stroke();
-      g.beginPath(); g.arc(s / 2, s / 2, s * 0.1, 0, TAU); g.stroke();
-      for (let i = 0; i < 72; i++) { const a = (i / 72) * TAU, l = i % 6 ? 0.02 : 0.045; g.beginPath(); g.moveTo(s / 2 + Math.cos(a) * s * 0.18, s / 2 + Math.sin(a) * s * 0.18); g.lineTo(s / 2 + Math.cos(a) * s * (0.18 + l), s / 2 + Math.sin(a) * s * (0.18 + l)); g.stroke(); }
-      for (let i = 0; i < 5; i++) trace(g, r, s * 0.5, s * 0.5, 3, s * 0.035);
-      label(g, r, s * 0.43, s * 0.76, s * 0.03);
-    },
-  ];
-  function hexPath(g, s, k) { g.beginPath(); for (let i = 0; i < 6; i++) { const a = Math.PI / 6 + (i * Math.PI) / 3; const x = s / 2 + (Math.cos(a) * s * k) / 2, y = s / 2 - (Math.sin(a) * s * k) / 2; i ? g.lineTo(x, y) : g.moveTo(x, y); } g.closePath(); }
-
-  const side = new THREE.MeshPhysicalMaterial({ color: 0xb9c4bf, metalness: 1, roughness: 0.22, clearcoat: 0.4 });
-  const tops = faces.map((draw) => {
-    const m = engraving(1024, draw, { rough: 0.34, groove: 0.8, repeat: [0.5, -0.5], offset: [0.5, 0.5] });
-    return new THREE.MeshPhysicalMaterial({ color: 0x9aa59f, metalness: 1, roughness: 1, ...m, bumpScale: 2.2, clearcoat: 0.25, clearcoatRoughness: 0.4 });
-  });
-
-  const d = Math.sqrt(3) * R + gap, rowH = (d * Math.sqrt(3)) / 2;
-  const cells = [];
-  const r = rng(21);
-  for (let row = -10; row < 26; row++) for (let col = -10; col < 10; col++) {
-    const x = d * (col + 0.5 * (row & 1)), z = row * rowH;
-    const across = x * 0.82 - z * 0.57;
-    if (Math.abs(across + 0.6) > 3.4 + r() * 1.6) continue;
-    if (r() < 0.04) continue;
-    cells.push({ x, z, set: Math.floor(r() * 3), rot: Math.floor(r() * 6) * (Math.PI / 3), h0: r() < 0.1 ? 0.12 * r() : r() < 0.06 ? -0.25 : 0, lift: r() < 0.08 ? r() : -1 });
-  }
-  const meshes = tops.map((top, k) => {
-    const list = cells.filter((c) => c.set === k);
-    const m = new THREE.InstancedMesh(geo, [top, side], list.length);
+  // The gantry: each face of the profile is its own lathe, so every edge stays crisp.
+  const prof = [[1.45, -1.3], [1.45, 1.3], [1.62, 1.46], [3.05, 1.46], [3.45, 1.1], [3.45, -1.1], [3.05, -1.46], [1.62, -1.46], [1.45, -1.3]];
+  const faceMarks = engraving(2048, (g, s, r) => {
+    rules(g, 0, s * 0.3, s, s * 0.06, s * 0.008, 0, 1.6);
+    g.lineWidth = 3; g.beginPath(); g.moveTo(0, s * 0.62); g.lineTo(s, s * 0.62); g.stroke();
+    for (let k = 0; k < 4; k++) label(g, r, s * (0.06 + k * 0.25), s * 0.56, s * 0.022, 0, k % 2 ? "No. 004127" : "AND CAPITAL");
+  }, { rough: 0.22, groove: 0.6, brushed: "h", repeat: [1, 1] });
+  const shell = new THREE.MeshPhysicalMaterial({ color: 0xb4beb9, metalness: 0.35, roughness: 1, ...faceMarks, bumpScale: 1.1, clearcoat: 0.8, clearcoatRoughness: 0.1 });
+  const boreMat = new THREE.MeshPhysicalMaterial({ color: 0x6f7975, metalness: 1, roughness: 0.32, anisotropy: 0.7 });
+  const gantry = new THREE.Group();
+  for (let i = 0; i < prof.length - 1; i++) {
+    const pts = [new THREE.Vector2(...prof[i]), new THREE.Vector2(...prof[i + 1])];
+    const geo = new THREE.LatheGeometry(pts, 220);
+    const m = new THREE.Mesh(geo, i === 0 ? boreMat : shell);
     m.castShadow = m.receiveShadow = true;
-    m.userData.list = list;
-    scene.add(m);
-    return m;
-  });
+    gantry.add(m);
+  }
+  // A recessed light ring inside the bore, and a fine seam around the front.
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(1.44, 0.012, 8, 220), new THREE.MeshBasicMaterial({ color: new THREE.Color(0xd9fff0).multiplyScalar(1.6) }));
+  ring.rotation.x = Math.PI / 2; ring.position.y = 0.9;
+  gantry.add(ring);
+  const seam = new THREE.Mesh(new THREE.TorusGeometry(2.4, 0.01, 6, 220), new THREE.MeshPhysicalMaterial({ color: 0x0a0d0c, roughness: 0.6 }));
+  seam.rotation.x = Math.PI / 2; seam.position.y = 1.465;
+  gantry.add(seam);
+  gantry.rotation.x = Math.PI / 2;
+  gantry.position.set(0, 3.45, 0);
+  scene.add(gantry);
 
-  const key = new THREE.SpotLight(0xe6fff1, 2200, 60, 0.42, 0.25, 2);
-  key.map = slitTexture(0.22, 0.07, 0.35);
+  // The patient table runs out of the bore toward us.
+  const table = new THREE.Mesh(new THREE.BoxGeometry(1.15, 0.14, 7.5), new THREE.MeshPhysicalMaterial({ color: 0x9aa59f, metalness: 0.2, roughness: 0.35, clearcoat: 0.9 }));
+  table.position.set(0, 2.38, 3.0); table.castShadow = table.receiveShadow = true;
+  scene.add(table);
+  const base = new THREE.Mesh(new THREE.BoxGeometry(0.9, 2.2, 4.2), new THREE.MeshPhysicalMaterial({ color: 0x59625e, metalness: 0.3, roughness: 0.4 }));
+  base.scale.set(1, 1, 0.5); base.position.set(0, 1.15, 3.2); base.castShadow = base.receiveShadow = true;
+  scene.add(base);
+
+  // A dark, faintly polished floor to set it down.
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), new THREE.MeshPhysicalMaterial({ color: 0x050706, metalness: 0.4, roughness: 0.22, clearcoat: 0.6 }));
+  floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true;
+  scene.add(floor);
+
+  const key = new THREE.SpotLight(0xe6fff1, 3800, 60, 0.36, 0.25, 2);
+  key.map = slitTexture(0.16, 0.05, 0.6);
   key.castShadow = true; key.shadow.mapSize.set(2048, 2048); key.shadow.bias = -0.0004; key.shadow.normalBias = 0.02;
-  key.position.set(-7, 11, 12);
+  key.position.set(-9, 12, 9);
   scene.add(key, key.target);
-  const rim = new THREE.DirectionalLight(0xcfe8dc, 0.35);
-  rim.position.set(4, 3, 20);
-  scene.add(rim);
-  scene.add(ctx.motes = dust(500, [-4, 6, 0, 3.5, -1, 10]));
-  const band = softbox(scene, 30, 0.7, 3.2);
-  ctx.band = band;
+  const band = softbox(scene, 0.7, 18, 5);
+  // A broad, still soft-box above to model the gantry's form.
+  const top = softbox(scene, 8, 3, 1.6);
+  top.position.set(-5, 9, 7); top.lookAt(0, 3, 0);
+  scene.add(ctx.motes = dust(500, [-4, 4, 0.5, 6, -1, 8]));
 
-  const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0), v = new THREE.Vector3(), one = new THREE.Vector3(1, 1, 1);
   return {
-    focus: 6.6, aperture: 0.0022, maxblur: 0.01,
+    focus: 12.6, aperture: 0.0016, maxblur: 0.009,
     update(p) {
       const ph = p * TAU;
-      meshes.forEach((m) => {
-        m.userData.list.forEach((c, i) => {
-          let y = c.h0 + 0.03 * Math.sin(ph - (c.x * 0.33 + c.z * 0.21));
-          if (c.lift >= 0) y += 0.16 * Math.pow(0.5 + 0.5 * Math.cos(ph - c.lift * TAU), 10);
-          q.setFromAxisAngle(up, c.rot);
-          m4.compose(v.set(c.x, y, c.z), q, one);
-          m.setMatrixAt(i, m4);
-        });
-        m.instanceMatrix.needsUpdate = true;
-      });
-      camera.position.set(-3.4 + 0.45 * Math.sin(ph), 1.75 + 0.1 * Math.sin(ph * 2), -0.6 + 0.6 * Math.cos(ph));
-      camera.lookAt(1.8 + 0.3 * Math.sin(ph + 1), -0.1, 5.4);
-      key.target.position.set(1 + 3.2 * Math.sin(ph), 0, 5 + 2 * Math.cos(ph));
-      band.position.set(2, 2.6, 15 + 5 * Math.sin(ph));
-      band.lookAt(2, 0, 4);
-      band.rotateZ(0.6);
+      camera.position.set(-7.4 + 0.6 * Math.sin(ph), 2.9 + 0.2 * Math.sin(ph * 2), 10.6 + 0.5 * Math.cos(ph));
+      camera.lookAt(0.6 + 0.2 * Math.sin(ph), 3.3, 0);
+      key.target.position.set(2.2 * Math.sin(ph), 3.4, 1.2 * Math.cos(ph));
+      band.position.set(-1 + 9 * Math.sin(ph), 5, 12);
+      band.lookAt(0, 3.4, 0);
+      band.rotateZ(0.25);
     },
   };
 }
@@ -331,7 +318,7 @@ function assets(ctx) {
   const { scene, camera, renderer } = ctx;
   scene.fog = new THREE.FogExp2(0x000000, 0.05);
   scene.environment = studio(renderer, [[1.4, 16, -10, 4, 6, 2.6], [16, 1.2, 0, 10, -4, 1.2], [1.2, 8, 10, 0, 6, 0.6, [0.85, 1, 0.92]]]);
-  scene.environmentIntensity = 0.16;
+  scene.environmentIntensity = 0.11;
 
   function iShape(b, h, tf, tw, rr) {
     const s = new THREE.Shape(), B = b / 2, H = h / 2, W = tw / 2;
@@ -390,7 +377,7 @@ function assets(ctx) {
   add(beamGeo(16), steel, [0, 9, 0.62]);
   add(new THREE.PlaneGeometry(120, 60), concrete, [0, 0, -12]);
 
-  const key = new THREE.SpotLight(0xeefff5, 650, 70, 0.32, 0.2, 2);
+  const key = new THREE.SpotLight(0xeefff5, 700, 70, 0.32, 0.2, 2);
   key.map = slitTexture(0.1, 0.035, 0);
   key.castShadow = true; key.shadow.mapSize.set(2048, 2048); key.shadow.bias = -0.0003; key.shadow.normalBias = 0.02;
   key.position.set(-13, 8, 8);
@@ -399,7 +386,7 @@ function assets(ctx) {
   fill.position.set(6, -4, 14); fill.target.position.set(0, 3, 4);
   scene.add(fill, fill.target);
   scene.add(ctx.motes = dust(500, [-5, 3, 0, 6, 2, 12]));
-  const band = softbox(scene, 22, 0.5, 3.0);
+  const band = softbox(scene, 22, 0.5, 4.5);
   ctx.band = band;
 
   return {
@@ -420,7 +407,7 @@ function energy(ctx) {
   const { scene, camera, renderer } = ctx;
   scene.fog = new THREE.FogExp2(0x000000, 0.045);
   scene.environment = studio(renderer, [[18, 1.2, 0, 10, 2, 3.2], [1.2, 12, -10, 2, 6, 1.2], [1.2, 10, 10, -2, -4, 0.7, [0.85, 1, 0.92]]]);
-  scene.environmentIntensity = 0.3;
+  scene.environmentIntensity = 0.17;
 
   // NACA 4412 section, swept along the span with taper, twist and pre-bend.
   const N = 72, S = 160, L = 22;
@@ -477,9 +464,9 @@ function energy(ctx) {
       g.stroke();
     }
     g.lineWidth = 3;
-    ruler(g, 0, s * 0.16, s, s / 96, s * 0.025);
-    for (let k = 0; k < 4; k++) label(g, r, s * (0.08 + k * 0.25), s * 0.215, s * 0.02);
-    g.lineWidth = 2; g.strokeRect(s * 0.6, s * 0.13, s * 0.12, s * 0.018);
+    rules(g, 0, s * 0.15, s, s * 0.03, s * 0.005, 0, 1.6);
+    label(g, r, s * 0.1, s * 0.215, s * 0.022, 0, "AND CAPITAL");
+    label(g, r, s * 0.6, s * 0.215, s * 0.016, 0, "No. 004127");
   }, { rough: 0.26, groove: 0.7, brushed: "h" });
   const mat = new THREE.MeshPhysicalMaterial({ color: 0xa3aea9, metalness: 0.85, roughness: 1, ...marks, bumpScale: 1.4, clearcoat: 0.7, clearcoatRoughness: 0.18, side: THREE.DoubleSide });
   const blade = new THREE.Mesh(geo, mat);
@@ -502,7 +489,7 @@ function energy(ctx) {
     scene.add(c);
   });
 
-  const key = new THREE.SpotLight(0xf0fff6, 2600, 70, 0.3, 0.18, 2);
+  const key = new THREE.SpotLight(0xf0fff6, 4200, 70, 0.3, 0.18, 2);
   key.map = slitTexture(0.08, 0.03, 0.2);
   key.castShadow = true; key.shadow.mapSize.set(2048, 2048); key.shadow.bias = -0.0003; key.shadow.normalBias = 0.02;
   key.position.set(3, 15, 5);
@@ -511,7 +498,7 @@ function energy(ctx) {
   rim.position.set(14, 6, -10); rim.target.position.set(4, 0, 0);
   scene.add(rim, rim.target);
   scene.add(ctx.motes = dust(500, [-2, 10, -3, 3, -1, 6]));
-  const band = softbox(scene, 0.8, 16, 5.5);
+  const band = softbox(scene, 0.8, 16, 9);
   ctx.band = band;
 
   return {
@@ -529,96 +516,93 @@ function energy(ctx) {
   };
 }
 
-// The hero: the counter of the AND "A", standing as an engraved fin on a long faceted body.
+// The hero: a turbofan intake, the fan turning slowly, the light crossing the lip.
 function hero(ctx) {
   const { scene, camera, renderer } = ctx;
-  scene.fog = new THREE.FogExp2(0x000000, 0.04);
+  scene.fog = new THREE.FogExp2(0x000000, 0.03);
   scene.environment = studio(renderer, [[16, 1.2, 0, 10, 4, 2.6], [1.2, 12, -10, 2, 6, 1.0], [1.2, 10, 10, 2, -4, 0.7, [0.85, 1, 0.92]]]);
-  scene.environmentIntensity = 0.2;
+  scene.environmentIntensity = 0.12;
 
-  const K = 0.378, H = 6, B = K * H;
-  // Fin: the counter triangle, its engraving a column of marks and an inner counter.
-  const finShape = new THREE.Shape();
-  finShape.moveTo(-B, 0); finShape.lineTo(B, 0); finShape.lineTo(0, H); finShape.closePath();
-  const finGeo = new THREE.ExtrudeGeometry(finShape, { depth: 0.1, bevelEnabled: true, bevelThickness: 0.03, bevelSize: 0.03, bevelSegments: 3 });
-  finGeo.translate(0, 0, -0.05);
-  const finMarks = engraving(2048, (g, s, r) => {
-    const X = (x) => s * (x / H + 0.5), Y = (y) => s * (1 - y / H);
-    g.lineWidth = 4;
-    g.beginPath(); g.moveTo(X(-B * 0.86), Y(0.25)); g.lineTo(X(B * 0.86), Y(0.25)); g.lineTo(X(0), Y(H * 0.9)); g.closePath(); g.stroke();
-    g.lineWidth = 3;
-    for (let k = 0; k < 6; k++) { const y = 0.9 + k * 0.62; label(g, r, X(-0.12), Y(y), s * 0.0085); }
-    g.save(); g.translate(X(-B * 0.62), Y(0.5)); g.rotate(-Math.atan2(H, B) + Math.PI / 2 - Math.PI);
-    g.restore();
-    for (let k = 0; k < 40; k++) { const y = 0.5 + k * 0.12, half = B * (1 - y / H) * 0.78; g.beginPath(); g.moveTo(X(-half), Y(y)); g.lineTo(X(-half + (k % 5 ? 0.08 : 0.18)), Y(y)); g.stroke(); }
-    g.beginPath(); g.moveTo(X(0.35), Y(0.6)); g.lineTo(X(0.35), Y(3.2)); g.stroke();
-    g.strokeRect(X(0.5), Y(1.6), s * 0.03, s * 0.08);
-  }, { rough: 0.24, groove: 0.75, brushed: "v", repeat: [1 / H, 1 / H], offset: [0.5, 0] });
-  const finMat = new THREE.MeshPhysicalMaterial({ color: 0xa6b1ac, metalness: 1, roughness: 1, ...finMarks, bumpScale: 1.6, clearcoat: 0.6, clearcoatRoughness: 0.15 });
-  const fin = new THREE.Mesh(finGeo, finMat);
-  fin.castShadow = fin.receiveShadow = true;
+  const metal = (c, r, extra = {}) => new THREE.MeshPhysicalMaterial({ color: c, metalness: 1, roughness: r, ...extra });
 
-  // Body: a long faceted bar with panel seams and markings.
-  const prof = new THREE.Shape();
-  [[-1.7, 0], [-1.25, 0.55], [1.25, 0.55], [1.7, 0], [1.3, -0.45], [-1.3, -0.45]].forEach(([x, y], i) => (i ? prof.lineTo(x, y) : prof.moveTo(x, y)));
-  prof.closePath();
-  const bodyGeo = new THREE.ExtrudeGeometry(prof, { depth: 40, bevelEnabled: true, bevelThickness: 0.02, bevelSize: 0.02, bevelSegments: 2 });
-  bodyGeo.translate(0, 0, -20);
-  const bodyMarks = engraving(2048, (g, s, r) => {
-    g.lineWidth = 3;
-    for (let k = 0; k < 6; k++) { const y = s * (k / 6); g.beginPath(); g.moveTo(0, y); g.lineTo(s, y); g.stroke(); }
-    g.lineWidth = 2.5;
-    ruler(g, s * 0.62, 0, s, s / 120, s * 0.03, true);
-    for (let k = 0; k < 6; k++) { label(g, r, s * 0.3, s * (0.08 + k / 6), s * 0.02, Math.PI / 2); }
-    for (let k = 0; k < 8; k++) trace(g, r, s * (0.15 + r() * 0.15), s * r(), 3, s * 0.02);
-  }, { rough: 0.32, groove: 0.8, brushed: "v", repeat: [0.4, 0.12] });
-  const bodyMat = new THREE.MeshPhysicalMaterial({ color: 0x7f8a86, metalness: 1, roughness: 1, ...bodyMarks, bumpScale: 1.5, anisotropy: 0.6, anisotropyRotation: Math.PI / 2, clearcoat: 0.2 });
-  const body = new THREE.Mesh(bodyGeo, bodyMat);
-  body.castShadow = body.receiveShadow = true;
+  // Nacelle: a smooth lathe from the inner lip, round the leading edge, back along the outside.
+  const lip = [];
+  for (let i = 0; i <= 40; i++) { const a = -Math.PI / 2 + (i / 40) * Math.PI; lip.push(new THREE.Vector2(3.0 + 0.32 * Math.cos(a) * -1 + 0.32, 0.32 * Math.sin(a))); }
+  const nacPts = [new THREE.Vector2(2.72, -5.5), new THREE.Vector2(2.7, -1.2), ...lip.reverse().map((v) => new THREE.Vector2(v.x - 0.02, v.y)), new THREE.Vector2(3.38, -1.4), new THREE.Vector2(3.42, -5.5)];
+  const nacMarks = engraving(2048, (g, s, r) => {
+    label(g, r, s * 0.1, s * 0.72, s * 0.02, 0, "AND CAPITAL");
+    label(g, r, s * 0.6, s * 0.72, s * 0.014, 0, "No. 004127");
+    g.lineWidth = 2; g.beginPath(); g.moveTo(0, s * 0.76); g.lineTo(s, s * 0.76); g.stroke();
+  }, { rough: 0.2, groove: 0.6, brushed: "h" });
+  const nacelle = new THREE.Mesh(new THREE.LatheGeometry(nacPts, 240), metal(0xb8c2bd, 1, { ...nacMarks, bumpScale: 1, clearcoat: 1, clearcoatRoughness: 0.06, side: THREE.DoubleSide }));
+  nacelle.castShadow = nacelle.receiveShadow = true;
 
-  const rig = new THREE.Group();
-  body.rotation.y = Math.PI / 2;
-  fin.position.set(0.6, 0.5, 0);
-  fin.rotation.y = -0.5;
-  rig.add(body, fin);
-  // A single emerald inlay where the fin meets the body: the only colour in the film.
-  const inlay = new THREE.Mesh(new THREE.BoxGeometry(2 * B * 0.9, 0.025, 0.02), new THREE.MeshBasicMaterial({ color: new THREE.Color(0x4fb97a).multiplyScalar(2.2) }));
-  inlay.position.set(0.6, 0.57, 0); inlay.rotation.y = -0.5;
-  rig.add(inlay);
-  rig.rotation.set(0.1, 0.35, -0.32);
-  scene.add(rig);
+  // Spinner: a polished cone with the engraved spiral every turbofan carries.
+  const sp = [];
+  for (let i = 0; i <= 40; i++) { const t = i / 40; sp.push(new THREE.Vector2(0.78 * Math.sin(t * Math.PI / 2) ** 0.8 + 0.001, 1.1 - t * 1.9)); }
+  const spMarks = engraving(1024, (g, s) => {
+    g.lineWidth = s * 0.03;
+    g.beginPath(); for (let i = 0; i <= 100; i++) { const t = i / 100; const x = (t * s * 1.0 + s * 0.2) % s, y = t * s; i ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke();
+  }, { rough: 0.12, groove: 0.45 });
+  const spinner = new THREE.Mesh(new THREE.LatheGeometry(sp, 160), metal(0x9aa5a0, 1, { ...spMarks, bumpScale: 0.6, clearcoat: 1, clearcoatRoughness: 0.04 }));
 
-  // Hairline frames in the dark behind, catching the light as it passes.
-  const hair = new THREE.MeshPhysicalMaterial({ color: 0xc0cac5, metalness: 1, roughness: 0.2 });
-  const r = rng(9);
-  for (let i = 0; i < 9; i++) {
-    const m = new THREE.Mesh(new THREE.BoxGeometry(0.025, 0.025, 80), hair);
-    m.position.set(-8 + r() * 18, -2 + r() * 10, -6 - r() * 10);
-    m.rotation.set(r() * 0.6, 0.6 + r() * 1.2, r() * 0.8);
-    scene.add(m);
+  // Fan: swept, twisted blades on a hub; identical, so turning by one pitch loops exactly.
+  const NB = 22, S = 40, C = 10;
+  const pos = [], idx = [], uvs = [];
+  for (let j = 0; j <= S; j++) {
+    const t = j / S, rad = lerp(0.8, 2.66, t), pitch = lerp(0.95, 0.42, t), w = lerp(0.62, 0.9, t), sweep = 0.32 * t * t;
+    for (let k = 0; k <= C; k++) {
+      const c = k / C - 0.5;
+      const dth = (c * w * Math.cos(pitch)) / rad + sweep;
+      const z = -0.9 - c * w * Math.sin(pitch) + 0.08 * Math.sin(Math.PI * (k / C));
+      pos.push(rad * Math.cos(dth), rad * Math.sin(dth), z);
+      uvs.push(k / C, t);
+    }
   }
+  for (let j = 0; j < S; j++) for (let k = 0; k < C; k++) { const a = j * (C + 1) + k, b = a + C + 1; idx.push(a, b, a + 1, b, b + 1, a + 1); }
+  const bladeGeo = new THREE.BufferGeometry();
+  bladeGeo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+  bladeGeo.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
+  bladeGeo.setIndex(idx); bladeGeo.computeVertexNormals();
+  const bladeMat = metal(0x9ba6a1, 0.3, { anisotropy: 0.6, clearcoat: 0.5, side: THREE.DoubleSide });
+  const fan = new THREE.Group();
+  for (let i = 0; i < NB; i++) { const b = new THREE.Mesh(bladeGeo, bladeMat); b.rotation.z = (i / NB) * TAU; b.castShadow = b.receiveShadow = true; fan.add(b); }
+  const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.82, 0.82, 1.2, 96), metal(0x89938f, 0.3));
+  hub.rotation.x = Math.PI / 2; hub.position.z = -0.9;
+  fan.add(hub);
+  // The dark core behind the fan.
+  const core = new THREE.Mesh(new THREE.CircleGeometry(2.72, 96), new THREE.MeshStandardMaterial({ color: 0x010101, roughness: 1 }));
+  core.position.z = -2.6;
 
-  const key = new THREE.SpotLight(0xeefff5, 1600, 70, 0.34, 0.2, 2);
-  key.map = slitTexture(0.12, 0.04, 0.5);
+  const engine = new THREE.Group();
+  nacelle.rotation.x = Math.PI / 2; spinner.rotation.x = Math.PI / 2;
+  engine.add(nacelle, spinner, fan, core);
+  engine.rotation.set(0.08, -0.62, 0);
+  engine.position.set(1.4, 0.2, 0);
+  scene.add(engine);
+
+  const key = new THREE.SpotLight(0xeefff5, 1300, 70, 0.34, 0.2, 2);
+  key.map = slitTexture(0.12, 0.04, 0.4);
   key.castShadow = true; key.shadow.mapSize.set(2048, 2048); key.shadow.bias = -0.0003; key.shadow.normalBias = 0.02;
-  key.position.set(-6, 13, 9);
+  key.position.set(-8, 10, 10);
   scene.add(key, key.target);
-  const band = softbox(scene, 0.8, 20, 2.4);
-  const rim = new THREE.SpotLight(0xcde6d9, 900, 60, 0.5, 0.6, 2);
-  rim.position.set(10, 8, -10); rim.target.position.set(0, 2, 0);
+  const band = softbox(scene, 0.6, 22, 1.8);
+  const rim = new THREE.SpotLight(0xcde6d9, 500, 60, 0.5, 0.6, 2);
+  rim.position.set(10, 6, -8); rim.target.position.set(1.4, 0, 0);
   scene.add(rim, rim.target);
-  scene.add(ctx.motes = dust(600, [-6, 6, -1, 6, -2, 7]));
+  scene.add(ctx.motes = dust(600, [-6, 6, -3, 4, -1, 7]));
 
   return {
-    focus: 13.5, aperture: 0.0012, maxblur: 0.009,
+    focus: 9.4, aperture: 0.0016, maxblur: 0.009,
     update(p) {
       const ph = p * TAU;
-      camera.position.set(-2.6 + 0.8 * Math.sin(ph), -0.4 + 0.25 * Math.sin(ph * 2), 14 + 0.6 * Math.cos(ph));
-      camera.lookAt(-1.4 + 0.3 * Math.sin(ph), 2.6, 0);
-      key.target.position.set(1.5 * Math.sin(ph), 1.5, 2 * Math.cos(ph));
-      band.position.set(1 + 7 * Math.sin(ph), 3, 12);
-      band.lookAt(1, 2, 0);
-      band.rotateZ(0.5);
+      fan.rotation.z = -p * (TAU / NB) * 3;
+      camera.position.set(-2.6 + 0.6 * Math.sin(ph), 0.5 + 0.25 * Math.sin(ph * 2), 9.6 + 0.4 * Math.cos(ph));
+      camera.lookAt(-0.4 + 0.3 * Math.sin(ph), 0.1, 0);
+      key.target.position.set(1.4 + 2 * Math.sin(ph), 0.5, 1.5 * Math.cos(ph));
+      band.position.set(1 + 8 * Math.sin(ph), 3, 12);
+      band.lookAt(1.4, 0, 0);
+      band.rotateZ(0.4);
     },
   };
 }
@@ -629,10 +613,10 @@ const SCENES = { health, assets, energy, hero };
 
 export const PERIOD = 16;
 
-export function createFilms(canvas, { names = ["health", "assets", "energy"], start = names[0], dpr = Math.min(devicePixelRatio || 1, 1.75), freeze = null } = {}) {
+export function createFilms(canvas, { names = ["health", "assets", "energy"], start = names[0], dpr = Math.min(devicePixelRatio || 1, 1.75), freeze = null, size = null, grain = 0.045 } = {}) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: "high-performance" });
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.0;
+  renderer.toneMappingExposure = 0.92;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.setPixelRatio(dpr);
@@ -651,8 +635,9 @@ export function createFilms(canvas, { names = ["health", "assets", "energy"], st
   const composer = new EffectComposer(renderer, rt);
   const renderPass = new RenderPass(films[start].scene, films[start].camera);
   const bokeh = new BokehPass(films[start].scene, films[start].camera, { focus: 8, aperture: 0.001, maxblur: 0.008 });
-  const bloom = new UnrealBloomPass(new THREE.Vector2(4, 4), 0.42, 0.55, 0.82);
+  const bloom = new UnrealBloomPass(new THREE.Vector2(4, 4), 0.5, 0.42, 0.86);
   const grade = new ShaderPass(GradeShader);
+  grade.uniforms.uGrain.value = grain;
   composer.addPass(renderPass);
   composer.addPass(bokeh);
   composer.addPass(bloom);
@@ -662,7 +647,7 @@ export function createFilms(canvas, { names = ["health", "assets", "energy"], st
   let current = start, next = null, fadeT = 1, fading = 0;
   let w = 0, h = 0;
   function resize() {
-    const r = canvas.getBoundingClientRect();
+    const r = size ? { width: size[0], height: size[1] } : canvas.getBoundingClientRect();
     const nw = Math.max(2, Math.round(r.width)), nh = Math.max(2, Math.round(r.height));
     if (nw === w && nh === h) return;
     w = nw; h = nh;
@@ -716,6 +701,15 @@ export function createFilms(canvas, { names = ["health", "assets", "energy"], st
     get current() { return current; },
     // Renders one frame at a phase, for posters and checks.
     still(name, p) { use(name); resize(); films[name].shot.update(p); composer.render(0); use(current); },
+    // One frame of a film at loop phase p, with grain seeded by t: for offline rendering.
+    frame(name, p, t) {
+      use(name); resize();
+      const f = films[name];
+      f.shot.update(p);
+      if (f.motes) { f.motes.material.uniforms.uPhase.value = p; f.motes.material.uniforms.uPx.value = dpr * (h / 900); }
+      grade.uniforms.uTime.value = t; grade.uniforms.uFade.value = 1;
+      composer.render(1 / 24);
+    },
     renderer, films,
     set freeze(v) { freeze = v; },
   };

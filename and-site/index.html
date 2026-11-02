@@ -8,8 +8,7 @@
 <meta name="theme-color" content="#050706">
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
 <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700&display=swap">
-<link rel="stylesheet" href="css/site.css?v=7">
-<script type="importmap">{ "imports": { "three": "./vendor/three/three.module.min.js", "three/addons/": "./vendor/three/addons/" } }</script>
+<link rel="stylesheet" href="css/site.css?v=10">
 </head>
 <body class="is-loading">
 
@@ -40,12 +39,13 @@
   <!-- ============ 1. Hero ============ -->
   <section class="hero" data-theme="dark">
     <div class="hero-media media">
-      <img class="film-poster" src="assets/hero.jpg" alt="">
-      <canvas class="film" data-film="hero" aria-hidden="true"></canvas>
+      <video muted loop playsinline autoplay preload="auto" data-lazy poster="assets/films/hero.jpg">
+        <source src="assets/films/hero-2160.mp4" type="video/mp4" media="(min-width: 1700px), (min-resolution: 1.5dppx) and (min-width: 1100px)">
+        <source src="assets/films/hero-1080.mp4" type="video/mp4">
+      </video>
     </div>
     <div class="hero-shade"></div>
     <div class="hero-inner">
-      <p class="cap hero-eyebrow" data-blink>A Global Investment Portfolio</p>
       <h1 class="hero-title" data-hero-title>
         <span class="line">The most important risks</span>
         <span class="line">are the least understood</span>
@@ -60,7 +60,6 @@
   <!-- ============ 2. The problem ============ -->
   <section class="intro" id="philosophy">
     <div class="wrap">
-      <p class="cap section-cap" data-blink><span class="cap-num">01</span>The Problem We See</p>
       <h2 class="display" data-text-fade>Accessing capital has become more complex. <em>Not less.</em></h2>
       <div class="intro-grid">
         <div class="intro-copy">
@@ -105,26 +104,22 @@
   <section class="split">
     <div class="wrap split-grid">
       <div class="split-head">
-        <p class="cap section-cap" data-blink><span class="cap-num">02</span>Thesis</p>
         <h2 class="display sticky" data-text-fade>Why complexity <em>is mispriced.</em></h2>
       </div>
       <div class="split-body">
         <p class="lede" data-words>In today's markets, <b>true risk rarely appears</b> where financial models predict it will.</p>
         <article class="point" data-reveal>
           <i data-icon="understanding" data-size="40"></i>
-          <p class="cap">Our Advantage</p>
           <h3>Deep Understanding Wins</h3>
           <p class="body">Where others see obstacles, we see sustainable competitive moats built on deep domain understanding.</p>
         </article>
         <article class="point" data-reveal>
           <i data-icon="hidden" data-size="40"></i>
-          <p class="cap">Hidden Opportunities</p>
           <h3>Complexity Creates Value</h3>
           <p class="body">Persistent mispricings hide within regulated industries, operational complexity, and legacy infrastructure.</p>
         </article>
         <article class="point" data-reveal>
           <i data-icon="speed" data-size="40"></i>
-          <p class="cap">The Speed Trap</p>
           <h3>Pattern Recognition Fails</h3>
           <p class="body">Most capital chases patterns, speed, and surface efficiency, creating systematic blind spots in complex markets.</p>
         </article>
@@ -135,11 +130,20 @@
   <!-- ============ 4. Focus areas ============ -->
   <section class="focus" id="focus">
     <div class="focus-media media" data-focus-media>
-      <img class="film-poster" src="assets/focus-health.jpg" alt="" loading="lazy">
-      <canvas class="film" data-film="focus" aria-hidden="true"></canvas>
+      <video class="is-active" data-k="health" muted loop playsinline preload="none" data-lazy poster="assets/films/health.jpg">
+        <source src="assets/films/health-2160.mp4" type="video/mp4" media="(min-width: 1700px), (min-resolution: 1.5dppx) and (min-width: 1100px)">
+        <source src="assets/films/health-1080.mp4" type="video/mp4">
+      </video>
+      <video data-k="assets" muted loop playsinline preload="none" data-lazy poster="assets/films/assets.jpg">
+        <source src="assets/films/assets-2160.mp4" type="video/mp4" media="(min-width: 1700px), (min-resolution: 1.5dppx) and (min-width: 1100px)">
+        <source src="assets/films/assets-1080.mp4" type="video/mp4">
+      </video>
+      <video data-k="energy" muted loop playsinline preload="none" data-lazy poster="assets/films/energy.jpg">
+        <source src="assets/films/energy-2160.mp4" type="video/mp4" media="(min-width: 1700px), (min-resolution: 1.5dppx) and (min-width: 1100px)">
+        <source src="assets/films/energy-1080.mp4" type="video/mp4">
+      </video>
     </div>
     <div class="focus-head">
-      <p class="cap section-cap center" data-blink><span class="cap-num">03</span>Focus Areas</p>
       <h2 class="title-sm" data-text-fade>We focus where complexity <br>hides durable value</h2>
       <p class="cap" data-blink>Technology and data, applied to complex operations</p>
     </div>
@@ -162,7 +166,6 @@
   <!-- ============ 5. Numbers ============ -->
   <section class="stats" id="partners">
     <div class="wrap">
-      <p class="cap section-cap center" data-blink><span class="cap-num">04</span>Track Record</p>
       <h2 class="title-sm center" data-text-fade>A Record That <br>Speaks for Itself</h2>
       <div class="stats-grid">
         <figure class="stat stat-ring">
@@ -193,7 +196,6 @@
   <!-- ============ 6. How we decide ============ -->
   <section class="decide" id="decide">
     <div class="decide-head">
-      <p class="cap section-cap center" data-blink><span class="cap-num">05</span>Process</p>
       <h2 class="title-sm center" data-text-fade>How We <br>Decide.</h2>
       <p class="body center" data-words>Our investment decisions combine <b>AI-powered analytics with human judgment,</b> a systematic approach that exceeds traditional risk assessment.</p>
     </div>
@@ -209,7 +211,6 @@
   <section class="infra">
     <div class="wrap infra-grid">
       <div class="infra-head">
-        <p class="cap section-cap" data-blink><span class="cap-num">06</span>Our Institutional Infrastructure</p>
         <h2 class="display" data-text-fade>Systematic process. <em>Human judgment.</em></h2>
         <p class="body" data-words>We build systematic processes and <b>institutional-grade infrastructure</b> that enhance traditional investment capabilities. Our integrated approach to data, analytics, and operational excellence creates <b>the transparency and efficiency</b> sophisticated investors expect.</p>
       </div>
@@ -238,7 +239,6 @@
     <div class="wrap">
       <div class="team-head">
         <div>
-          <p class="cap section-cap" data-blink><span class="cap-num">07</span>People</p>
           <h2 class="display" data-text-fade>Our People. <em>Experienced leadership.</em></h2>
         </div>
         <p class="body" data-words>Driving value across <b>healthcare, minerals, and real assets.</b></p>
@@ -253,7 +253,6 @@
   <!-- ============ 9. The letter ============ -->
   <section class="letter" id="news">
     <div class="wrap">
-      <p class="cap section-cap center" data-blink><span class="cap-num">08</span>Perspective</p>
       <blockquote class="letter-quote" data-scrub-words>
         Complexity is not the enemy of returns. It is the source of sustainable competitive advantage for those willing to understand it.
       </blockquote>
@@ -303,7 +302,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
 <script src="js/icons.js?v=4"></script>
-<script src="js/site.js?v=5"></script>
-<script type="module" src="js/film-mount.js?v=2"></script>
+<script src="js/site.js?v=7"></script>
 </body>
 </html>
