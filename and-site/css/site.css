@@ -236,13 +236,14 @@ body:not(.is-open) .chrome { opacity: 0; transition: none; }
 /* ---------- Media ---------- */
 .media { position: relative; overflow: hidden; background: var(--bg); }
 .media video, .media img { width: 100%; height: 100%; object-fit: cover; }
-.focus-media video { position: absolute; inset: 0; opacity: 0; transition: opacity 1.1s var(--ease-out); }
-.focus-media video.is-active { opacity: 1; }
+.media .film-poster, .media .film { position: absolute; inset: 0; width: 100%; height: 100%; }
+.media .film { display: block; opacity: 0; transition: opacity 1.4s var(--ease-out); }
+.media .film.is-live { opacity: 1; }
 
 /* ---------- 1. Hero ---------- */
 .hero { position: relative; height: 100svh; min-height: 640px; overflow: hidden; display: grid; place-items: center; }
 .hero-media { position: absolute; inset: 0; }
-.hero-media video { transform: scale(1.12); will-change: transform; }
+.hero-media .film, .hero-media .film-poster { transform: scale(1.12); will-change: transform; }
 .hero-shade {
   position: absolute; inset: 0;
   background:

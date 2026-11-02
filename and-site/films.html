@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AND Films</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #000; color: #fff; font: 500 12px/1.4 system-ui, sans-serif; overflow: hidden; }
+  canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  nav { position: fixed; left: 24px; bottom: 24px; display: flex; gap: 8px; z-index: 2; }
+  nav button { background: rgba(255,255,255,.08); color: #fff; border: 1px solid rgba(255,255,255,.14); padding: 8px 14px; border-radius: 999px; font: inherit; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; }
+  nav button.on { background: #fff; color: #000; }
+  #fps { position: fixed; right: 24px; bottom: 24px; opacity: .5; }
+</style>
+<script type="importmap">{ "imports": { "three": "./vendor/three/three.module.min.js", "three/addons/": "./vendor/three/addons/" } }</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<nav><button data-f="health">Health</button><button data-f="assets">Real Assets</button><button data-f="energy">Energy</button><button data-f="hero">Hero</button></nav>
+<div id="fps"></div>
+<script type="module">
+  import { createFilms, THREE } from "./js/films.js?v=2"; window.THREE = THREE;
+  const q = new URLSearchParams(location.search);
+  const start = q.get("f") || "health";
+  const films = createFilms(document.getElementById("c"), { names: ["health", "assets", "energy", "hero"], start, freeze: q.has("p") ? +q.get("p") : null });
+  window.films = films;
+  films.play();
+  const btns = [...document.querySelectorAll("nav button")];
+  const mark = (n) => btns.forEach((b) => b.classList.toggle("on", b.dataset.f === n));
+  mark(start);
+  btns.forEach((b) => b.addEventListener("click", () => { films.show(b.dataset.f); mark(b.dataset.f); }));
+  if (q.has("clean")) document.querySelector("nav").remove();
+  let n = 0, t = performance.now();
+  (function tick(now) { n++; if (now - t > 1000) { document.getElementById("fps").textContent = n + " fps"; n = 0; t = now; } requestAnimationFrame(tick); })(t);
+</script>
+</body>
+</html>

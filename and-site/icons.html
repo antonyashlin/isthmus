@@ -17,9 +17,7 @@
   .rules { display: grid; gap: 14px; font-size: 14px; line-height: 1.5; color: rgba(255,255,255,.55); }
   .rules b { color: #fff; font-weight: 500; }
   .anatomy { display: grid; grid-template-columns: 280px 1fr; gap: 48px; align-items: center; padding: 56px 0; border-bottom: 1px solid var(--line); }
-  .anatomy-art { display: flex; align-items: end; gap: 28px; }
-  .anatomy-art .src { width: 104px; height: auto; fill: #fff; }
-  .anatomy-art .and-icon { width: 160px; height: 160px; color: #fff; }
+  .anatomy-art svg { width: 240px; height: 240px; color: #fff; }
   .anatomy-notes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
   .anatomy-notes div { border-top: 1px solid var(--line); padding-top: 16px; font-size: 13px; color: rgba(255,255,255,.55); line-height: 1.5; }
   .anatomy-notes b { display: block; color: #fff; font-weight: 500; margin-bottom: 6px; font-size: 14px; }
@@ -45,22 +43,22 @@
   <header>
     <div>
       <p class="cap">AND Capital / Icon System</p>
-      <h1>Cut from <span>the wordmark.</span></h1>
+      <h1>One grid. <span>Every line meets at AND.</span></h1>
     </div>
     <div class="rules">
-      <p><b>The source.</b> Every icon is built only from what the AND wordmark is made of. Nothing is borrowed from a stock set or another system.</p>
-      <p><b>The strokes.</b> Straight stems with flat, square-cut ends, like the letters. Diagonals run only at the A's leg angle. Curves are only the D's bowl, a true semicircle.</p>
-      <p><b>The counter.</b> Each icon holds the A's counter, the triangle inside the A, drawn at the same angle in emerald. One per icon, and the only colour.</p>
+      <p><b>The grid.</b> Every icon is drawn on the same three by three node grid, so the whole set reads as one system.</p>
+      <p><b>The join.</b> Straight lines only, one 1.25 weight, square terminals. Nodes a line touches are solid; the rest stay as faint points.</p>
+      <p><b>The conjunction.</b> Each icon carries one emerald node: the point the idea resolves to. It is the signature of the set, and the only colour.</p>
     </div>
   </header>
 
   <section class="anatomy">
     <div class="anatomy-art" id="anatomy"></div>
     <div class="anatomy-notes">
-      <div><b>Stem</b>2.2 at 24px in a 24 unit box. Flat, square-cut ends and mitred joins, like the letters.</div>
-      <div><b>Angle</b>Every diagonal runs at the A's leg: 0.378 across for every 1 down. No other angles.</div>
-      <div><b>Curve</b>Every curve is the D's bowl: a true semicircle. No freehand curves, no rounded corners.</div>
-      <div><b>Counter</b>The A's counter in #4FB97A, at the same angle. One per icon. Never two, never removed.</div>
+      <div><b>Grid</b>3 x 3 nodes in a 24 unit box, at 4, 12 and 20.</div>
+      <div><b>Stroke</b>1.25 at 24px, square caps, mitred joins. Scales with the icon.</div>
+      <div><b>Nodes</b>Solid 2.8 squares where lines land. Unused nodes stay at 1.2, 32 percent.</div>
+      <div><b>AND node</b>One 4.2 emerald square, #4FB97A. Never two. Never removed.</div>
     </div>
   </section>
 
@@ -76,12 +74,10 @@
   <div class="row" id="light"></div>
 </section>
 
-<script src="js/icons.js?v=3"></script>
+<script src="js/icons.js"></script>
 <script>
   const { ICONS, svg } = ANDIcons;
-  // The wordmark's A beside the icon cut from it.
-  const A = "M24.0635 25.0596H19.508L17.9827 20.6462L10.5632 20.6553L9.05718 25.0596H4.60889L12.1635 5.07972L16.4832 5.05176L16.6632 5.13995L24.064 25.059L24.0635 25.0596ZM16.8819 17.3159L14.3099 10.0024L11.7369 17.3159H16.8819Z";
-  document.getElementById("anatomy").innerHTML = `<svg class="src" viewBox="4.4 4.8 19.9 20.5" aria-hidden="true"><path d="${A}"/></svg>` + svg("curiosity", { size: 160, stroke: 1.6 });
+  document.getElementById("anatomy").innerHTML = svg("alignment", { size: 240, stroke: 1 });
   const groups = [
     ["Thesis", ["understanding", "hidden", "speed"]],
     ["Infrastructure", ["process", "efficiency", "data"]],
@@ -94,7 +90,7 @@
     <section class="group"><h2 class="cap">${title}</h2><div class="grid">
       ${names.map((n) => `<div class="cell"><div class="ic">${svg(n, { size: 56 })}</div><p>${ICONS[n].label}</p></div>`).join("")}
     </div></section>`).join("");
-  document.getElementById("sizes").innerHTML = [16, 20, 24, 32, 48].map((s) => `<figure>${svg("curiosity", { size: s })}<figcaption>${s}px</figcaption></figure>`).join("");
+  document.getElementById("sizes").innerHTML = [16, 20, 24, 32, 48].map((s) => `<figure>${svg("energy", { size: s })}<figcaption>${s}px</figcaption></figure>`).join("");
   document.getElementById("light").innerHTML = Object.keys(ICONS).map((n) => svg(n, { size: 40, theme: "light" })).join("");
 </script>
 </body>

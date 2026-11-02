@@ -8,7 +8,8 @@
 <meta name="theme-color" content="#050706">
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
 <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700&display=swap">
-<link rel="stylesheet" href="css/site.css?v=6">
+<link rel="stylesheet" href="css/site.css?v=7">
+<script type="importmap">{ "imports": { "three": "./vendor/three/three.module.min.js", "three/addons/": "./vendor/three/addons/" } }</script>
 </head>
 <body class="is-loading">
 
@@ -39,9 +40,8 @@
   <!-- ============ 1. Hero ============ -->
   <section class="hero" data-theme="dark">
     <div class="hero-media media">
-      <video autoplay muted loop playsinline preload="auto" poster="assets/hero.jpg">
-        <source src="assets/hero.mp4" type="video/mp4">
-      </video>
+      <img class="film-poster" src="assets/hero.jpg" alt="">
+      <canvas class="film" data-film="hero" aria-hidden="true"></canvas>
     </div>
     <div class="hero-shade"></div>
     <div class="hero-inner">
@@ -135,15 +135,8 @@
   <!-- ============ 4. Focus areas ============ -->
   <section class="focus" id="focus">
     <div class="focus-media media" data-focus-media>
-      <video class="is-active" data-k="health" muted loop playsinline preload="none" poster="assets/focus-health.jpg" data-lazy>
-        <source src="assets/focus-health.mp4" type="video/mp4">
-      </video>
-      <video data-k="assets" muted loop playsinline preload="none" poster="assets/focus-assets.jpg" data-lazy>
-        <source src="assets/focus-assets.mp4" type="video/mp4">
-      </video>
-      <video data-k="energy" muted loop playsinline preload="none" poster="assets/focus-energy.jpg" data-lazy>
-        <source src="assets/focus-energy.mp4" type="video/mp4">
-      </video>
+      <img class="film-poster" src="assets/focus-health.jpg" alt="" loading="lazy">
+      <canvas class="film" data-film="focus" aria-hidden="true"></canvas>
     </div>
     <div class="focus-head">
       <p class="cap section-cap center" data-blink><span class="cap-num">03</span>Focus Areas</p>
@@ -309,7 +302,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
-<script src="js/icons.js?v=3"></script>
-<script src="js/site.js?v=4"></script>
+<script src="js/icons.js?v=4"></script>
+<script src="js/site.js?v=5"></script>
+<script type="module" src="js/film-mount.js?v=2"></script>
 </body>
 </html>

@@ -86,7 +86,7 @@
   const owCut = $(".ow-cut");
   const owLogo = $(".ow-logo");
   const nodesEl = $("[data-nodes]");
-  const heroVideo = $(".hero-media video");
+  const heroVideo = $(".hero-media .film");
 
   // Perimeter clockwise, then the centre: every line meets at AND.
   const NODE_ORDER = [0, 1, 2, 5, 8, 7, 6, 3, 4];
@@ -94,15 +94,13 @@
   const nodes = NODE_ORDER.map((i) => nodesEl.children[i]);
   nodes[8].classList.add("is-and");
 
-  // Real loading progress: fonts, the hero video's first frames, the window.
+  // Real loading progress: fonts, the hero film's first frame, the window.
   let loaded = 0;
   const tasks = [
     document.fonts ? document.fonts.ready : Promise.resolve(),
     new Promise((r) => {
-      if (!heroVideo) return r();
-      if (heroVideo.readyState >= 3) return r();
-      heroVideo.addEventListener("canplay", r, { once: true });
-      heroVideo.addEventListener("error", r, { once: true });
+      if (window.__filmReady) return r();
+      addEventListener("film:ready", r, { once: true });
       setTimeout(r, 6000);
     }),
     new Promise((r) => (document.readyState === "complete" ? r() : addEventListener("load", r, { once: true }))),
@@ -268,7 +266,7 @@
 
     // Slow drift on the focus films.
     $$(".focus-media").forEach((m) => {
-      gsap.fromTo(m.querySelectorAll("video"), { yPercent: -6, scale: 1.12 }, {
+      gsap.fromTo(m.querySelectorAll(".film, .film-poster"), { yPercent: -6, scale: 1.12 }, {
         yPercent: 6, scale: 1.04, ease: "none",
         scrollTrigger: { trigger: m, start: "top bottom", end: "bottom top", scrub: true },
       });
@@ -393,11 +391,7 @@
       li.classList.toggle("is-open", v);
       b.setAttribute("aria-expanded", v);
       if (v) {
-        $$("[data-focus-media] video").forEach((vid) => {
-          const on = vid.dataset.k === li.dataset.k;
-          vid.classList.toggle("is-active", on);
-          if (on) { if (vid.preload === "none") { vid.preload = "auto"; vid.load(); } vid.play().catch(() => {}); }
-        });
+        dispatchEvent(new CustomEvent("focus:show", { detail: li.dataset.k }));
       }
     };
     b.addEventListener("mouseenter", () => matchMedia("(hover: hover)").matches && open(true));
