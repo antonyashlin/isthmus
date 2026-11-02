@@ -19,7 +19,7 @@
 <nav><button data-f="health">Health</button><button data-f="assets">Real Assets</button><button data-f="energy">Energy</button><button data-f="hero">Hero</button></nav>
 <div id="fps"></div>
 <script type="module">
-  import { createFilms, THREE } from "./js/films.js?v=15"; window.THREE = THREE;
+  import { createFilms, THREE } from "./js/films.js?v=16"; window.THREE = THREE;
   const q = new URLSearchParams(location.search);
   const start = q.get("f") || "health";
   if (q.has("render")) {
@@ -28,6 +28,9 @@
     const f = q.get("f");
     const films = createFilms(c, { names: [f], start: f, dpr: 1, size: [+(q.get("w") || 3840), +(q.get("h") || 2160)], grain: +(q.get("grain") || 0.03) });
     window.renderFrame = (i, n) => { films.frame(f, i / n, i / 24); return c.toDataURL("image/jpeg", 0.95); };
+    // A shot: phase p, grain time t, lens and turn in o.
+    window.renderShot = (p, t, o) => { films.frame(f, p, t, o); return c.toDataURL("image/jpeg", 0.95); };
+    window.focusAt = (p, o) => films.focusAt(f, p, o);
     document.querySelector("nav").remove();
     throw "render mode";
   }

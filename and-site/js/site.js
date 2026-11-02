@@ -83,8 +83,6 @@
    * ------------------------------------------------------------------ */
   const opening = $(".opening");
   const owName = $(".ow-name");
-  const owCut = $(".ow-cut");
-  const owLogo = $(".ow-logo");
   const nodesEl = $("[data-nodes]");
   const heroVideo = $(".hero-media video");
 
@@ -126,26 +124,14 @@
   async function openingSequence() {
     requestAnimationFrame(tickPct);
     await wait(120);
-    owName.classList.add("is-in");
-    // Hold the name long enough to read, and until the page is ready.
-    await Promise.all([allLoaded.then(() => pctDone), wait(1300)]);
-    await wait(180);
+    // The name decodes while the page loads, and settles once it is ready.
+    await decode(owName, allLoaded.then(() => pctDone));
+    await wait(1100);
 
-    // "Andean" closes up to "And".
-    owCut.style.width = owCut.getBoundingClientRect().width + "px";
-    void owCut.offsetWidth;
-    owName.classList.add("is-cut");
-    await wait(820);
-
-    // "And Capital" gives way to the wordmark, centred.
-    owName.classList.add("is-out");
-    owLogo.classList.add("is-on");
-    await wait(1650);
-
-    // The wordmark leaves where it stands.
+    // The name leaves where it stands.
     nodesEl.classList.add("is-out");
-    owLogo.classList.add("is-gone");
-    await wait(750);
+    owName.classList.add("is-out");
+    await wait(700);
 
     // The black lifts, then the hero line comes in.
     opening.classList.add("is-opening");
@@ -156,6 +142,68 @@
     await wait(800);
     document.body.classList.add("is-ready");
     opening.classList.add("is-done");
+  }
+
+  /* Decode: each letter gets a fixed-width cell measured from its final
+   * glyph, so nothing shifts. Letters cycle through glyphs in the same
+   * face, then settle left to right once `ready` resolves. */
+  function decode(el, ready) {
+    const text = el.dataset.decode;
+    const POOL = "ABCDEFGHJKLMNOPQRSTUVWXYZ0123456789#%&+=/<>";
+    el.textContent = "";
+    const cells = [...text].map((ch) => {
+      const s = document.createElement("span");
+      s.className = "ow-c";
+      s.textContent = ch === " " ? "\u00a0" : ch;
+      el.appendChild(s);
+      return { s, ch };
+    });
+    cells.forEach((c) => (c.w = c.s.getBoundingClientRect().width));
+    cells.forEach((c) => (c.s.style.width = c.w + "px"));
+    // Each cell only cycles through glyphs about its own width, in its own case.
+    const probe = document.createElement("span");
+    probe.className = "ow-c";
+    probe.style.cssText = "position:absolute;visibility:hidden";
+    el.appendChild(probe);
+    const widths = {};
+    [...POOL, ...POOL.toLowerCase()].forEach((g) => { probe.textContent = g; widths[g] = probe.getBoundingClientRect().width; });
+    probe.remove();
+    cells.forEach((c) => {
+      const set = /[a-z]/.test(c.ch) ? POOL.toLowerCase() + "0123456789" : POOL;
+      c.pool = [...new Set(set)].filter((g) => widths[g] <= c.w * 1.06 && widths[g] >= c.w * 0.55);
+      if (c.pool.length < 3) c.pool = [...new Set(set)].filter((g) => widths[g] <= c.w * 1.25).slice(0, 12);
+      if (!c.pool.length) c.pool = [c.ch];
+    });
+    const pick = (c) => c.pool[(Math.random() * c.pool.length) | 0];
+    return new Promise((done) => {
+      const t0 = performance.now();
+      let settleAt = Infinity;
+      ready.then(() => (settleAt = Math.max(performance.now(), t0 + 1500)));
+      let last = 0;
+      (function tick(now) {
+        const step = now - last > 55;
+        if (step) last = now;
+        let left = 0;
+        cells.forEach((c, i) => {
+          if (c.done) return;
+          if (c.ch === " ") { c.done = true; return; }
+          if (now >= settleAt + i * 85) {
+            c.done = true;
+            c.s.textContent = c.ch;
+            c.s.classList.remove("is-scr");
+            c.s.classList.add("is-set");
+            return;
+          }
+          left++;
+          if (now >= t0 + i * 70 && step) {
+            c.s.classList.add("is-scr");
+            c.s.textContent = Math.random() < 0.12 ? c.ch : pick(c);
+          }
+        });
+        if (left) requestAnimationFrame(tick);
+        else done();
+      })(performance.now());
+    });
   }
 
   function startHero() {

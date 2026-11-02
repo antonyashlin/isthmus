@@ -212,29 +212,39 @@ function dust(count, box, seed = 3) {
   return pts;
 }
 
-// Final grade: emerald-black shadows, cool desaturated highlights, vignette, edge fringe, grain.
+// Final grade, after TGE: the frame is mostly true black, and light reads as
+// one colour, the AND emerald. Luminance is crushed at the toe, then mapped
+// through black, deep emerald, emerald and neon to a pale mint at the hottest
+// speculars. No fringe; a whisper of grain to hold the gradients.
 const GradeShader = {
-  uniforms: { tDiffuse: { value: null }, uTime: { value: 0 }, uRes: { value: new THREE.Vector2(1, 1) }, uFade: { value: 1 }, uGrain: { value: 0.045 } },
+  uniforms: { tDiffuse: { value: null }, uTime: { value: 0 }, uRes: { value: new THREE.Vector2(1, 1) }, uFade: { value: 1 }, uGrain: { value: 0.03 } },
   vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
   fragmentShader: `
     uniform sampler2D tDiffuse; uniform float uTime; uniform vec2 uRes; uniform float uFade; uniform float uGrain; varying vec2 vUv;
     float hash(vec2 p){ p = fract(p * vec2(443.897, 441.423)); p += dot(p, p.yx + 19.19); return fract((p.x + p.y) * p.x); }
+    vec3 ramp(float k){
+      vec3 c1 = vec3(0.006, 0.050, 0.026);
+      vec3 c2 = vec3(0.090, 0.330, 0.200);
+      vec3 c3 = vec3(0.310, 0.725, 0.478);
+      vec3 c4 = vec3(0.560, 0.960, 0.680);
+      vec3 c5 = vec3(0.930, 1.000, 0.950);
+      vec3 c = mix(vec3(0.0), c1, smoothstep(0.0, 0.14, k));
+      c = mix(c, c2, smoothstep(0.14, 0.38, k));
+      c = mix(c, c3, smoothstep(0.38, 0.64, k));
+      c = mix(c, c4, smoothstep(0.64, 0.9, k));
+      return mix(c, c5, smoothstep(0.92, 1.0, k));
+    }
     void main(){
       vec2 c = vUv - 0.5;
-      float r2 = dot(c, c);
-      vec2 off = c * r2 * 0.012;
-      vec3 col = vec3(texture2D(tDiffuse, vUv - off).r, texture2D(tDiffuse, vUv).g, texture2D(tDiffuse, vUv + off).b);
-      float l = dot(col, vec3(0.2126, 0.7152, 0.0722));
-      col = mix(vec3(l), col, 0.45);
-      col *= vec3(0.8, 1.0, 0.88);
-      col = pow(col, vec3(1.22));
-      float hl = smoothstep(0.42, 0.95, l);
-      col = mix(col, vec3(0.84, 1.0, 0.92) * min(1.0, l * 1.3), hl * 0.6);
-      col += vec3(0.0, 0.011, 0.006) * (1.0 - smoothstep(0.0, 0.2, l));
-      col *= mix(0.25, 1.0, smoothstep(0.95, 0.2, length(c * vec2(1.0, 1.25))));
+      vec3 src = texture2D(tDiffuse, vUv).rgb;
+      float l = dot(src, vec3(0.2126, 0.7152, 0.0722));
+      float k = clamp((l - 0.03) / 0.97, 0.0, 1.0);
+      k = pow(k, 1.25);
+      vec3 col = ramp(k);
+      col *= mix(0.15, 1.0, smoothstep(0.9, 0.18, length(c * vec2(1.0, 1.3))));
       float g = hash(floor(vUv * uRes) + floor(uTime * 24.0) * 17.0) - 0.5;
-      col += g * uGrain * (1.0 - l * 0.5);
-      gl_FragColor = vec4(col * uFade, 1.0);
+      col += g * uGrain * (0.35 + k) * vec3(0.7, 1.0, 0.8);
+      gl_FragColor = vec4(max(col, 0.0) * uFade, 1.0);
     }`,
 };
 
@@ -300,7 +310,7 @@ function health(ctx) {
   scene.add(ctx.motes = dust(500, [-4, 4, 0.5, 6, -1, 8]));
 
   return {
-    focus: 12.6, aperture: 0.0016, maxblur: 0.009,
+    focus: 12.6, aperture: 0.0004, maxblur: 0.0022,
     update(p) {
       const ph = p * TAU;
       camera.position.set(-7.4 + 0.6 * Math.sin(ph), 2.9 + 0.2 * Math.sin(ph * 2), 10.6 + 0.5 * Math.cos(ph));
@@ -390,7 +400,7 @@ function assets(ctx) {
   ctx.band = band;
 
   return {
-    focus: 6.4, aperture: 0.0022, maxblur: 0.01,
+    focus: 6.4, aperture: 0.0004, maxblur: 0.0022,
     update(p) {
       const ph = p * TAU;
       camera.position.set(-4.6 + 0.45 * Math.sin(ph), 0.7 + 0.2 * Math.sin(ph + 0.6), 8.2 + 0.45 * Math.cos(ph));
@@ -502,7 +512,7 @@ function energy(ctx) {
   ctx.band = band;
 
   return {
-    focus: 10.5, aperture: 0.0014, maxblur: 0.009,
+    focus: 10.5, aperture: 0.0004, maxblur: 0.0022,
     update(p) {
       const ph = p * TAU;
       blade.rotation.x = 0.06 * Math.sin(ph);
@@ -593,7 +603,7 @@ function hero(ctx) {
   scene.add(ctx.motes = dust(600, [-6, 6, -3, 4, -1, 7]));
 
   return {
-    focus: 9.4, aperture: 0.0016, maxblur: 0.009,
+    focus: 9.4, aperture: 0.0004, maxblur: 0.0022,
     update(p) {
       const ph = p * TAU;
       fan.rotation.z = -p * (TAU / NB) * 3;
@@ -613,10 +623,10 @@ const SCENES = { health, assets, energy, hero };
 
 export const PERIOD = 16;
 
-export function createFilms(canvas, { names = ["health", "assets", "energy"], start = names[0], dpr = Math.min(devicePixelRatio || 1, 1.75), freeze = null, size = null, grain = 0.045 } = {}) {
+export function createFilms(canvas, { names = ["health", "assets", "energy"], start = names[0], dpr = Math.min(devicePixelRatio || 1, 1.75), freeze = null, size = null, grain = 0.03, envScale = 0.45 } = {}) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: "high-performance" });
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 0.92;
+  renderer.toneMappingExposure = 0.8;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.setPixelRatio(dpr);
@@ -628,6 +638,7 @@ export function createFilms(canvas, { names = ["health", "assets", "energy"], st
     const camera = new THREE.PerspectiveCamera(30, 16 / 9, 0.1, 200);
     const ctx = { scene, camera, renderer };
     const shot = SCENES[n](ctx);
+    scene.environmentIntensity *= envScale;
     films[n] = { scene, camera, shot, motes: ctx.motes, ctx };
   });
 
@@ -635,7 +646,7 @@ export function createFilms(canvas, { names = ["health", "assets", "energy"], st
   const composer = new EffectComposer(renderer, rt);
   const renderPass = new RenderPass(films[start].scene, films[start].camera);
   const bokeh = new BokehPass(films[start].scene, films[start].camera, { focus: 8, aperture: 0.001, maxblur: 0.008 });
-  const bloom = new UnrealBloomPass(new THREE.Vector2(4, 4), 0.5, 0.42, 0.86);
+  const bloom = new UnrealBloomPass(new THREE.Vector2(4, 4), 0.32, 0.18, 0.9);
   const grade = new ShaderPass(GradeShader);
   grade.uniforms.uGrain.value = grain;
   composer.addPass(renderPass);
@@ -666,6 +677,30 @@ export function createFilms(canvas, { names = ["health", "assets", "energy"], st
     bokeh.uniforms.maxblur.value = f.shot.maxblur;
   }
   use(start);
+
+  // A shot: narrower lens (fov), a turn off the scene camera (yaw, pitch, roll)
+  // and its own focus distance.
+  function aim(f, o) {
+    const cam = f.camera;
+    const fov = (o && o.fov) || 30;
+    if (cam.fov !== fov) { cam.fov = fov; cam.updateProjectionMatrix(); }
+    if (o) {
+      cam.rotateY(o.yaw || 0); cam.rotateX(o.pitch || 0); cam.rotateZ(o.roll || 0);
+      if (o.dolly) cam.translateZ(-o.dolly);
+      cam.updateMatrixWorld();
+    }
+    bokeh.uniforms.focus.value = (o && o.focus) || f.shot.focus;
+    if (o && o.aperture != null) bokeh.uniforms.aperture.value = o.aperture;
+  }
+  // Distance to whatever is at the centre of a shot, for focus.
+  const ray = new THREE.Raycaster();
+  function focusAt(name, p, o) {
+    const f = films[name];
+    f.shot.update(p); aim(f, o);
+    ray.setFromCamera(new THREE.Vector2(o && o.fx || 0, o && o.fy || 0), f.camera);
+    const hit = ray.intersectObjects(f.scene.children, true).find((h) => h.object.isMesh && h.object.visible && !h.object.material.transparent);
+    return hit ? hit.distance : f.shot.focus;
+  }
 
   const t0 = performance.now();
   let running = false, raf = 0, last = t0;
@@ -702,15 +737,16 @@ export function createFilms(canvas, { names = ["health", "assets", "energy"], st
     // Renders one frame at a phase, for posters and checks.
     still(name, p) { use(name); resize(); films[name].shot.update(p); composer.render(0); use(current); },
     // One frame of a film at loop phase p, with grain seeded by t: for offline rendering.
-    frame(name, p, t) {
+    frame(name, p, t, o = null) {
       use(name); resize();
       const f = films[name];
       f.shot.update(p);
+      aim(f, o);
       if (f.motes) { f.motes.material.uniforms.uPhase.value = p; f.motes.material.uniforms.uPx.value = dpr * (h / 900); }
       grade.uniforms.uTime.value = t; grade.uniforms.uFade.value = 1;
       composer.render(1 / 24);
     },
-    renderer, films,
+    focusAt, renderer, films,
     set freeze(v) { freeze = v; },
   };
 }

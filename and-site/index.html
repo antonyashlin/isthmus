@@ -8,15 +8,14 @@
 <meta name="theme-color" content="#050706">
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
 <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700&display=swap">
-<link rel="stylesheet" href="css/site.css?v=10">
+<link rel="stylesheet" href="css/site.css?v=11">
 </head>
 <body class="is-loading">
 
 <!-- ============ Opening: the wait is the first scene ============ -->
 <div class="opening" aria-hidden="true">
   <div class="opening-word">
-    <div class="ow-name"><span class="ow-a">And</span><span class="ow-cut">ean</span><span class="ow-b">&nbsp;Capital</span></div>
-    <div class="ow-logo" data-logo></div>
+    <div class="ow-name" data-decode="AND Capital"></div>
   </div>
   <div class="opening-nodes" data-nodes></div>
 </div>
@@ -195,6 +194,12 @@
 
   <!-- ============ 6. How we decide ============ -->
   <section class="decide" id="decide">
+    <div class="section-film" aria-hidden="true">
+      <video muted loop playsinline preload="none" data-lazy poster="assets/films/ring.jpg">
+        <source src="assets/films/ring-2160.mp4" type="video/mp4" media="(min-width: 1700px), (min-resolution: 1.5dppx) and (min-width: 1100px)">
+        <source src="assets/films/ring-1080.mp4" type="video/mp4">
+      </video>
+    </div>
     <div class="decide-head">
       <h2 class="title-sm center" data-text-fade>How We <br>Decide.</h2>
       <p class="body center" data-words>Our investment decisions combine <b>AI-powered analytics with human judgment,</b> a systematic approach that exceeds traditional risk assessment.</p>
@@ -252,6 +257,12 @@
 
   <!-- ============ 9. The letter ============ -->
   <section class="letter" id="news">
+    <div class="section-film" aria-hidden="true">
+      <video muted loop playsinline preload="none" data-lazy poster="assets/films/close.jpg">
+        <source src="assets/films/close-2160.mp4" type="video/mp4" media="(min-width: 1700px), (min-resolution: 1.5dppx) and (min-width: 1100px)">
+        <source src="assets/films/close-1080.mp4" type="video/mp4">
+      </video>
+    </div>
     <div class="wrap">
       <blockquote class="letter-quote" data-scrub-words>
         Complexity is not the enemy of returns. It is the source of sustainable competitive advantage for those willing to understand it.
@@ -302,6 +313,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
 <script src="js/icons.js?v=4"></script>
-<script src="js/site.js?v=7"></script>
+<script src="js/site.js?v=8"></script>
 </body>
 </html>
