@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AND Icon System</title>
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700&display=swap">
+<style>
+  :root { --bg: #030504; --paper: #f4f6f5; --ink: #0a0e0c; --emerald: #4fb97a; --line: rgba(255,255,255,.1); }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: #fff; font-family: "Satoshi", sans-serif; -webkit-font-smoothing: antialiased; }
+  .sheet { max-width: 1440px; margin: 0 auto; padding: 72px clamp(20px, 4vw, 64px) 96px; }
+  .cap { font-size: 11px; font-weight: 500; letter-spacing: .2em; text-transform: uppercase; color: rgba(255,255,255,.46); }
+  header { display: grid; grid-template-columns: 1.2fr 1fr; gap: 48px; align-items: end; padding-bottom: 56px; border-bottom: 1px solid var(--line); }
+  h1 { margin: 18px 0 0; font-weight: 300; font-size: clamp(48px, 6vw, 96px); line-height: .96; letter-spacing: -.045em; }
+  h1 span { color: rgba(255,255,255,.3); }
+  .rules { display: grid; gap: 14px; font-size: 14px; line-height: 1.5; color: rgba(255,255,255,.55); }
+  .rules b { color: #fff; font-weight: 500; }
+  .anatomy { display: grid; grid-template-columns: 280px 1fr; gap: 48px; align-items: center; padding: 56px 0; border-bottom: 1px solid var(--line); }
+  .anatomy-art svg { width: 240px; height: 240px; color: #fff; }
+  .anatomy-notes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+  .anatomy-notes div { border-top: 1px solid var(--line); padding-top: 16px; font-size: 13px; color: rgba(255,255,255,.55); line-height: 1.5; }
+  .anatomy-notes b { display: block; color: #fff; font-weight: 500; margin-bottom: 6px; font-size: 14px; }
+  .group { padding: 48px 0 8px; }
+  .group h2 { margin: 0 0 24px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 180px)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); width: fit-content; max-width: 100%; }
+  .cell { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); aspect-ratio: 1; display: grid; grid-template-rows: 1fr auto; padding: 18px; color: #fff; }
+  .cell .ic { display: grid; place-items: center; }
+  .cell .ic svg { width: 56px; height: 56px; }
+  .cell p { margin: 0; font-size: 12px; color: rgba(255,255,255,.55); }
+  .light { background: var(--paper); color: var(--ink); margin-top: 64px; padding: 48px clamp(20px, 4vw, 64px); }
+  .light .cap { color: rgba(10,14,12,.5); }
+  .light .row { display: flex; flex-wrap: wrap; gap: 36px; margin-top: 28px; color: var(--ink); }
+  .light .row svg { width: 40px; height: 40px; }
+  .sizes { display: flex; gap: 40px; align-items: end; margin-top: 28px; color: #fff; }
+  .sizes figure { margin: 0; display: grid; gap: 10px; justify-items: center; }
+  .sizes figcaption { font-size: 11px; color: rgba(255,255,255,.46); }
+  @media (max-width: 860px) { header, .anatomy { grid-template-columns: 1fr; } .anatomy-notes { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <header>
+    <div>
+      <p class="cap">AND Capital / Icon System</p>
+      <h1>One grid. <span>Every line meets at AND.</span></h1>
+    </div>
+    <div class="rules">
+      <p><b>The grid.</b> Every icon is drawn on the same three by three node grid, so the whole set reads as one system.</p>
+      <p><b>The join.</b> Straight lines only, one 1.25 weight, square terminals. Nodes a line touches are solid; the rest stay as faint points.</p>
+      <p><b>The conjunction.</b> Each icon carries one emerald node: the point the idea resolves to. It is the signature of the set, and the only colour.</p>
+    </div>
+  </header>
+
+  <section class="anatomy">
+    <div class="anatomy-art" id="anatomy"></div>
+    <div class="anatomy-notes">
+      <div><b>Grid</b>3 x 3 nodes in a 24 unit box, at 4, 12 and 20.</div>
+      <div><b>Stroke</b>1.25 at 24px, square caps, mitred joins. Scales with the icon.</div>
+      <div><b>Nodes</b>Solid 2.8 squares where lines land. Unused nodes stay at 1.2, 32 percent.</div>
+      <div><b>AND node</b>One 4.2 emerald square, #4FB97A. Never two. Never removed.</div>
+    </div>
+  </section>
+
+  <div id="groups"></div>
+
+  <section class="group">
+    <h2 class="cap">Sizes</h2>
+    <div class="sizes" id="sizes"></div>
+  </section>
+</div>
+<section class="light">
+  <p class="cap">On light</p>
+  <div class="row" id="light"></div>
+</section>
+
+<script src="js/icons.js"></script>
+<script>
+  const { ICONS, svg } = ANDIcons;
+  document.getElementById("anatomy").innerHTML = svg("alignment", { size: 240, stroke: 1 });
+  const groups = [
+    ["Thesis", ["understanding", "hidden", "speed"]],
+    ["Infrastructure", ["process", "efficiency", "data"]],
+    ["How we decide", ["curiosity", "immersion", "separation", "durability"]],
+    ["Focus areas", ["health", "assets", "energy"]],
+    ["Firm", ["alignment", "transactions", "partners", "companies", "funds"]],
+    ["Interface", ["arrow", "contact"]],
+  ];
+  document.getElementById("groups").innerHTML = groups.map(([title, names]) => `
+    <section class="group"><h2 class="cap">${title}</h2><div class="grid">
+      ${names.map((n) => `<div class="cell"><div class="ic">${svg(n, { size: 56 })}</div><p>${ICONS[n].label}</p></div>`).join("")}
+    </div></section>`).join("");
+  document.getElementById("sizes").innerHTML = [16, 20, 24, 32, 48].map((s) => `<figure>${svg("energy", { size: s })}<figcaption>${s}px</figcaption></figure>`).join("");
+  document.getElementById("light").innerHTML = Object.keys(ICONS).map((n) => svg(n, { size: 40, theme: "light" })).join("");
+</script>
+</body>
+</html>
